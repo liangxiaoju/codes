@@ -28,7 +28,7 @@ class PowerSupply:
             with open(self.path + "/" + filename, "r") as f:
                 s = f.read()
         except:
-            s = None
+             s = None
         return s
 
     def getInfo(self):
@@ -51,7 +51,10 @@ class Power:
 
     def __findPsy(self):
         rootdir = "/sys/class/power_supply"
-        names = os.listdir(rootdir)
+        try:
+            names = os.listdir(rootdir)
+        except:
+            names = []
         join = os.path.join
         self.paths = [join(rootdir, name) for name in names
                       if os.path.isdir(join(rootdir, name))]
@@ -80,10 +83,19 @@ class Power:
         return info
 
     def getBattCap(self):
+        capacity = 0
         for psy in self.psylist:
-            info = psy.getInfo()
-            if info.capacity != None:
-                return int(info.capacity)
+            capacity = psy.getInfo().capacity
+            if capacity:
+                capacity = int(capacity)
+                break
+            capacity = 0
+
+        if capacity > 100:
+            capacity = 100
+        elif capacity < 0:
+            capacity = 0
+        return capacity
 
     def setObserver(self, observer):
         self.observer = observer
