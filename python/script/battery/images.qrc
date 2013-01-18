@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+  <file>images/battery.png</file>
+  <file>images/exit.png</file>
+  <file>images/hibernate.png</file>
+  <file>images/reboot.png</file>
+  <file>images/shutdown.png</file>
+  <file>images/sleep.png</file>
+</qresource>
+</RCC>

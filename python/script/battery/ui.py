@@ -6,6 +6,15 @@ import os
 import sys
 from PyQt4 import QtGui, QtCore
 import power
+try:
+    import images_rc
+except:
+    os.system("pyrcc4 -o images_rc.py images.qrc")
+    try:
+        import images_rc
+    except:
+        print "Please generate images_rc.py first,"
+        print "run 'pyrcc4 -o images_rc.py images.qrc'."
 
 class MainWin(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -101,23 +110,23 @@ class MainWin(QtGui.QDialog):
         os.system("reboot")
 
     def createActions(self):
-        self.sleepAction = QtGui.QAction(QtGui.QIcon("image/sleep.png"),
+        self.sleepAction = QtGui.QAction(QtGui.QIcon(":/images/sleep.png"),
                                             "Sleep", self,
                                             triggered=self.systemSleep)
 
-        self.hibernateAction = QtGui.QAction(QtGui.QIcon("image/hibernate.png"),
+        self.hibernateAction = QtGui.QAction(QtGui.QIcon(":/images/hibernate.png"),
                                            "Hibernate", self,
                                            triggered=self.systemHibernate)
 
-        self.shutdownAction = QtGui.QAction(QtGui.QIcon("image/shutdown.png"),
+        self.shutdownAction = QtGui.QAction(QtGui.QIcon(":/images/shutdown.png"),
                                           "Shutdown", self,
                                           triggered=self.systemShutdown)
 
-        self.rebootAction = QtGui.QAction(QtGui.QIcon("image/reboot.png"),
+        self.rebootAction = QtGui.QAction(QtGui.QIcon(":/images/reboot.png"),
                                           "Reboot", self,
                                           triggered=self.systemReboot)
 
-        self.quitAction = QtGui.QAction(QtGui.QIcon("image/exit.png"),
+        self.quitAction = QtGui.QAction(QtGui.QIcon(":/images/exit.png"),
                                         "&Quit", self, triggered=self.__exiting)
 
     def createTrayIcon(self):
@@ -129,7 +138,7 @@ class MainWin(QtGui.QDialog):
         self.trayIconMenu.addSeparator()
         self.trayIconMenu.addAction(self.quitAction)
 
-        self.trayIconPic = QtGui.QIcon("image/battery.png")
+        self.trayIconPic = QtGui.QIcon(":/images/battery.png")
         self.trayIcon = QtGui.QSystemTrayIcon(self.trayIconPic, self)
         self.trayIcon.setContextMenu(self.trayIconMenu)
         self.trayIcon.activated.connect(self.trayIconActivated)
