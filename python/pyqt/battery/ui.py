@@ -11,6 +11,7 @@ try:
 except:
     print "Please generate images_rc.py first,"
     print "run 'pyrcc4 -o images_rc.py images.qrc'."
+    sys.exit(1)
 
 class MainWin(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -110,11 +111,19 @@ class MainWin(QtGui.QDialog):
     def systemHibernate(self):
         self.__suspendToMode("disk")
 
+    def runSubProcess(self, *args, **kwargs):
+        os.execvp(args[0], args)
+
+    def runCmd(self, cmd):
+        from multiprocessing import Process
+        proc = Process(target=self.runSubProcess, args=cmd)
+        proc.start()
+
     def systemShutdown(self):
-        os.system("poweroff -h -i")
+        self.runCmd(("poweroff", "-h", "-i"))
 
     def systemReboot(self):
-        os.system("reboot")
+        self.runCmd(("reboot",))
 
     def createActions(self):
         self.sleepAction = QtGui.QAction(QtGui.QIcon(":/images/sleep.png"),
