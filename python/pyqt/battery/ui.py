@@ -9,12 +9,8 @@ import power
 try:
     import images_rc
 except:
-    os.system("pyrcc4 -o images_rc.py images.qrc")
-    try:
-        import images_rc
-    except:
-        print "Please generate images_rc.py first,"
-        print "run 'pyrcc4 -o images_rc.py images.qrc'."
+    print "Please generate images_rc.py first,"
+    print "run 'pyrcc4 -o images_rc.py images.qrc'."
 
 class MainWin(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -25,11 +21,12 @@ class MainWin(QtGui.QDialog):
         self.timer = QtCore.QTimer()
         self.timer.setInterval(500)
         self.timer.setSingleShot(False)
-        self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.iconFlicker)
+        self.connect(self.timer, QtCore.SIGNAL("timeout()"), self.iconFlickerSlot)
 
         # define ourself signals
-        self.connect(self, QtCore.SIGNAL("startWarning_"), self.startWarning)
-        self.connect(self, QtCore.SIGNAL("stopWarning_"), self.stopWarning)
+        self.connect(self, QtCore.SIGNAL("startWarning_"), self.startWarningSlot)
+        self.connect(self, QtCore.SIGNAL("stopWarning_"), self.stopWarningSlot)
+        self.connect(self, QtCore.SIGNAL("onEvent_"), self.onEventSlot)
 
         self.createActions()
         self.createTrayIcon()
@@ -47,33 +44,44 @@ class MainWin(QtGui.QDialog):
 
         self.power.start()
 
-    def iconFlicker(self):
+    def iconFlickerSlot(self):
         if not self.trayIcon.icon().isNull():
             self.trayIcon.setIcon(QtGui.QIcon())
         else:
-            self.trayIcon.setIcon(self.trayIconPic)
+            self.trayIcon.setIcon(QtGui.QIcon(self.currTrayIconPic))
 
-    def stopWarning(self, *args, **kwargs):
+    def stopWarningSlot(self, *args, **kwargs):
         print "stop warning"
         self.timer.stop()
-        self.trayIcon.setIcon(self.trayIconPic)
+        self.trayIcon.setIcon(QtGui.QIcon(self.currTrayIconPic))
 
-    def startWarning(self, *args, **kwargs):
+    def startWarningSlot(self, *args, **kwargs):
         print "start warning"
         if self.trayIcon.supportsMessages():
             self.trayIcon.showMessage(args[0], args[1])
         self.timer.start()
 
-    # not UI thread, we cannt do any UI operation here
-    def onEvent(self):
+    def onEventSlot(self, *args, **kwargs):
         capacity = self.power.getBattCap()
+        charging = self.power.isCharging()
         self.progressBar.setValue(capacity)
-        if capacity <= self.warnValue:
+
+        if charging:
+            self.currTrayIconPic = self.trayIconPicCharge[str((capacity+19)/20*20)]
+        else:
+            self.currTrayIconPic = self.trayIconPicDisCharge[str((capacity+19)/20*20)]
+        self.trayIcon.setIcon(QtGui.QIcon(self.currTrayIconPic))
+
+        if capacity <= self.warnValue and not charging:
             if not self.timer.isActive():
                 self.emit(QtCore.SIGNAL("startWarning_"), "Warning", "Battery Capacity too low !")
         else:
             if self.timer.isActive():
                 self.emit(QtCore.SIGNAL("stopWarning_"))
+
+    # not UI thread, we cannt do any UI operation here
+    def onEvent(self):
+        self.emit(QtCore.SIGNAL("onEvent_"))
 
     def trayIconActivated(self, reason):
         if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
@@ -84,7 +92,6 @@ class MainWin(QtGui.QDialog):
 
     def setWarning(self, value):
         self.warnValue = value
-        self.power.setWarning(value)
         self.onEvent()
 
     def changeStyle(self, styleName):
@@ -138,8 +145,13 @@ class MainWin(QtGui.QDialog):
         self.trayIconMenu.addSeparator()
         self.trayIconMenu.addAction(self.quitAction)
 
-        self.trayIconPic = QtGui.QIcon(":/images/battery.png")
-        self.trayIcon = QtGui.QSystemTrayIcon(self.trayIconPic, self)
+        keys = ["%d" % i for i in range(0, 101, 20)]
+        discharge_pics = [":/images/battery-%s.png" % i.zfill(3) for i in keys]
+        charge_pics = [":/images/battery-charging-%s.png" % i.zfill(3) for i in keys]
+        self.trayIconPicDisCharge = dict(zip(keys, discharge_pics))
+        self.trayIconPicCharge = dict(zip(keys, charge_pics))
+        self.currTrayIconPic = discharge_pics[-1]
+        self.trayIcon = QtGui.QSystemTrayIcon(QtGui.QIcon(self.currTrayIconPic), self)
         self.trayIcon.setContextMenu(self.trayIconMenu)
         self.trayIcon.activated.connect(self.trayIconActivated)
 
@@ -182,7 +194,7 @@ class MainWin(QtGui.QDialog):
 def main():
     app = QtGui.QApplication(sys.argv)
     ex = MainWin()
-    ex.show()
+#    ex.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":

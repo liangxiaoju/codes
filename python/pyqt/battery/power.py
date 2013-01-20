@@ -5,19 +5,12 @@ from uevent import UEvent
 import os
 
 class PowerSupply:
-    class Info:
-        pass
-
     def __init__(self, path, onChange, args=[], kwargs={}):
         self.timer = Timer(10, self.__update, False, args, kwargs)
         self.uevent = UEvent(path, self.__update, args, kwargs)
         self.onChange = onChange
         self.path = path
-        self.info = self.Info()
-
-    def start_monitor(self):
-        self.timer.start()
-        self.uevent.start()
+        self.info = {}
 
     def __update(self, *args, **kwargs):
         if callable(self.onChange):
@@ -28,15 +21,29 @@ class PowerSupply:
             with open(self.path + "/" + filename, "r") as f:
                 s = f.read()
         except:
-             s = None
+             s = False
+        if s[-1] == "\n":
+            s = s[:-1]
         return s
 
     def getInfo(self):
-        info = self.info
-        info.type = self.__read_sysfs("type")
-        info.uevent = self.__read_sysfs("uevent")
-        info.capacity = self.__read_sysfs("capacity")
-        return info
+        uevent = self.__read_sysfs("uevent")
+        if not uevent:
+            return {}
+        uevent = uevent.splitlines()
+        index1 = len("POWER_SUPPLY_")
+        for i in range(0, len(uevent)):
+            index2 = uevent[i].rfind("=")
+            self.info[uevent[i][index1:index2].lower()] = uevent[i][index2+1:]
+        self.info["type"] = self.__read_sysfs("type")
+        return self.info
+
+    def getValue(self, attr):
+        return self.__read_sysfs(attr)
+
+    def start_monitor(self):
+        self.timer.start()
+        self.uevent.start()
 
     def stop_monitor(self):
         self.timer.stop(True)
@@ -46,67 +53,66 @@ class PowerSupply:
 class Power:
     def __init__(self, observer=None, args=[], kwargs={}):
         self.observer = observer
-        self.__findPsy()
-        self.psylist =[PowerSupply(path, self.onEvent, args, kwargs) for path in self.paths]
-
-    def __findPsy(self):
         rootdir = "/sys/class/power_supply"
         try:
             names = os.listdir(rootdir)
         except:
-            names = []
+            raise Exception("Please add PowerSupply support in kernel.")
+        self.names = names
         join = os.path.join
-        self.paths = [join(rootdir, name) for name in names
+        paths = [join(rootdir, name) for name in names
                       if os.path.isdir(join(rootdir, name))]
-        #print "There are %s PSYs." % len(self.paths)
-        #for path in self.paths:
-        #    print path
+        psylist =[PowerSupply(path, self.onEvent, args, kwargs)
+                       for path in paths]
+        self.psydict = dict(zip(names, psylist))
 
     def onEvent(self, *args, **kwargs):
         if callable(self.observer):
             self.observer(*args, **kwargs)
 
     def getPsyNum(self):
-        return len(self.paths)
+        return len(self.psydict)
 
     def getInfoByName(self, name):
-        for psy in self.psylist:
-            info = psy.getInfo()
-            if info.name == name:
-                return info
+        if self.psydict.has_key(name):
+            return self.psydict[name].getInfo()
+        return {}
 
-    def getInfoByNum(self, num):
-        try:
-            info = self.psylist[num].getInfo()
-        except:
-            info = None
-        return info
+    def getInfoByType(self, infoType):
+        for psy in self.psydict.values():
+            info = psy.getInfo()
+            if info.has_key("type") and info["type"] == infoType:
+                return info
+        return {}
 
     def getBattCap(self):
         capacity = 0
-        for psy in self.psylist:
-            capacity = psy.getInfo().capacity
-            if capacity:
-                capacity = int(capacity)
+        for psy in self.psydict.values():
+            info = psy.getInfo()
+            if info.has_key("capacity"):
+                capacity = int(info["capacity"])
                 break
-            capacity = 0
-
         if capacity > 100:
             capacity = 100
         elif capacity < 0:
             capacity = 0
         return capacity
 
+    def isCharging(self):
+        for psy in self.psydict.values():
+            info = psy.getInfo()
+            if info.has_key("status"):
+                if info["status"] == "Charging":
+                    return True
+        return False
+
     def setObserver(self, observer):
         self.observer = observer
 
-    def setWarning(self, value):
-        pass
-
     def start(self):
-        for psy in self.psylist:
+        for psy in self.psydict.values():
             psy.start_monitor()
 
     def stop(self):
-        for psy in self.psylist:
+        for psy in self.psydict.values():
             psy.stop_monitor()

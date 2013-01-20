@@ -1,10 +1,21 @@
-<!DOCTYPE RCC><RCC version="1.0">
+<RCC>
 <qresource>
-  <file>images/battery.png</file>
   <file>images/exit.png</file>
   <file>images/hibernate.png</file>
   <file>images/reboot.png</file>
   <file>images/shutdown.png</file>
   <file>images/sleep.png</file>
+  <file>images/battery-100.png</file>
+  <file>images/battery-080.png</file>
+  <file>images/battery-060.png</file>
+  <file>images/battery-040.png</file>
+  <file>images/battery-020.png</file>
+  <file>images/battery-000.png</file>
+  <file>images/battery-charging-100.png</file>
+  <file>images/battery-charging-080.png</file>
+  <file>images/battery-charging-060.png</file>
+  <file>images/battery-charging-040.png</file>
+  <file>images/battery-charging-020.png</file>
+  <file>images/battery-charging-000.png</file>
 </qresource>
 </RCC>
