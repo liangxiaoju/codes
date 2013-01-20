@@ -4,6 +4,7 @@
 
 import os
 import sys
+import logging
 from PyQt4 import QtGui, QtCore
 import power
 try:
@@ -12,6 +13,15 @@ except:
     print "Please generate images_rc.py first,"
     print "run 'pyrcc4 -o images_rc.py images.qrc'."
     sys.exit(1)
+
+logger = logging.getLogger("pybattery")
+handler = logging.FileHandler("/tmp/pybattery.log")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger.setLevel(logging.DEBUG)
+handler.setLevel(logging.DEBUG)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+debug = logger.debug
 
 class MainWin(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -44,6 +54,7 @@ class MainWin(QtGui.QDialog):
         QtGui.qApp.lastWindowClosed.connect(self.__exiting)
 
         self.power.start()
+        debug("Start UI")
 
     def iconFlickerSlot(self):
         if not self.trayIcon.icon().isNull():
@@ -52,12 +63,12 @@ class MainWin(QtGui.QDialog):
             self.trayIcon.setIcon(QtGui.QIcon(self.currTrayIconPic))
 
     def stopWarningSlot(self, *args, **kwargs):
-        print "stop warning"
+        debug("Stop warning")
         self.timer.stop()
         self.trayIcon.setIcon(QtGui.QIcon(self.currTrayIconPic))
 
     def startWarningSlot(self, *args, **kwargs):
-        print "start warning"
+        debug("Start warning")
         if self.trayIcon.supportsMessages():
             self.trayIcon.showMessage(args[0], args[1])
         self.timer.start()
@@ -66,6 +77,7 @@ class MainWin(QtGui.QDialog):
         capacity = self.power.getBattCap()
         charging = self.power.isCharging()
         self.progressBar.setValue(capacity)
+        debug("onEvent: cap=%d charging=%d" % (capacity, charging))
 
         if charging:
             self.currTrayIconPic = self.trayIconPicCharge[str((capacity+19)/20*20)]
@@ -103,12 +115,14 @@ class MainWin(QtGui.QDialog):
             with open("/sys/power/state", "r+") as f:
                 f.write(mode)
         except IOError:
-            print "Failed to suspend to", mode
+            debug("Failed to suspend to %s" % mode)
 
     def systemSleep(self):
+        debug("Suspend to mem")
         self.__suspendToMode("mem")
 
     def systemHibernate(self):
+        debug("Suspend to disk")
         self.__suspendToMode("disk")
 
     def runSubProcess(self, *args, **kwargs):
@@ -120,9 +134,11 @@ class MainWin(QtGui.QDialog):
         proc.start()
 
     def systemShutdown(self):
+        debug("Shutdown")
         self.runCmd(("poweroff", "-h", "-i"))
 
     def systemReboot(self):
+        debug("Reboot")
         self.runCmd(("reboot",))
 
     def createActions(self):
