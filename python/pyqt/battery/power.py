@@ -86,7 +86,7 @@ class Power:
         return {}
 
     def getBattCap(self):
-        capacity = 0
+        capacity = 50
         for psy in self.psydict.values():
             info = psy.getInfo()
             if info.has_key("capacity"):
