@@ -24,7 +24,7 @@ while True:
 
         # recv data
         while True:
-            data = connection.recv(8)
+            data = connection.recv(1024)
             print "received '%s'" % data
             if data:
                 print "sending back"
