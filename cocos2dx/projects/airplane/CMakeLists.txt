@@ -58,6 +58,7 @@ if( UNIX ) #assume linux
 set(GAME_SRC
   proj.linux/main.cpp
   Classes/AppDelegate.cpp
+  Classes/JavaHelper.cpp
   Classes/WelcomeScene.cpp
   Classes/GameScene.cpp
   Classes/BackgroundLayer.cpp

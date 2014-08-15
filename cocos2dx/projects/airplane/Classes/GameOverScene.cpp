@@ -1,6 +1,6 @@
 #include "GameOverScene.h"
 #include "GameScene.h"
-#include "AdController.h"
+#include "JavaHelper.h"
 
 using namespace CocosDenshion;
 
@@ -36,13 +36,16 @@ bool GameOverLayer::init() {
                     "Exit", CC_CALLBACK_1(GameOverLayer::exitCallback, this)));
         mMenu->addChild(MenuItemFont::create(
                     "Restart", CC_CALLBACK_1(GameOverLayer::restartCallback, this)));
+        mMenu->addChild(MenuItemFont::create(
+                    "Leaderboards", CC_CALLBACK_1(GameOverLayer::leaderboardsCallback, this)));
         mMenu->alignItemsHorizontallyWithPadding(30);
         addChild(mMenu);
 
         SimpleAudioEngine::getInstance()->stopBackgroundMusic();
         SimpleAudioEngine::getInstance()->stopAllEffects(); 
 
-        AdController::getInstance()->setVisible(true);
+        JavaHelper::getInstance()->showAds();
+        JavaHelper::getInstance()->storeLeaderboards(ScoreLayer::getInstance()->getHighestScore());
 
         bRet = true;
     } while (0);
@@ -55,6 +58,11 @@ void GameOverLayer::exitCallback(Ref *sender) {
 }
 
 void GameOverLayer::restartCallback(Ref *sender) {
-    AdController::getInstance()->setVisible(false);
+    JavaHelper::getInstance()->hideAds();
     Director::getInstance()->replaceScene(GameScene::create());
+}
+
+void GameOverLayer::leaderboardsCallback(Ref *sender) {
+    JavaHelper::getInstance()->storeLeaderboards(ScoreLayer::getInstance()->getHighestScore());
+    JavaHelper::getInstance()->showLeaderboards();
 }
