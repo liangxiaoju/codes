@@ -1,5 +1,5 @@
 #include "MenuLayer.h"
-#include "AdController.h"
+#include "JavaHelper.h"
 
 using namespace CocosDenshion;
 
@@ -27,7 +27,7 @@ bool MenuLayer::init() {
 void MenuLayer::show() {
     Director::getInstance()->pause();
     setVisible(true);
-    AdController::getInstance()->setVisible(true);
+    JavaHelper::getInstance()->showAds();
 
     SimpleAudioEngine::getInstance()->pauseAllEffects();
     SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
@@ -36,7 +36,7 @@ void MenuLayer::show() {
 void MenuLayer::hide() {
     setVisible(false);
     Director::getInstance()->resume();
-    AdController::getInstance()->setVisible(false);
+    JavaHelper::getInstance()->hideAds();
 
     SimpleAudioEngine::getInstance()->resumeAllEffects();
     SimpleAudioEngine::getInstance()->resumeBackgroundMusic();

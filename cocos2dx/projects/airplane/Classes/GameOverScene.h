@@ -16,6 +16,7 @@ private:
 
     void exitCallback(Ref *sender);
     void restartCallback(Ref *sender);
+    void leaderboardsCallback(Ref *sender);
 };
 
 class GameOverScene : public Scene {
