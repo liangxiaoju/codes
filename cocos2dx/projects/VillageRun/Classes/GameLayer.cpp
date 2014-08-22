@@ -13,9 +13,6 @@ bool GameLayer::init() {
 		hero->setPosition(wsize.width/5, wsize.height*(2.0f/3));
 		addChild(hero);
 
-		auto map = TMXTiledMap::create("maps/basicLevels/basicLevel_1.tmx");
-		addChild(map);
-
 		bRet = true;
 	} while(0);
 

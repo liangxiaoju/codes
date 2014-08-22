@@ -62,7 +62,8 @@ set(GAME_SRC
   Classes/GameLayer.cpp
   Classes/BackgroundLayer.cpp
   Classes/HeroSprite.cpp
-  Classes/BarrierSprite.cpp
+  Classes/BarrierMap.cpp
+  Classes/GameOverScene.cpp
 )
 elseif ( WIN32 )
 set(GAME_SRC

@@ -16,10 +16,14 @@ private:
 		STATE_STAND,
 		STATE_RUN,
 		STATE_JUMP,
+		STATE_JUMP1 = STATE_JUMP,
+		STATE_JUMP2,
 		STATE_DEAD,
 	};
 
 	int mState;
+    FiniteTimeAction *mRunAnimate;
+    FiniteTimeAction *mSmokeRunAnimate;
 
 	void run();
 	void jump();

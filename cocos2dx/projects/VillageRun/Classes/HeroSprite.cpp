@@ -1,4 +1,6 @@
 #include "HeroSprite.h"
+#include "Constant.h"
+#include "GameOverScene.h"
 
 bool HeroSprite::init() {
 	bool bRet = false;
@@ -7,14 +9,15 @@ bool HeroSprite::init() {
 		CC_BREAK_IF(!Sprite::initWithFile("ui/heroSheet/heroStand_0001.png"));
 
 		Size heroSize = this->getContentSize();
-		PhysicsBody *body = PhysicsBody::createCircle(heroSize.height/2, PhysicsMaterial(0, 0, 0));
+		//PhysicsBody *body = PhysicsBody::createCircle(heroSize.height/2-8, PhysicsMaterial(0, 0, 0));
+		PhysicsBody *body = PhysicsBody::createBox(heroSize-Size(0,16), PhysicsMaterial(0, 0, 0));
 		body->setLinearDamping(0.0f);
 		body->setDynamic(true);
 		body->setGravityEnable(true);
-		body->setTag(101);
+		body->setTag(TAG_HERO_PHYS_BODY);
 		body->setContactTestBitmask(0xFFFFFFFF);
 		//body->setVelocityLimit(800);
-		body->setMass(20);
+		body->setMass(50);
 		body->setRotationEnable(false);
 
 		this->setPhysicsBody(body);
@@ -22,6 +25,8 @@ bool HeroSprite::init() {
 		stand();
 
 		mState = STATE_IDLE;
+        mRunAnimate = NULL;
+        mSmokeRunAnimate = NULL;
 
 		bRet = true;
 	} while(0);
@@ -30,37 +35,63 @@ bool HeroSprite::init() {
 }
 
 void HeroSprite::run() {
-    Animation *animation = Animation::create();
-    animation->setDelayPerUnit(0.05f);
-	for (int i=1; i <=11; i++) {
-		char name[64];
-		snprintf(name, sizeof(name), "ui/heroSheet/heroRun_%04d.png", i);
-    	animation->addSpriteFrameWithFile(name);
-	}
-	Animate *animate = Animate::create(animation);
-	runAction(RepeatForever::create(animate));
+    if (mRunAnimate == NULL) {
+        Animation *animation = Animation::create();
+        animation->setDelayPerUnit(0.05f);
+        for (int i=1; i <=11; i++) {
+            char name[64];
+            snprintf(name, sizeof(name), "ui/heroSheet/heroRun_%04d.png", i);
+            animation->addSpriteFrameWithFile(name);
+        }
+        Animate *animate = Animate::create(animation);
+        RepeatForever *repeat = RepeatForever::create(animate);
+        mRunAnimate = repeat;
+        mRunAnimate->retain();
+    }
+	runAction(mRunAnimate);
+/*
+    if (mSmokeRunAnimate == NULL) {
+        Animation *animation = Animation::create();
+        animation->setDelayPerUnit(0.02f);
+        for (int i=1; i <=22; i++) {
+            char name[64];
+            snprintf(name, sizeof(name), "ui/spriteSheet/effectSmokeRun_%04d.png", i);
+            animation->addSpriteFrameWithFile(name);
+        }
+        Animate *animate = Animate::create(animation);
+        RepeatForever *repeat = RepeatForever::create(animate);
+        mSmokeRunAnimate = repeat;
+        mSmokeRunAnimate->retain();
+    }
+    Sprite *smoke = Sprite::create("ui/spriteSheet/effectSmokeRun_0001.png");
+    smoke->setScale(0.5);
+    smoke->setAnchorPoint(Vec2(0, 0));
+    smoke->setPosition(0, 0);
+    smoke->runAction(mSmokeRunAnimate);
+    addChild(smoke, 0, "smokeRun");
+*/
+
 	mState = STATE_RUN;
 }
 
 void HeroSprite::jump() {
-	if (mState == STATE_JUMP)
-		return;
+    Vect pulse;
 
-	stopAllActions();
+	if (mState == STATE_JUMP2)
+		return;
+    else if (mState == STATE_JUMP1) {
+        mState = STATE_JUMP2;
+        pulse = Vect(0, 7500);
+    } else {
+        mState = STATE_JUMP1;
+        pulse = Vect(0, 8500);
+        //removeChildByName("smokeRun");
+    }
+
+    stopAllActions();
 	setTexture("ui/heroSheet/heroJump_0001.png");
-	//getPhysicsBody()->setVelocity(Vec2(0, 900));
-	//getPhysicsBody()->applyForce(Vect(0, 20*1200*2));
-	getPhysicsBody()->applyImpulse(Vect(0, 13000));
 	
-	CallFunc *callback = CallFunc::create([&]() {
-			getPhysicsBody()->applyImpulse(Vect(0, 12000));
-		});
-	DelayTime *delay = DelayTime::create(0.15f);
-	auto seq = Sequence::create(delay, callback, nullptr);
-	auto repeat = Repeat::create(seq, 3);
-	seq->setTag(1);
-	runAction(seq);
-	mState = STATE_JUMP;
+    getPhysicsBody()->applyImpulse(pulse);
 }
 
 void HeroSprite::stand() {
@@ -103,7 +134,6 @@ void HeroSprite::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* unused_even
 void HeroSprite::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* unused_event) {
     switch (keyCode) {
     case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		stopActionByTag(1);
 		break;
 	default:
 		break;
@@ -119,18 +149,28 @@ void HeroSprite::onTouchMoved(Touch *touch, Event *event) {
 }
 
 void HeroSprite::onTouchEnded(Touch *touch, Event *event) {
-	stopActionByTag(1);
 }
 
 bool HeroSprite::onContactBegin(PhysicsContact& contact) {
     PhysicsBody* a = contact.getShapeA()->getBody();
     PhysicsBody* b = contact.getShapeB()->getBody();
-	//CCLog("%s\n", __func__);
+    int tagA = a->getTag();
+    int tagB = b->getTag();
 
-	if (mState == STATE_JUMP) {
-		stand();
-		run();
-	}
+    if (((tagA==TAG_HERO_PHYS_BODY) && (tagB==TAG_GROUND1_PHYS_BODY))
+        || ((tagA==TAG_GROUND1_PHYS_BODY) && (tagB==TAG_HERO_PHYS_BODY))) {
+        if ((mState == STATE_JUMP1) || (mState == STATE_JUMP2)) {
+            stand();
+            run();
+        }
+    }
+
+    if (((tagA == TAG_HERO_PHYS_BODY) && (tagB == TAG_BARRIER_PHYS_BODY))
+        || ((tagA == TAG_BARRIER_PHYS_BODY) && (tagB == TAG_HERO_PHYS_BODY))) {
+
+        CCLog("Game Over!\n");
+        Director::getInstance()->replaceScene(GameOverScene::create());
+    }
 
 	return true;
 }
