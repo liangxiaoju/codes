@@ -1,0 +1,26 @@
+#
+# cocos2d source
+#
+/projects/**/cocos2d
+
+#
+# generated files
+#
+linux-build
+/projects/**/bin
+gen
+obj
+assets
+
+#
+# .keystore
+#
+*.keystore
+
+#
+# .so
+#
+*.so
+
+tags
+TAGS
