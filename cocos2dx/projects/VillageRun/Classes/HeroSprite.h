@@ -24,6 +24,7 @@ private:
 	int mState;
     FiniteTimeAction *mRunAnimate;
     FiniteTimeAction *mSmokeRunAnimate;
+    FiniteTimeAction *mSmokeStandAnimate;
 
 	void run();
 	void jump();
@@ -35,6 +36,7 @@ private:
 	void onTouchMoved(Touch *touch, Event *event);
 	void onTouchEnded(Touch *touch, Event *event);
 	bool onContactBegin(PhysicsContact& contact);
+    bool onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSolve& solve);
 };
 
 #endif

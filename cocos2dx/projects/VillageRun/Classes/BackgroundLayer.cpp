@@ -91,9 +91,9 @@ void BackgroundLayer::groundMove() {
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
 void BackgroundLayer::mapMove() {
-    char name[32];
+    char name[64];
 
-    snprintf(name, sizeof(name), "basicLevel_%d.tmx", levelValue[levelIndex][valueIndex]);
+    snprintf(name, sizeof(name), "maps/basicLevels/basicLevel_%d.tmx", levelValue[levelIndex][valueIndex]);
 
     valueIndex = (++valueIndex) % ARRAY_SIZE(levelValue[levelIndex]);
     if (valueIndex == 0)

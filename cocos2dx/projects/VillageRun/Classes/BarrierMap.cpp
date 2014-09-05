@@ -15,7 +15,7 @@ bool BarrierMap::initWithTMXFile(const std::string& tmxFile) {
 	bool bRet = false;
 
 	do {
-		CC_BREAK_IF(!TMXTiledMap::initWithTMXFile("maps/basicLevels/"+tmxFile));
+		CC_BREAK_IF(!TMXTiledMap::initWithTMXFile(tmxFile));
 
         auto layer1 = getLayer("Tile");
         layer1->setVisible(false);
