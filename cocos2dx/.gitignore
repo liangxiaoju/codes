@@ -22,5 +22,11 @@ assets
 #
 *.so
 
+#
+# test files
+#
+test
+tmp
+
 tags
 TAGS
