@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="36" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tilesetCollisions" tilewidth="32" tileheight="32" spacing="1" margin="1">
+  <image source="tilesetCollisions.png" width="112" height="40"/>
+ </tileset>
+ <tileset firstgid="4" name="tilesetFront" tilewidth="32" tileheight="32" spacing="1" margin="1">
+  <image source="tilesetFront.png" width="128" height="128"/>
+ </tileset>
+ <layer name="Tile" width="36" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3DsQkAAAgDsA76/8u+ISWBJABAm3l2tegBOq+6T0ALAAA=
+  </data>
+ </layer>
+ <layer name="Collision" width="36" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3DsQ0AAAwCIP3/aa/o0kBCAgB8U/XsAIwTZoxACwAA
+  </data>
+ </layer>
+ <objectgroup name="Main" width="36" height="20">
+  <object name="b1_1" type="1_0_1" x="629" y="402" width="35" height="68"/>
+  <object name="b1_1" type="1_0_1" x="757" y="402" width="35" height="68"/>
+  <object name="b1_1" type="1_0_1" x="885" y="402" width="35" height="68"/>
+  <object name="b5_3" type="1_0_1" x="384" y="275" width="108" height="195"/>
+  <object name="rect" type="1_0_1" x="389" y="279" width="99" height="173"/>
+  <object name="rect" type="1_0_1" x="630" y="406" width="33" height="47"/>
+  <object name="rect" type="1_0_1" x="759" y="406" width="33" height="48"/>
+  <object name="rect" type="1_0_1" x="886" y="405" width="33" height="48"/>
+ </objectgroup>
+</map>

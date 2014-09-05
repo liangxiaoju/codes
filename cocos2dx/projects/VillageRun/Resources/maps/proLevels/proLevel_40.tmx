@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="36" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tilesetCollisions" tilewidth="32" tileheight="32" spacing="1" margin="1">
+  <image source="tilesetCollisions.png" width="112" height="40"/>
+ </tileset>
+ <tileset firstgid="4" name="tilesetFront" tilewidth="32" tileheight="32" spacing="1" margin="1">
+  <image source="tilesetFront.png" width="128" height="128"/>
+ </tileset>
+ <layer name="Tile" width="36" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3DsQkAAAgDsA76/8u+ISWBJABAm3l2tegBOq+6T0ALAAA=
+  </data>
+ </layer>
+ <layer name="Collision" width="36" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3DsQ0AAAwCIP3/aa/o0kBCAgB8U/XsAIwTZoxACwAA
+  </data>
+ </layer>
+ <objectgroup name="Main" width="36" height="20">
+  <object name="c1_1" type="1_0_1" x="123" y="25" width="124" height="44"/>
+  <object name="c1_1" type="1_0_1" x="522" y="24" width="124" height="44"/>
+  <object name="c1_1" type="1_0_1" x="908" y="21" width="124" height="44"/>
+  <object name="b2_1" type="1_0_1" x="134" y="375" width="76" height="95"/>
+  <object name="b2_1" type="1_0_1" x="483" y="375" width="76" height="95"/>
+  <object name="b2_3" type="1_0_1" x="56" y="379" width="80" height="89"/>
+  <object name="b2_3" type="1_0_1" x="825" y="379" width="80" height="89"/>
+  <object name="b2_2" type="1_0_1" x="407" y="384" width="72" height="84"/>
+  <object name="b2_2" type="1_0_1" x="749" y="383" width="72" height="84"/>
+  <object name="rect" type="1_0_1" x="912" y="31" width="114" height="26"/>
+  <object name="rect" type="1_0_1" x="525" y="36" width="117" height="24"/>
+  <object name="rect" type="1_0_1" x="135" y="38" width="110" height="26"/>
+  <object name="rect" type="1_0_1" x="62" y="399" width="66" height="51"/>
+  <object name="rect" type="1_0_1" x="141" y="394" width="67" height="53"/>
+  <object name="rect" type="1_0_1" x="412" y="402" width="62" height="48"/>
+  <object name="rect" type="1_0_1" x="493" y="388" width="60" height="65"/>
+  <object name="rect" type="1_0_1" x="753" y="399" width="62" height="49"/>
+  <object name="rect" type="1_0_1" x="833" y="396" width="63" height="53"/>
+ </objectgroup>
+</map>

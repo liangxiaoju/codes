@@ -1,0 +1,11 @@
+#ifndef __CONSTANT_H__
+#define __CONSTANT_H__
+
+enum {
+    TAG_HERO_PHYS_BODY = 10,
+    TAG_BARRIER_PHYS_BODY,
+    TAG_GROUND1_PHYS_BODY,
+    TAG_GROUND2_PHYS_BODY = TAG_GROUND1_PHYS_BODY,
+};
+
+#endif
