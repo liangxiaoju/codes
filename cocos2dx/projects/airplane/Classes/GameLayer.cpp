@@ -100,8 +100,9 @@ void GameLayer::repeat(float dt) {
 }
 
 void GameLayer::showUFO(float dt) {
-    CCLog("GameLayer::showUFO()\n");
-    UFOSprite *ufo = UFOSprite::create(CCRANDOM_0_1() > 0.5 ? 1 : 2);
+    float random = CCRANDOM_0_1();
+    int type = random < 0.3 ? 1 : (random < 0.6 ? 2 : 3);
+    UFOSprite *ufo = UFOSprite::create(type);
     addChild(ufo, 0, "ufo");
 }
 
@@ -133,12 +134,17 @@ void GameLayer::update(float fDelta) {
             UFOBox = UFOChild->getBoundingBox();
 
             if (planeBox.intersectsRect(UFOBox)) {
-                if (((UFOSprite *)UFOChild)->getType() == 1) {
+                int type = ((UFOSprite *)UFOChild)->getType();
+                if (type == 1) {
                     mPlaneSprite->superPower();
-                } else {
+                } else if (type == 2) {
                     mBomb++;
                     updateBomb();
                     SimpleAudioEngine::getInstance()->playEffect("sound/get_bomb.mp3", false);
+                } else if (type == 3) {
+                    mPlaneSprite->blowUp();
+                    mPlaneSprite = NULL;
+                    gameover();
                 }
                 removeChild(UFOChild);
             }

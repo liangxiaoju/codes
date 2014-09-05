@@ -12,6 +12,12 @@ public:
     int getType();
 
 private:
+    enum {
+        TYPE_UFO1 = 1,
+        TYPE_UFO2,
+        TYPE_UFO3,
+    };
+
     int mType;
 };
 
