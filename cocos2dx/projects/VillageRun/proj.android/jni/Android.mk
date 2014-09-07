@@ -17,7 +17,9 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/BackgroundLayer.cpp \
                    ../../Classes/HeroSprite.cpp \
                    ../../Classes/BarrierMap.cpp \
-                   ../../Classes/GameOverScene.cpp
+                   ../../Classes/GameOverScene.cpp \
+                   ../../Classes/GamePauseLayer.cpp \
+                   ../../Classes/GameStatusLayer.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

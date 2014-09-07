@@ -29,6 +29,7 @@ private:
 	void run();
 	void jump();
 	void stand();
+	void dead();
 	void onEnterTransitionDidFinish();
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* unused_event);
 	void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* unused_event);
@@ -37,6 +38,7 @@ private:
 	void onTouchEnded(Touch *touch, Event *event);
 	bool onContactBegin(PhysicsContact& contact);
     bool onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSolve& solve);
+	void onContactPostSolve(PhysicsContact& contact, const PhysicsContactPostSolve& solve);
 };
 
 #endif

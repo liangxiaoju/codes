@@ -64,6 +64,8 @@ set(GAME_SRC
   Classes/HeroSprite.cpp
   Classes/BarrierMap.cpp
   Classes/GameOverScene.cpp
+  Classes/GameStatusLayer.cpp
+  Classes/GamePauseLayer.cpp
 )
 elseif ( WIN32 )
 set(GAME_SRC

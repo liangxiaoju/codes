@@ -2,7 +2,6 @@
 #define __GAMESCENE_H__
 
 #include "cocos2d.h"
-#include "BackgroundLayer.h"
 #include "GameLayer.h"
 
 USING_NS_CC;
@@ -13,7 +12,6 @@ public:
 	CREATE_FUNC(GameScene);
 
 private:
-	BackgroundLayer *mBackgroundLayer;
 	GameLayer *mGameLayer;
 };
 

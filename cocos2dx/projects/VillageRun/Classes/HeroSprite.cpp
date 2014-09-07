@@ -1,6 +1,7 @@
 #include "HeroSprite.h"
 #include "Constant.h"
 #include "GameOverScene.h"
+#include "BackgroundLayer.h"
 
 bool HeroSprite::init() {
 	bool bRet = false;
@@ -9,14 +10,13 @@ bool HeroSprite::init() {
 		CC_BREAK_IF(!Sprite::initWithSpriteFrameName("heroStand_0001.png"));
 
 		Size heroSize = this->getContentSize();
-		//PhysicsBody *body = PhysicsBody::createCircle(heroSize.height/2-8, PhysicsMaterial(0, 0, 0));
 		PhysicsBody *body = PhysicsBody::createBox(heroSize-Size(0,16), PhysicsMaterial(0, 0, 0));
 		body->setLinearDamping(0.0f);
 		body->setDynamic(true);
 		body->setGravityEnable(true);
 		body->setTag(TAG_HERO_PHYS_BODY);
-		body->setContactTestBitmask(0xFFFFFFFF);
-		//body->setVelocityLimit(800);
+		body->setCategoryBitmask(1<<2);
+		body->setContactTestBitmask(1<<0 | 1<<1);
 		body->setMass(50);
 		body->setRotationEnable(false);
 
@@ -37,8 +37,6 @@ void HeroSprite::run() {
         Animation *animation = Animation::create();
         animation->setDelayPerUnit(0.03f);
         char name[64];
-		//std::vector<int> array = {1, 2, 3, 5, 7, 9, 10, 11};
-        //for (int i : array) {
         for (int i=1; i <=11; i++) {
             snprintf(name, sizeof(name), "heroRun_%04d.png", i);
     		SpriteFrame *frame = SpriteFrameCache::getInstance()
@@ -46,7 +44,12 @@ void HeroSprite::run() {
             animation->addSpriteFrame(frame);
         }
         Animate *animate = Animate::create(animation);
-        Sequence *seq = Sequence::create(animate, animate->reverse(), nullptr);
+        Sequence *seq = Sequence::create(
+				animate,
+				DelayTime::create(0.1),
+				animate->reverse(),
+				DelayTime::create(0.1),
+				nullptr);
         RepeatForever *repeat = RepeatForever::create(seq);
         mRunAnimate = repeat;
         mRunAnimate->retain();
@@ -72,7 +75,7 @@ void HeroSprite::run() {
     CallFunc *callback = CallFunc::create([&]() {
             Sprite *smoke = Sprite::createWithSpriteFrameName("effectSmokeRun_0022.png");
             smoke->setOpacity(160);
-            smoke->setScale(0.6);
+            smoke->setScale(0.8);
             smoke->setAnchorPoint(Vec2(0, 0));
             smoke->setPosition(getPosition() - getContentSize()/2);
             smoke->runAction(mSmokeRunAnimate->clone());
@@ -89,14 +92,19 @@ void HeroSprite::run() {
 void HeroSprite::jump() {
     Vect pulse;
 
+	getPhysicsBody()->setContactTestBitmask((1<<0) | (1<<1));
+
 	if (mState == STATE_JUMP2)
 		return;
+	if (mState == STATE_IDLE || mState == STATE_DEAD)
+		return;
+
     else if (mState == STATE_JUMP1) {
         mState = STATE_JUMP2;
-        pulse = Vect(0, 7500);
+        pulse = Vect(0, 6000);
     } else {
         mState = STATE_JUMP1;
-        pulse = Vect(0, 8500);
+        pulse = Vect(0, 8000);
     }
 
 	setSpriteFrame("heroJump_0001.png");
@@ -108,12 +116,10 @@ void HeroSprite::jump() {
 	auto delay1 = DelayTime::create(0.06f);
 	auto callback1 = CallFunc::create([&]() {
 			getPhysicsBody()->applyForce(Vect(0, 1500));
-			CCLog("applyForce");
 			});
 	auto delay2 = DelayTime::create(0.8f);
 	auto callback2 = CallFunc::create([&]() {
 			getPhysicsBody()->resetForces();
-			CCLog("resetForce");
 			});
 	auto seq = Sequence::create(delay1, callback1, delay2, callback2, nullptr);
 	seq->setTag(10);
@@ -147,6 +153,14 @@ void HeroSprite::stand() {
     getParent()->addChild(smoke);
 }
 
+void HeroSprite::dead() {
+	mState = STATE_DEAD;
+	stopAllActions();
+	getPhysicsBody()->setVelocity(Vec2(0, 0));
+	getPhysicsBody()->resetForces();
+	getPhysicsBody()->applyImpulse(Vec2(-2000, 5000));
+}
+
 void HeroSprite::onEnterTransitionDidFinish() {
 	Sprite::onEnterTransitionDidFinish();
 
@@ -166,6 +180,7 @@ void HeroSprite::onEnterTransitionDidFinish() {
 	auto contactListener = EventListenerPhysicsContact::create();
 	contactListener->onContactBegin = CC_CALLBACK_1(HeroSprite::onContactBegin, this);
 	contactListener->onContactPreSolve = CC_CALLBACK_2(HeroSprite::onContactPreSolve, this);
+	contactListener->onContactPostSolve = CC_CALLBACK_2(HeroSprite::onContactPostSolve, this);
 	eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
 }
 
@@ -184,7 +199,6 @@ void HeroSprite::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* unused_eve
     case EventKeyboard::KeyCode::KEY_UP_ARROW:
 		stopActionByTag(10);
     	getPhysicsBody()->resetForces();
-		CCLog("onKeyReleased: resetForce");
 		break;
 	default:
 		break;
@@ -202,7 +216,6 @@ void HeroSprite::onTouchMoved(Touch *touch, Event *event) {
 void HeroSprite::onTouchEnded(Touch *touch, Event *event) {
 	stopActionByTag(10);
 	getPhysicsBody()->resetForces();
-	CCLog("onTouchEnded: resetForce");
 }
 
 bool hitTest(PhysicsContact& contact, int mask) {
@@ -215,34 +228,83 @@ bool hitTest(PhysicsContact& contact, int mask) {
     return (tag & mask) == mask;
 }
 
-bool HeroSprite::onContactBegin(PhysicsContact& contact) {
-	return true;
+Node *getNodeByTag(PhysicsContact& contact, int tag) {
+    PhysicsBody* a = contact.getShapeA()->getBody();
+    PhysicsBody* b = contact.getShapeB()->getBody();
+    int tagA = a->getTag();
+    int tagB = b->getTag();
+
+	Node *node;
+
+	if (tagA == tag)
+		node = a->getNode();
+	else if (tagB == tag)
+		node = b->getNode();
+	else
+		node = NULL;
+
+	return node;
 }
 
-bool HeroSprite::onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSolve& solve) {
+bool HeroSprite::onContactBegin(PhysicsContact& contact) {
+
+	if (mState == STATE_DEAD) {
+		return false;
+	}
 
     if (hitTest(contact, TAG_HERO_PHYS_BODY|TAG_GROUND1_PHYS_BODY)) {
 
-        solve.setSurfaceVelocity(Vec2(0, 0));
+		Vec2 v = getPhysicsBody()->getVelocity();
+		getPhysicsBody()->setVelocity(Vec2(0, 0));
+		getPhysicsBody()->resetForces();
+		getPhysicsBody()->setContactTestBitmask(1<<1);
 
         if ((mState == STATE_JUMP1)
                 || (mState == STATE_JUMP2)
                 || (mState == STATE_IDLE)) {
 
-			stand();
+			if (v.y < -200)
+				stand();
+			else
+				mState = STATE_STAND;
+
 			CallFunc *callback = CallFunc::create([&]() {
 				run();
 			});
-			auto delay = DelayTime::create(0.01f);
+			auto delay = DelayTime::create(0.05f);
 			auto seq = Sequence::create(delay, callback, nullptr);
 			runAction(seq);
         }
     }
 
     if (hitTest(contact, TAG_HERO_PHYS_BODY|TAG_BARRIER_PHYS_BODY)) {
-        Director::getInstance()->replaceScene(GameOverScene::create());
+		BackgroundLayer * bg = (BackgroundLayer *)(getScene()
+				->getChildByName("gamelayer")
+				->getChildByName("background"));
+		bg->stopMove();
+
+		auto scale1 = ScaleTo::create(0.1, 0.9, 0.9);
+		auto scale2 = ScaleTo::create(0.1, 1.0, 1.0);
+		auto seq1 = Sequence::create(scale1, scale2, nullptr);
+		getNodeByTag(contact, TAG_BARRIER_PHYS_BODY)->runAction(seq1);
+
+		getPhysicsBody()->setContactTestBitmask(1<<1 | 1<<0);
+		dead();
+
+		CallFunc *callback = CallFunc::create([]() {
+			Director::getInstance()->replaceScene(GameOverScene::create());
+		});
+		auto seq = Sequence::create(DelayTime::create(1), callback, nullptr);
+		runAction(seq);
     }
 
+	return true;
+}
+
+bool HeroSprite::onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSolve& solve) {
     return true;
+}
+
+void HeroSprite::onContactPostSolve(PhysicsContact& contact, const PhysicsContactPostSolve& solve) {
 }
 

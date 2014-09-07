@@ -14,12 +14,15 @@ public:
 
 private:
     BackgroundLayer();
+    virtual ~BackgroundLayer();
 	void groundMove();
 	void mapMove();
 
     int levelValue[5][10];
     int valueIndex;
     int levelIndex;
+
+	FiniteTimeAction *mMapAction;
 };
 
 #endif

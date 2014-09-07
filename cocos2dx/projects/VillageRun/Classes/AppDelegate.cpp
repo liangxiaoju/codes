@@ -16,8 +16,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
     if(!glview) {
-        //glview = GLView::createWithRect("My Game", Rect(0, 0, 480, 320));
-        glview = GLView::createWithRect("My Game", Rect(0, 0, 240, 160));
+        glview = GLView::createWithRect("My Game", Rect(0, 0, 480, 320));
+        //glview = GLView::createWithRect("My Game", Rect(0, 0, 240, 160));
         director->setOpenGLView(glview);
     }
 	glview->setDesignResolutionSize(1136, 640, ResolutionPolicy::FIXED_HEIGHT);

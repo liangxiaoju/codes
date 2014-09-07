@@ -15,46 +15,74 @@ bool BarrierMap::initWithTMXFile(const std::string& tmxFile) {
 	bool bRet = false;
 
 	do {
-		CC_BREAK_IF(!TMXTiledMap::initWithTMXFile(tmxFile));
+		setContentSize(Director::getInstance()->getVisibleSize());
 
-        auto layer1 = getLayer("Tile");
-        layer1->setVisible(false);
-        auto layer2 = getLayer("Collision");
-        layer2->setVisible(false);
+		TMXMapInfo *mapInfo = TMXMapInfo::create(tmxFile);
+		if (!mapInfo)
+			break;
+
+        cocos2d::Vector<cocos2d::TMXLayerInfo *> info1;
+        cocos2d::Vector<cocos2d::TMXTilesetInfo *> info2;
+
+		/* do not use layers and tilesets */
+		mapInfo->setLayers(info1);
+		mapInfo->setTilesets(info2);
+
+		buildWithMapInfo(mapInfo);
+
         auto group = getObjectGroup("Main");
         auto& objs = group->getObjects();
 
-        for (auto& obj : objs) {
+		std::vector<Rect> rects;
 
+		for (auto& obj : objs) {
             ValueMap& dict = obj.asValueMap();
-
             std::string name = dict["name"].asString();
-            std::string type = dict["type"].asString();
-            float x = dict["x"].asFloat();
-            float y = dict["y"].asFloat();
-            float width = dict["width"].asFloat();
-            float height = dict["height"].asFloat();
 
-            if (name.compare("rect") == 0) {
-                Node *node = Node::create();
-                node->setAnchorPoint(Vec2(0.5, 0.5));
-                node->setPosition(x+width/2, y+height/2);
-                Size size = Size(width, height);
-                node->setContentSize(size);
-                PhysicsBody *body = PhysicsBody::createEdgeBox(size);
-                body->setTag(TAG_BARRIER_PHYS_BODY);
-		        body->setContactTestBitmask(0xFFFFFFFF);
-                node->setPhysicsBody(body);
-                addChild(node);
-            } else {
+			if (name == "rect") {
+				float x = dict["x"].asFloat();
+				float y = dict["y"].asFloat();
+				float width = dict["width"].asFloat();
+				float height = dict["height"].asFloat();
+
+				Rect rect(x, y, width, height);
+				rects.push_back(rect);
+			}
+		}
+
+		for (auto& obj : objs) {
+            ValueMap& dict = obj.asValueMap();
+            std::string name = dict["name"].asString();
+
+			if (name != "rect") {
+				float x = dict["x"].asFloat();
+				float y = dict["y"].asFloat();
+				float width = dict["width"].asFloat();
+				float height = dict["height"].asFloat();
+
+				Rect spriteRect(x, y, width, height);
+
+                PhysicsBody *body = PhysicsBody::create();
+				for (auto rect : rects) {
+					if (spriteRect.intersectsRect(rect)) {
+						body->addShape(PhysicsShapeBox::create(rect.size));
+					}
+				}
+				body->setDynamic(false);
+				body->setTag(TAG_BARRIER_PHYS_BODY);
+				body->setCategoryBitmask(1<<1);
+				body->setContactTestBitmask(1<<2);
+
                 Sprite *sprite = Sprite::createWithSpriteFrameName(name+".png");
                 sprite->setPosition(x+width/2, y+height/2);
+				sprite->setPhysicsBody(body);
                 addChild(sprite);
-            }
-        }
+			}
+		}
 
 		bRet = true;
 	} while(0);
 
 	return bRet;
 }
+

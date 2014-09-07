@@ -21,11 +21,8 @@ bool GameScene::init() {
 		node->setPhysicsBody(body);
 		//addChild(node);
 
-		mBackgroundLayer = BackgroundLayer::create();
-		addChild(mBackgroundLayer);
-
 		mGameLayer = GameLayer::create();
-		addChild(mGameLayer);
+		addChild(mGameLayer, 0, "gamelayer");
 
 		bRet = true;
 	} while(0);
