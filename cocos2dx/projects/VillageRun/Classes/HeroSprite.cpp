@@ -92,13 +92,10 @@ void HeroSprite::run() {
 void HeroSprite::jump() {
     Vect pulse;
 
-	getPhysicsBody()->setContactTestBitmask((1<<0) | (1<<1));
-
 	if (mState == STATE_JUMP2)
 		return;
-	if (mState == STATE_IDLE || mState == STATE_DEAD)
+	else if (mState == STATE_IDLE || mState == STATE_DEAD)
 		return;
-
     else if (mState == STATE_JUMP1) {
         mState = STATE_JUMP2;
         pulse = Vect(0, 6000);
@@ -124,6 +121,8 @@ void HeroSprite::jump() {
 	auto seq = Sequence::create(delay1, callback1, delay2, callback2, nullptr);
 	seq->setTag(10);
 	runAction(seq);
+
+	getPhysicsBody()->setContactTestBitmask((1<<0) | (1<<1));
 }
 
 void HeroSprite::stand() {
@@ -296,6 +295,9 @@ bool HeroSprite::onContactBegin(PhysicsContact& contact) {
 		});
 		auto seq = Sequence::create(DelayTime::create(1), callback, nullptr);
 		runAction(seq);
+
+		EventCustom event("EVENT_GameOver");
+		_eventDispatcher->dispatchEvent(&event);
     }
 
 	return true;

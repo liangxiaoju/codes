@@ -10,7 +10,7 @@ bool GameOverLayer::init() {
     do {
         CC_BREAK_IF(!Layer::init());
 
-        Size winSize = Director::getInstance()->getWinSize();
+        Size s = Director::getInstance()->getVisibleSize();
 
 		auto bg = BackgroundLayer::create();
 		bg->stopMove();
@@ -38,6 +38,20 @@ bool GameOverLayer::init() {
         mMenu->alignItemsHorizontallyWithPadding(50);
 		mMenu->setPositionY(s1_1->getContentSize().height/2);
         addChild(mMenu);
+
+		int highestScore = UserDefault::getInstance()->getIntegerForKey("highestScore", 0);
+		int currentScore = UserDefault::getInstance()->getIntegerForKey("currentScore", 0);
+
+		Sprite *s1 = Sprite::createWithSpriteFrameName("barTrackBorder.png");
+		s1->setPosition(s.width/2, s.height*0.6);
+		addChild(s1);
+		char buf[128];
+		snprintf(buf, sizeof(buf), "Highest: %d\nCurrent: %d", highestScore, currentScore);
+        auto l1 = Label::createWithSystemFont(buf, "arial", 40);
+		l1->enableOutline(Color4B::BLACK, 5);
+		l1->setPosition(s.width/2, s.height*0.6);
+		l1->setColor(Color3B::YELLOW);
+		addChild(l1);
 
         bRet = true;
     } while (0);

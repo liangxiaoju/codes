@@ -114,12 +114,12 @@ void BackgroundLayer::mapMove() {
 
     auto map = BarrierMap::create(name);
     Size s = map->getContentSize();
-    map->setPosition(s.width*2, 0);
+    map->setPosition(s.width, 0);
     addChild(map, 0, "map");
 
 	if (mMapAction == NULL) {
 		MoveBy *move1 = MoveBy::create(s.width/400, Vec2(-s.width, 0));
-		MoveBy *move2 = MoveBy::create(s.width*3/400, Vec2(-s.width*3, 0));
+		MoveBy *move2 = MoveBy::create(s.width/400, Vec2(-s.width, 0));
 		CallFunc *callback = CallFunc::create([&]() { mapMove(); });
 		Sequence *seq = Sequence::create(
 				move1,
@@ -130,11 +130,4 @@ void BackgroundLayer::mapMove() {
 	}
 
     map->runAction(mMapAction->clone());
-
-	char* buf = new char[10];
-	sprintf(buf, "%d", 1);
-	EventCustom event("EVENT_addGameScore");
-	event.setUserData(buf);
-	_eventDispatcher->dispatchEvent(&event);
-	delete buf;
 }

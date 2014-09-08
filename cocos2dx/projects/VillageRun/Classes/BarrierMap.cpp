@@ -25,6 +25,8 @@ bool BarrierMap::initWithTMXFile(const std::string& tmxFile) {
         cocos2d::Vector<cocos2d::TMXTilesetInfo *> info2;
 
 		/* do not use layers and tilesets */
+		info1.clear();
+		info2.clear();
 		mapInfo->setLayers(info1);
 		mapInfo->setTilesets(info2);
 

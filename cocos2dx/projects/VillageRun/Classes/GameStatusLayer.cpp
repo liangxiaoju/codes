@@ -20,26 +20,41 @@ bool GameStatusLayer::init() {
 		menu->setPosition(s1_1->getContentSize().width/2, s.height-s1_1->getContentSize().height/2);
         addChild(menu);
 
-		mScoreLabel = Label::createWithSystemFont("0", "Marker Felt", 50);
+		mScoreLabel = Label::createWithBMFont("fonts/score.fnt", "0");
+		//mScoreLabel = Label::createWithSystemFont("0", "arial", 50);
 		mScoreLabel->setColor(Color3B::BLACK);
 		mScoreLabel->setAnchorPoint(Vec2(1, 1));
-		mScoreLabel->setPosition(s.width, s.height);
+		mScoreLabel->setPosition(s.width-10, s.height-10);
 		addChild(mScoreLabel);
 
 		mScore = 0;
-		mListener = EventListenerCustom::create("EVENT_addGameScore", [&](EventCustom* event){
-			char *scoreStr = (char *)(event->getUserData());
-			int score = 0;
-			sscanf(scoreStr, "%d", &score);
 
-			addGameScore(score);
+		CallFunc *callback = CallFunc::create([=]() {
+			addGameScore(1);
 		});
-		_eventDispatcher->addEventListenerWithFixedPriority(mListener, 1);
+		auto seq = Sequence::create(DelayTime::create(0.05f), callback, nullptr);
+		runAction(RepeatForever::create(seq));
 
 		bRet = true;
 	} while(0);
 
 	return bRet;
+}
+
+void GameStatusLayer::onEnter() {
+	Layer::onEnter();
+
+	mListener = EventListenerCustom::create("EVENT_GameOver", [=](EventCustom* event){
+		stopAllActions();
+
+		int highestScore = UserDefault::getInstance()->getIntegerForKey("highestScore", 0);
+		highestScore = highestScore > mScore ? highestScore : mScore;
+
+		UserDefault::getInstance()->setIntegerForKey("highestScore", highestScore);
+		UserDefault::getInstance()->setIntegerForKey("currentScore", mScore);
+		UserDefault::getInstance()->flush();
+	});
+	_eventDispatcher->addEventListenerWithFixedPriority(mListener, 1);
 }
 
 void GameStatusLayer::onExit() {

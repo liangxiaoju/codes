@@ -5,7 +5,7 @@
 
 USING_NS_CC;
 
-class BarrierMap : public TMXTiledMap {
+class BarrierMap : public experimental::TMXTiledMap {
 public:
     static BarrierMap* create(const std::string& tmxFile);
 

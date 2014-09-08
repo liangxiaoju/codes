@@ -11,7 +11,8 @@ public:
 	CREATE_FUNC(GameStatusLayer);
 
 private:
-	void onExit();
+	void onEnter() override;
+	void onExit() override;
 	void pauseCallback(Ref *sender);
 	void addGameScore(int score);
 	int mScore;
