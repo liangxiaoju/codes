@@ -6,6 +6,7 @@ bool HeroSprite::init() {
 
     do {
         CC_BREAK_IF(!Sprite::initWithFile("CloseNormal.png"));
+        setColor(Color3B::BLUE);
 
         auto vsize = Director::getInstance()->getVisibleSize();
 
@@ -74,7 +75,11 @@ Node *getNodeByBitmask(PhysicsContact& contact, int mask) {
 }
 
 bool HeroSprite::onContactBegin(PhysicsContact& contact) {
-    return true;
+    if (hitTest(contact, BITMASK_PHYS_HERO, BITMASK_PHYS_CORD)) {
+        return contact.getContactData()->normal.y < 0;
+    } else {
+        return true;
+    }
 }
 
 bool HeroSprite::onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSolve& solve) {
@@ -95,5 +100,14 @@ void HeroSprite::onContactPostSolve(PhysicsContact& contact, const PhysicsContac
     }
 }
 
+/* cocos2dx's event callback is async in multithreading context */
 void HeroSprite::onContactSeperate(PhysicsContact& contact) {
+    if (hitTest(contact, BITMASK_PHYS_HERO, BITMASK_PHYS_CORD)) {
+        /* competition */
+        auto node = getNodeByBitmask(contact, BITMASK_PHYS_CORD);
+        if (node && node->isVisible()) {
+            node->setVisible(false);
+            node->removeFromParent();
+        }
+    }
 }

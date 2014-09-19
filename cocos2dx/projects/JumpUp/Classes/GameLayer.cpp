@@ -3,6 +3,7 @@
 #include "HeroSprite.h"
 #include "Constant.h"
 #include "HeroFollow.h"
+#include "CordSprite.h"
 
 bool GameLayer::init() {
     bool bRet = false;
@@ -63,17 +64,17 @@ bool GameLayer::onTouchBegan(Touch *touch, Event *event) {
 void GameLayer::onTouchMoved(Touch *touch, Event *event) {
     Point p1 = touch->getStartLocation();
     Point p2 = touch->getLocation();
-    auto body = PhysicsBody::createEdgeSegment(p1, p2,
-            PhysicsMaterial(10, 0.5, 0.5), 15);
-    body->setCategoryBitmask(BITMASK_PHYS_CORD);
-    body->setContactTestBitmask(BITMASK_PHYS_HERO);
-    auto node = Node::create();
-    node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    node->setPhysicsBody(body);
 
-    if (getChildByName("cord"))
-        removeChildByName("cord");
-    addChild(node, 0, "cord");
+    auto cord = CordSprite::createWithVertex(p1, p2);
+
+    /* competition between here and HeroSprite::onContactSeperate */
+    auto node = getChildByName("cord");
+    if (node && node->isVisible()) {
+        node->setVisible(false);
+        removeChild(node);
+    }
+
+    addChild(cord, 0, "cord");
 }
 
 void GameLayer::onTouchEnded(Touch *touch, Event *event) {
