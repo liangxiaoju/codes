@@ -7,7 +7,7 @@
             <key>bg.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2978,536},{720,1480}}</string>
+                <string>{{2,2},{720,1480}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -20,7 +20,7 @@
             <key>fish1_blowup_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{614,2},{100,142}}</string>
+                <string>{{724,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -33,7 +33,7 @@
             <key>fish1_blowup_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{818,2},{100,142}}</string>
+                <string>{{826,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -46,7 +46,7 @@
             <key>fish1_blowup_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{716,2},{100,142}}</string>
+                <string>{{928,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -59,7 +59,7 @@
             <key>fish1_blowup_n4.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,2},{100,142}}</string>
+                <string>{{1030,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -72,7 +72,7 @@
             <key>fish1_blowup_n5.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{410,2},{100,142}}</string>
+                <string>{{1132,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -85,7 +85,7 @@
             <key>fish1_blowup_n6.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{104,2},{100,142}}</string>
+                <string>{{1234,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -98,7 +98,7 @@
             <key>fish1_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{512,2},{100,142}}</string>
+                <string>{{1336,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -111,7 +111,7 @@
             <key>fish1_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{308,2},{100,142}}</string>
+                <string>{{1438,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -124,7 +124,7 @@
             <key>fish1_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{206,2},{100,142}}</string>
+                <string>{{1540,2},{100,142}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -137,7 +137,7 @@
             <key>fish2_blowup_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2096,2},{194,276}}</string>
+                <string>{{1642,2},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -150,7 +150,7 @@
             <key>fish2_blowup_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2292,2},{194,276}}</string>
+                <string>{{1838,2},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -163,7 +163,7 @@
             <key>fish2_blowup_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1900,2},{194,276}}</string>
+                <string>{{2,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -176,7 +176,7 @@
             <key>fish2_blowup_n4.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2684,2},{194,276}}</string>
+                <string>{{198,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -189,7 +189,7 @@
             <key>fish2_blowup_n5.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1508,2},{194,276}}</string>
+                <string>{{394,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -202,7 +202,7 @@
             <key>fish2_blowup_n6.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2488,2},{194,276}}</string>
+                <string>{{590,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -215,7 +215,7 @@
             <key>fish2_hit.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{920,2},{194,276}}</string>
+                <string>{{786,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -228,7 +228,7 @@
             <key>fish2_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1116,2},{194,276}}</string>
+                <string>{{982,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -241,7 +241,7 @@
             <key>fish2_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1704,2},{194,276}}</string>
+                <string>{{1178,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -254,7 +254,7 @@
             <key>fish2_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1312,2},{194,276}}</string>
+                <string>{{1374,1484},{194,276}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -267,7 +267,7 @@
             <key>fish3_blowup_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1862,536},{370,532}}</string>
+                <string>{{1570,1484},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -280,7 +280,7 @@
             <key>fish3_blowup_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2606,536},{370,532}}</string>
+                <string>{{2,2018},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -293,7 +293,7 @@
             <key>fish3_blowup_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2234,536},{370,532}}</string>
+                <string>{{374,2018},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -306,7 +306,7 @@
             <key>fish3_blowup_n4.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1490,536},{370,532}}</string>
+                <string>{{746,2018},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -319,7 +319,7 @@
             <key>fish3_blowup_n5.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{3252,2},{370,532}}</string>
+                <string>{{1118,2018},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -332,7 +332,7 @@
             <key>fish3_blowup_n6.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2880,2},{370,532}}</string>
+                <string>{{1490,2018},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -345,7 +345,7 @@
             <key>fish3_hit.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,536},{370,532}}</string>
+                <string>{{2,2552},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -358,7 +358,7 @@
             <key>fish3_n1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{746,536},{370,532}}</string>
+                <string>{{374,2552},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -371,7 +371,7 @@
             <key>fish3_n2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{374,536},{370,532}}</string>
+                <string>{{746,2552},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -384,7 +384,7 @@
             <key>fish3_n3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{1118,536},{370,532}}</string>
+                <string>{{1118,2552},{370,532}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -402,9 +402,9 @@
             <key>realTextureFileName</key>
             <string>fish.png</string>
             <key>size</key>
-            <string>{3700,2018}</string>
+            <string>{2048,4096}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:b59d35585307a13f78604128a818ade9:d300826209b00ecd5c28378fa9aff6e4:14ac73c88c3019464dc0f7ed87dc5bc2$</string>
+            <string>$TexturePacker:SmartUpdate:0178c0267fa939ea941089b36af4d750:ab3de6b6989be3b826931739b4943e96:14ac73c88c3019464dc0f7ed87dc5bc2$</string>
             <key>textureFileName</key>
             <string>fish.png</string>
         </dict>
