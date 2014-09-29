@@ -15,6 +15,8 @@ bool HeroSprite::init() {
         //setPosition(vsize.width/2, vsize.height/2);
         setPosition(vsize.width/2, heroSize.height/2);
 
+        setScale(2.0);
+
         auto body = PhysicsBody::createCircle((heroSize.width+heroSize.height)/4);
         body->setTag(TAG_PHYS_BODY_HERO);
         body->setMass(1);
@@ -105,7 +107,7 @@ void HeroSprite::onContactPostSolve(PhysicsContact& contact, const PhysicsContac
         auto length= node->getContentSize().width;
         float rotation = node->getRotation();
 
-        Vec2 v = Vec2(500 * (400-length)/100, 0);
+        Vec2 v = Vec2(500 * (400-length)/100.0f, 0);
         v.rotate(Vec2::ZERO, CC_DEGREES_TO_RADIANS(90-rotation));
 
         getPhysicsBody()->setVelocity(v);
@@ -136,7 +138,7 @@ void HeroSprite::setState(int state) {
             log("STATE_IDLE");
             getPhysicsBody()->setGravityEnable(false);
             auto vsize = Director::getInstance()->getVisibleSize();
-            auto jump = JumpBy::create(1, Vec2(0, 0), 300, 1);
+            auto jump = JumpBy::create(1, Vec2(0, 0), 400, 1);
             runAction(RepeatForever::create(jump));
             break;
         }
@@ -147,19 +149,86 @@ void HeroSprite::setState(int state) {
                 stopAllActions();
             }
             log("STATE_STAND");
+            stopAllActions();
             setTexture("heroStand.png");
+
+            Animation *animation = Animation::create();
+            animation->setDelayPerUnit(0.02f);
+            for (int i=1; i <=17; i++) {
+                char name[64];
+                snprintf(name, sizeof(name), "effectSmokeLand_%04d.png", i);
+                /*
+                SpriteFrame *frame = SpriteFrameCache::getInstance()
+                    ->getSpriteFrameByName(name);
+                animation->addSpriteFrame(frame);
+                */
+                animation->addSpriteFrameWithFile(name);
+            }
+            Animate *animate = Animate::create(animation);
+            Sequence *seq = Sequence::create(animate, RemoveSelf::create(), nullptr);
+
+            //Sprite *smoke = Sprite::createWithSpriteFrameName("effectSmokeLand_0017.png");
+            Sprite *smoke = Sprite::create("effectSmokeLand_0017.png");
+            smoke->setScale(1.0);
+            smoke->setPosition(getPosition() - Vec2(0, getContentSize().height/2+smoke->getContentSize().height/2));
+            smoke->runAction(seq);
+            getParent()->addChild(smoke);
+
             break;
         }
         case STATE_JUMPUP:
         {
             log("STATE_JUMPUP");
             setTexture("heroJumpUp.png");
+
+            Animation *animation = Animation::create();
+            animation->setDelayPerUnit(0.03f);
+            for (int i=1; i <=22; i++) {
+                char name[64];
+                snprintf(name, sizeof(name), "effectSmokeRun_%04d.png", i);
+                /*
+                SpriteFrame *frame = SpriteFrameCache::getInstance()
+                    ->getSpriteFrameByName(name);
+                animation->addSpriteFrame(frame);
+                */
+                animation->addSpriteFrameWithFile(name);
+            }
+            Animate *animate = Animate::create(animation);
+            Sequence *seq = Sequence::create(animate, RemoveSelf::create(), nullptr);
+
+            Sprite *smoke = Sprite::create("effectSmokeRun_0001.png");
+            smoke->setPosition(getContentSize().width/2, -smoke->getContentSize().height/2);
+            smoke->runAction(seq);
+            addChild(smoke);
+
             break;
         }
         case STATE_JUMPDOWN:
         {
             log("STATE_JUMPDOWN");
             setTexture("heroJumpDown.png");
+
+            Animation *animation = Animation::create();
+            animation->setDelayPerUnit(0.02f);
+            char name[64];
+            for (int i=1; i <=11; i++) {
+                snprintf(name, sizeof(name), "heroRun_%04d.png", i);
+                /*
+                SpriteFrame *frame = SpriteFrameCache::getInstance()
+                    ->getSpriteFrameByName(name);
+                animation->addSpriteFrame(frame);
+                */
+                animation->addSpriteFrameWithFile(name);
+            }
+            Animate *animate = Animate::create(animation);
+            Sequence *seq = Sequence::create(
+                    animate,
+                    DelayTime::create(0.05),
+                    animate->reverse(),
+                    DelayTime::create(0.05),
+                    nullptr);
+            runAction(seq);
+
             break;
         }
         default:
@@ -184,5 +253,8 @@ void HeroSprite::update(float dt) {
 
         auto seq = Sequence::create(DelayTime::create(0.5), callback, nullptr);
         runAction(seq);
+
+		EventCustom event("EVENT_GameOver");
+		_eventDispatcher->dispatchEvent(&event);
     }
 }

@@ -11,6 +11,9 @@ public:
     CREATE_FUNC(GameOverLayer);
 
 private:
+    Label *mLabel;
+    Menu *mMenu;
+
     void exitCallback(Ref *sender);
     void restartCallback(Ref *sender);
     void leaderboardsCallback(Ref *sender);

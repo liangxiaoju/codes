@@ -1,6 +1,6 @@
 #include "GameOverScene.h"
 #include "GameScene.h"
-//#include "JavaHelper.h"
+#include "BGLayer.h"
 
 using namespace CocosDenshion;
 
@@ -10,60 +10,48 @@ bool GameOverLayer::init() {
     do {
         CC_BREAK_IF(!Layer::init());
 
-        auto bg = Sprite::create("background.png");
-        bg->setAnchorPoint(Vec2(0, 0));
-        bg->setPosition(Vec2(0, 0));
-        addChild(bg);
+        Size s = Director::getInstance()->getVisibleSize();
 
-        Size winSize = Director::getInstance()->getWinSize();
-/*
-        char score[32];
-        auto l1 = Label::createWithSystemFont("Best", "Marker Felt", 30);
-        auto l2 = Label::createWithSystemFont("Score", "Marker Felt", 30);
-        snprintf(score, sizeof(score), "%d", ScoreLayer::getInstance()->getHighestScore());
-        auto ls1 = Label::createWithSystemFont(score, "Marker Felt", 30);
-        snprintf(score, sizeof(score), "%d", ScoreLayer::getInstance()->getCurrentScore());
-        auto ls2 = Label::createWithSystemFont(score, "Marker Felt", 30);
-        l1->setPosition(winSize.width/3, winSize.height*2/3);
-        l2->setPosition(winSize.width*2/3, winSize.height*2/3);
-        ls1->setPosition(winSize.width/3, winSize.height*2/3-50);
-        ls2->setPosition(winSize.width*2/3, winSize.height*2/3-50);
-        l1->setColor(Color3B::BLACK);
-        l2->setColor(Color3B::BLACK);
-        ls1->setColor(Color3B(80,80,80));
-        ls2->setColor(Color3B(80,80,80));
-        addChild(l1);
-        addChild(l2);
-        addChild(ls1);
-        addChild(ls2);
+		auto bg = BGLayer::create();
+		addChild(bg);
 
-        ScoreLayer::getInstance()->clear();
-*/
-        Sprite *s1 = Sprite::create("stop_64.png");
-        s1->setColor(Color3B::GRAY);
+        Sprite *s1_1 = Sprite::create("buttonBack.png");
+        Sprite *s1_2 = Sprite::create("buttonBack.png");
+		s1_2->setOpacity(160);
         MenuItemSprite *exit = MenuItemSprite::create(
-                s1, nullptr, CC_CALLBACK_1(GameOverLayer::exitCallback, this));
+                s1_1, s1_2, CC_CALLBACK_1(GameOverLayer::exitCallback, this));
 
-        Sprite *s2 = Sprite::create("reload_64.png");
-        s2->setColor(Color3B::GRAY);
-        MenuItemSprite *restart = MenuItemSprite::create(
-                s2, nullptr, CC_CALLBACK_1(GameOverLayer::restartCallback, this));
+        Sprite *s2_1 = Sprite::create("buttonRetry.png");
+        Sprite *s2_2 = Sprite::create("buttonRetry.png");
+		s2_2->setOpacity(160);
+        MenuItemSprite *retry = MenuItemSprite::create(
+                s2_1, s2_2, CC_CALLBACK_1(GameOverLayer::restartCallback, this));
 
-        Sprite *s3 = Sprite::create("chart_bar_64.png");
-        s3->setColor(Color3B::GRAY);
+        Sprite *s3_1 = Sprite::create("buttonLeaderboard.png");
+        Sprite *s3_2 = Sprite::create("buttonLeaderboard.png");
+		s3_2->setOpacity(160);
         MenuItemSprite *leaderboards = MenuItemSprite::create(
-                s3, nullptr, CC_CALLBACK_1(GameOverLayer::leaderboardsCallback, this));
+                s3_1, s3_2, CC_CALLBACK_1(GameOverLayer::leaderboardsCallback, this));
 
-        auto menu = Menu::create(exit, restart, leaderboards, nullptr);
-        menu->alignItemsHorizontallyWithPadding(50);
-        addChild(menu);
-/*
-        SimpleAudioEngine::getInstance()->stopBackgroundMusic();
-        SimpleAudioEngine::getInstance()->stopAllEffects(); 
+        mMenu = Menu::create(exit, retry, leaderboards, nullptr);
+        mMenu->alignItemsHorizontallyWithPadding(50);
+		mMenu->setPositionY(s1_1->getContentSize().height/2);
+        addChild(mMenu);
 
-        JavaHelper::getInstance()->showAds();
-        JavaHelper::getInstance()->storeLeaderboards(ScoreLayer::getInstance()->getHighestScore());
-*/
+		int highestScore = UserDefault::getInstance()->getIntegerForKey("highestScore", 0);
+		int currentScore = UserDefault::getInstance()->getIntegerForKey("currentScore", 0);
+
+		Sprite *s1 = Sprite::create("barTrackBorder.png");
+		s1->setPosition(s.width/2, s.height*0.6);
+		addChild(s1);
+		char buf[128];
+		snprintf(buf, sizeof(buf), "Highest: %d\nCurrent: %d", highestScore, currentScore);
+        auto l1 = Label::createWithSystemFont(buf, "arial", 40);
+		l1->enableOutline(Color4B::BLACK, 5);
+		l1->setPosition(s.width/2, s.height*0.6);
+		l1->setColor(Color3B::YELLOW);
+		addChild(l1);
+
         bRet = true;
     } while (0);
 
@@ -75,11 +63,8 @@ void GameOverLayer::exitCallback(Ref *sender) {
 }
 
 void GameOverLayer::restartCallback(Ref *sender) {
-    //JavaHelper::getInstance()->hideAds();
     Director::getInstance()->replaceScene(GameScene::create());
 }
 
 void GameOverLayer::leaderboardsCallback(Ref *sender) {
-    //JavaHelper::getInstance()->storeLeaderboards(ScoreLayer::getInstance()->getHighestScore());
-    //JavaHelper::getInstance()->showLeaderboards();
 }

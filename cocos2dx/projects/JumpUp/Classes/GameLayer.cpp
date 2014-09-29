@@ -4,6 +4,7 @@
 #include "Constant.h"
 #include "HeroFollow.h"
 #include "CordSprite.h"
+#include "GameStatusLayer.h"
 
 bool GameLayer::init() {
     bool bRet = false;
@@ -32,13 +33,17 @@ bool GameLayer::init() {
 		node->setPhysicsBody(body);
 		addChild(node);
 
-        /* hero layer */
-        auto heroLayer = Layer::create();
-        addChild(heroLayer);
-
         /* add BG */
         auto bg = BGLayer::create();
         addChild(bg);
+
+        /* status layer */
+        auto status = GameStatusLayer::create();
+        addChild(status);
+
+        /* hero layer */
+        auto heroLayer = Layer::create();
+        addChild(heroLayer);
 
         /* add hero */
         auto hero = HeroSprite::create();
