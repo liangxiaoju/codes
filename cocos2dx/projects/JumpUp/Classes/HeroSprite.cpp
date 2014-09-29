@@ -28,7 +28,7 @@ bool HeroSprite::init() {
                 BITMASK_PHYS_ENEMY |
                 BITMASK_PHYS_GROUND |
                 BITMASK_PHYS_CORD);
-        body->setVelocityLimit(500);
+        body->setVelocityLimit(600);
         setPhysicsBody(body);
 
         setState(STATE_IDLE);
@@ -107,7 +107,7 @@ void HeroSprite::onContactPostSolve(PhysicsContact& contact, const PhysicsContac
         auto length= node->getContentSize().width;
         float rotation = node->getRotation();
 
-        Vec2 v = Vec2(500 * (400-length)/100.0f, 0);
+        Vec2 v = Vec2(300 * (400-length)/100.0f, 0);
         v.rotate(Vec2::ZERO, CC_DEGREES_TO_RADIANS(90-rotation));
 
         getPhysicsBody()->setVelocity(v);
@@ -182,7 +182,7 @@ void HeroSprite::setState(int state) {
             setTexture("heroJumpUp.png");
 
             Animation *animation = Animation::create();
-            animation->setDelayPerUnit(0.03f);
+            animation->setDelayPerUnit(0.02f);
             for (int i=1; i <=22; i++) {
                 char name[64];
                 snprintf(name, sizeof(name), "effectSmokeRun_%04d.png", i);
@@ -197,6 +197,7 @@ void HeroSprite::setState(int state) {
             Sequence *seq = Sequence::create(animate, RemoveSelf::create(), nullptr);
 
             Sprite *smoke = Sprite::create("effectSmokeRun_0001.png");
+            smoke->setScale(0.7);
             smoke->setPosition(getContentSize().width/2, -smoke->getContentSize().height/2);
             smoke->runAction(seq);
             addChild(smoke);
