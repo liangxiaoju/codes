@@ -7,7 +7,7 @@ bool GameScene::init() {
     do {
         CC_BREAK_IF(!Scene::initWithPhysics());
 
-        getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+        //getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
         getPhysicsWorld()->setSpeed(5.0f);
 
         auto gameLayer = GameLayer::create();

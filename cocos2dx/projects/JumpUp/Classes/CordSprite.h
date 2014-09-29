@@ -9,6 +9,12 @@ class CordSprite : public Sprite {
 public:
     virtual bool initWithVertex(Point a, Point b);
     static CordSprite *createWithVertex(Point a, Point b);
+protected:
+//    void onEnter();
+//    void onExit();
+private:
+    Point a, b;
+    float rotation;
 };
 
 #endif

@@ -15,7 +15,17 @@ bool GameLayer::init() {
 		Node *node = Node::create();
 		node->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 		node->setPosition(wsize.width/2, wsize.height/2);
+        /*
 		PhysicsBody *body = PhysicsBody::createEdgeBox(wsize,
+                PhysicsMaterial(10, 0.5, 0.5), 10);
+        */
+        Point points[] = {
+            {-wsize.width/2, -wsize.height/2},
+            {-wsize.width/2, wsize.height/2},
+            {wsize.width/2, wsize.height/2},
+            {wsize.width/2, -wsize.height/2},
+        };
+        PhysicsBody *body = PhysicsBody::createEdgeChain(points, 4,
                 PhysicsMaterial(10, 0.5, 0.5), 10);
         body->setCategoryBitmask(BITMASK_PHYS_WALL);
         body->setContactTestBitmask(BITMASK_PHYS_HERO);

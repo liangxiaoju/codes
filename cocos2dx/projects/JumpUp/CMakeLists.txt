@@ -64,6 +64,7 @@ set(GAME_SRC
   Classes/BGLayer.cpp
   Classes/HeroFollow.cpp
   Classes/CordSprite.cpp
+  Classes/GameOverScene.cpp
 )
 elseif ( WIN32 )
 set(GAME_SRC

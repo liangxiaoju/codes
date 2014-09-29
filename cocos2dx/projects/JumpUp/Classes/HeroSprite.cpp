@@ -1,18 +1,20 @@
 #include "HeroSprite.h"
 #include "Constant.h"
+#include "GameOverScene.h"
 
 bool HeroSprite::init() {
     bool bRet = false;
 
     do {
-        CC_BREAK_IF(!Sprite::initWithFile("CloseNormal.png"));
-        setColor(Color3B::BLUE);
+        CC_BREAK_IF(!Sprite::initWithFile("heroStand.png"));
+        setColor(Color3B::RED);
 
         auto vsize = Director::getInstance()->getVisibleSize();
-
-        setPosition(vsize.width/2, vsize.height/2);
-
         auto heroSize = getContentSize();
+
+        //setPosition(vsize.width/2, vsize.height/2);
+        setPosition(vsize.width/2, heroSize.height/2);
+
         auto body = PhysicsBody::createCircle((heroSize.width+heroSize.height)/4);
         body->setTag(TAG_PHYS_BODY_HERO);
         body->setMass(1);
@@ -24,8 +26,12 @@ bool HeroSprite::init() {
                 BITMASK_PHYS_ENEMY |
                 BITMASK_PHYS_GROUND |
                 BITMASK_PHYS_CORD);
-        body->setVelocityLimit(300);
+        body->setVelocityLimit(500);
         setPhysicsBody(body);
+
+        setState(STATE_IDLE);
+
+        scheduleUpdate();
 
         bRet = true;
     } while(0);
@@ -76,7 +82,11 @@ Node *getNodeByBitmask(PhysicsContact& contact, int mask) {
 
 bool HeroSprite::onContactBegin(PhysicsContact& contact) {
     if (hitTest(contact, BITMASK_PHYS_HERO, BITMASK_PHYS_CORD)) {
-        return contact.getContactData()->normal.y < 0;
+        if (contact.getContactData()->normal.y < 0) {
+            setState(STATE_STAND);
+            return true;
+        } else
+            return false;
     } else {
         return true;
     }
@@ -91,12 +101,16 @@ bool HeroSprite::onContactPreSolve(PhysicsContact& contact, PhysicsContactPreSol
 
 void HeroSprite::onContactPostSolve(PhysicsContact& contact, const PhysicsContactPostSolve& solve) {
     if (hitTest(contact, BITMASK_PHYS_HERO, BITMASK_PHYS_CORD)) {
-        Vec2 v = getPhysicsBody()->getVelocity();
-        log("%f %f", v.x, v.y);
-        getPhysicsBody()->resetForces();
-        getPhysicsBody()->setVelocity(Vec2(0,0));
-        //getPhysicsBody()->applyImpulse(v/0.8);
-        getPhysicsBody()->setVelocity(v*2);
+        auto node = getNodeByBitmask(contact, BITMASK_PHYS_CORD);
+        auto length= node->getContentSize().width;
+        float rotation = node->getRotation();
+
+        Vec2 v = Vec2(500 * (400-length)/100, 0);
+        v.rotate(Vec2::ZERO, CC_DEGREES_TO_RADIANS(90-rotation));
+
+        getPhysicsBody()->setVelocity(v);
+
+        setState(STATE_JUMPUP);
     }
 }
 
@@ -109,5 +123,66 @@ void HeroSprite::onContactSeperate(PhysicsContact& contact) {
             node->setVisible(false);
             node->removeFromParent();
         }
+    }
+}
+
+void HeroSprite::setState(int state) {
+    int oldState = mState;
+    mState = state;
+
+    switch (state) {
+        case STATE_IDLE:
+        {
+            log("STATE_IDLE");
+            getPhysicsBody()->setGravityEnable(false);
+            auto vsize = Director::getInstance()->getVisibleSize();
+            auto jump = JumpBy::create(1, Vec2(0, 0), 300, 1);
+            runAction(RepeatForever::create(jump));
+            break;
+        }
+        case STATE_STAND:
+        {
+            if (oldState == STATE_IDLE) {
+                getPhysicsBody()->setGravityEnable(true);
+                stopAllActions();
+            }
+            log("STATE_STAND");
+            setTexture("heroStand.png");
+            break;
+        }
+        case STATE_JUMPUP:
+        {
+            log("STATE_JUMPUP");
+            setTexture("heroJumpUp.png");
+            break;
+        }
+        case STATE_JUMPDOWN:
+        {
+            log("STATE_JUMPDOWN");
+            setTexture("heroJumpDown.png");
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void HeroSprite::update(float dt) {
+    if (mState == STATE_JUMPUP) {
+        Vec2 v = getPhysicsBody()->getVelocity();
+        if (v.y < 0.001f) {
+            setState(STATE_JUMPDOWN);
+        }
+    }
+
+    Point point = getPosition();
+    point = convertToWorldSpace(point);
+    if (point.y < -100) {
+        CallFunc *callback = CallFunc::create([]() {
+            Director::getInstance()->replaceScene(GameOverScene::create());
+        });
+
+        auto seq = Sequence::create(DelayTime::create(0.5), callback, nullptr);
+        runAction(seq);
     }
 }
