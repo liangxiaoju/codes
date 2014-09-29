@@ -13,7 +13,7 @@ bool MenuLayer::init(RenderTexture *texture) {
         if (texture != NULL) {
             sprite = Sprite::createWithTexture(texture->getSprite()->getTexture());
         } else {
-            sprite = Sprite::createWithSpriteFrameName("background.png");
+            sprite = Sprite::createWithSpriteFrameName("bg.png");
         }
         sprite->setFlippedY(true);
         sprite->setAnchorPoint(Vec2(0, 0));

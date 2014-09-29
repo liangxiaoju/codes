@@ -8,9 +8,7 @@ bool WelcomeScene::init() {
     do {
         CC_BREAK_IF(!Scene::init());
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile(
-                "ui/shoot_background.plist");
-        SpriteFrameCache::getInstance()->addSpriteFramesWithFile(
-                "ui/shoot.plist");
+                "ui/other.plist");
         SpriteFrameCache::getInstance()->addSpriteFramesWithFile(
                 "ui/fish.plist");
 

@@ -20,8 +20,7 @@ bool UFOSprite::initWithType(int type) {
     } else if (type == TYPE_UFO2) {
         initWithSpriteFrameName("ufo2.png");
     } else if (type == TYPE_UFO3) {
-        //initWithSpriteFrameName("ufo3.png");
-        initWithFile("ui/ufo3.png");
+        initWithSpriteFrameName("ufo3.png");
     }
 
     Size winSize = Director::getInstance()->getWinSize();
