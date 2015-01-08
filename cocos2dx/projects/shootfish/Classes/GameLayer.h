@@ -21,19 +21,23 @@ private:
     static GameLayer *s_gameLayer;
 
     int mBomb;
-    Sprite *mBombSprite;
+    MenuItemSprite *mBombSprite;
+    MenuItemSprite *mPauseSprite;
     Label *mBombLabel;
-
-    void repeat(float dt);
 
     void update(float fDelta) override;
 
-    void gameover();
+    void gameOver();
+    void gamePause();
 
+    void showEnemy(float dt);
     void showUFO(float dt);
 
+    void useBomb();
     void updateBomb();
     void bombAllEnemys();
+
+    void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
 };
 
 #endif

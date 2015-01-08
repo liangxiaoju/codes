@@ -35,7 +35,7 @@ bool EnemySprite::initWithType(int type, float multiple) {
 
     if (type == TYPE_ENEMY1) {
         initWithSpriteFrameName("fish1_n1.png");
-        mLife = 2;
+        mLife = 1;
         duration = 2.5 / multiple;
         mCost = 1000;
 
@@ -48,7 +48,7 @@ bool EnemySprite::initWithType(int type, float multiple) {
         runAction(RepeatForever::create(animate));
     } else if (type == TYPE_ENEMY2) {
         initWithSpriteFrameName("fish2_n1.png");
-        mLife = 5;
+        mLife = 3;
         duration = 3.5 / multiple;
         mCost = 3000;
 
@@ -70,7 +70,7 @@ bool EnemySprite::initWithType(int type, float multiple) {
         animation->addSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName("fish3_n3.png"));
         Animate *animate = Animate::create(animation);
         runAction(RepeatForever::create(animate));
-        mLife = 15;
+        mLife = 10;
         duration = 5.5 / multiple;
         mCost = 10000;
     }

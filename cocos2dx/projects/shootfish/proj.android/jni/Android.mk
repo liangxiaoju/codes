@@ -10,20 +10,15 @@ LOCAL_MODULE := cocos2dcpp_shared
 
 LOCAL_MODULE_FILENAME := libcocos2dcpp
 
-LOCAL_SRC_FILES := hellocpp/main.cpp \
-                   ../../Classes/AppDelegate.cpp \
-  				   ../../Classes/JavaHelper.cpp \
-  				   ../../Classes/WelcomeScene.cpp \
-  				   ../../Classes/GameScene.cpp \
-  				   ../../Classes/BackgroundLayer.cpp \
-  				   ../../Classes/GameLayer.cpp \
-  				   ../../Classes/ScoreLayer.cpp \
-  				   ../../Classes/MenuScene.cpp \
-  				   ../../Classes/PlaneSprite.cpp \
-  				   ../../Classes/BulletSprite.cpp \
-  				   ../../Classes/EnemySprite.cpp \
-  				   ../../Classes/UFOSprite.cpp \
-  				   ../../Classes/GameOverScene.cpp
+define all-cpp-files-under
+$(patsubst ./%,%, \
+  $(shell cd $(LOCAL_PATH) ; \
+          find -L $(1) -name "*.cpp" -and -not -name ".*") \
+ )
+endef
+
+LOCAL_SRC_FILES := hellocpp/main.cpp
+LOCAL_SRC_FILES += $(call all-cpp-files-under, ../../Classes)
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

@@ -16,10 +16,8 @@ bool BulletSprite::initWithType(int type) {
 
     if (type == 1) {
         Sprite::initWithSpriteFrameName("bullet1.png");
-        setScale(0.7);
     } else if (type == 2) {
         Sprite::initWithSpriteFrameName("bullet2.png");
-        setScale(0.6);
     }
 
     return true;

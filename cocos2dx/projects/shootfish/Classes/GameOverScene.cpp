@@ -18,20 +18,18 @@ bool GameOverLayer::init() {
         Size winSize = Director::getInstance()->getWinSize();
 
         char score[32];
-        auto l1 = Label::createWithSystemFont("Best", "Marker Felt", 60);
-        auto l2 = Label::createWithSystemFont("Score", "Marker Felt", 60);
+        auto l1 = Label::createWithSystemFont("Highest", "Marker Felt", 50);
+        auto l2 = Label::createWithSystemFont("Current", "Marker Felt", 50);
         snprintf(score, sizeof(score), "%d", ScoreLayer::getInstance()->getHighestScore());
-        auto ls1 = Label::createWithSystemFont(score, "Marker Felt", 60);
+        auto ls1 = Label::createWithBMFont("fonts/score.fnt", score);
         snprintf(score, sizeof(score), "%d", ScoreLayer::getInstance()->getCurrentScore());
-        auto ls2 = Label::createWithSystemFont(score, "Marker Felt", 60);
+        auto ls2 = Label::createWithBMFont("fonts/score.fnt", score);
         l1->setPosition(winSize.width/3, winSize.height*2/3);
         l2->setPosition(winSize.width*2/3, winSize.height*2/3);
         ls1->setPosition(winSize.width/3, winSize.height*2/3-80);
         ls2->setPosition(winSize.width*2/3, winSize.height*2/3-80);
         l1->setColor(Color3B::BLACK);
         l2->setColor(Color3B::BLACK);
-        ls1->setColor(Color3B(80,80,80));
-        ls2->setColor(Color3B(80,80,80));
         addChild(l1);
         addChild(l2);
         addChild(ls1);
@@ -40,22 +38,27 @@ bool GameOverLayer::init() {
         ScoreLayer::getInstance()->clear();
 
         Sprite *s1 = Sprite::create("ui/stop_64.png");
-        //s1->setColor(Color3B::GRAY);
+        Sprite *s1p = Sprite::create("ui/stop_64.png");
+        s1p->setColor(Color3B::GRAY);
         MenuItemSprite *exit = MenuItemSprite::create(
-                s1, nullptr, CC_CALLBACK_1(GameOverLayer::exitCallback, this));
+                s1, s1p, CC_CALLBACK_1(GameOverLayer::exitCallback, this));
 
         Sprite *s2 = Sprite::create("ui/reload_64.png");
-        //s2->setColor(Color3B::GRAY);
+        Sprite *s2p = Sprite::create("ui/reload_64.png");
+        s2p->setColor(Color3B::GRAY);
         MenuItemSprite *restart = MenuItemSprite::create(
-                s2, nullptr, CC_CALLBACK_1(GameOverLayer::restartCallback, this));
+                s2, s2p, CC_CALLBACK_1(GameOverLayer::restartCallback, this));
 
         Sprite *s3 = Sprite::create("ui/chart_bar_64.png");
-        //s3->setColor(Color3B::GRAY);
+        Sprite *s3p = Sprite::create("ui/chart_bar_64.png");
+        s3p->setColor(Color3B::GRAY);
         MenuItemSprite *leaderboards = MenuItemSprite::create(
-                s3, nullptr, CC_CALLBACK_1(GameOverLayer::leaderboardsCallback, this));
+                s3, s3p, CC_CALLBACK_1(GameOverLayer::leaderboardsCallback, this));
 
         auto menu = Menu::create(exit, restart, leaderboards, nullptr);
-        menu->alignItemsHorizontallyWithPadding(50);
+        menu->alignItemsHorizontallyWithPadding(100);
+        menu->setAnchorPoint(Vec2(0.5, 0.5));
+        menu->setPosition(winSize.width/2, winSize.height/3);
         addChild(menu);
 
         SimpleAudioEngine::getInstance()->stopBackgroundMusic();

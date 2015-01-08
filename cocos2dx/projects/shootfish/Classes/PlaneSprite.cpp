@@ -189,18 +189,32 @@ void PlaneSprite::onKeyReleased(EventKeyboard::KeyCode keyCode, Event *unused) {
 
 bool PlaneSprite::onTouchBegan(Touch *touch, Event *event) {
     Point touchPos = touch->getLocation();
-    Rect planeRect = this->getBoundingBox();
-    planeRect.origin -= Vec2(5, 5);
-    planeRect.size = planeRect.size + Size(10, 10);
+    Point planePos = this->getPosition();
+    Rect rect = Rect(planePos.x-300, planePos.y-300, 300*2, 300*2);
 
-    if (planeRect.containsPoint(touchPos))
+    if (rect.containsPoint(touchPos))
         return true;
 
     return false;
 }
 
 void PlaneSprite::onTouchMoved(Touch *touch, Event *event) {
-    Point pos = touch->getLocation();
+    Rect rect;
+    rect.origin = Director::getInstance()->getVisibleOrigin();
+    rect.size = Director::getInstance()->getVisibleSize();
+
+    Point pos = getPosition() + touch->getDelta();
+
+    if (pos.x < 0)
+        pos.x = 0;
+    if (pos.x > rect.getMaxX())
+        pos.x = rect.getMaxX();
+    if (pos.y < 0)
+        pos.y = 0;
+    if (pos.y > rect.getMaxY())
+        pos.y = rect.getMaxY();
+
+
     moveTo(0, pos, 0);
 }
 

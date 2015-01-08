@@ -1,5 +1,6 @@
 #include "GameLayer.h"
 #include "UFOSprite.h"
+#include "MenuScene.h"
 
 using namespace CocosDenshion;
 
@@ -23,22 +24,7 @@ bool GameLayer::init() {
 
         restart();
 
-        auto touchListener = EventListenerTouchOneByOne::create();
-        touchListener->onTouchBegan = [&](Touch *touch, Event *event) -> bool{
-            Point touchPos = touch->getLocation();
-            Rect bombRect = mBombSprite->getBoundingBox();
-            if (bombRect.containsPoint(touchPos)) {
-                if (mBomb > 0) {
-                    mBomb--;
-                    bombAllEnemys();
-                    updateBomb();
-                    SimpleAudioEngine::getInstance()->playEffect("sound/use_bomb.mp3", false);
-                }
-            }
-            return false;
-        };
-        Director::getInstance()->getEventDispatcher()
-            ->addEventListenerWithSceneGraphPriority(touchListener, this);
+        setKeyboardEnabled(true);
 
         bRet = true;
     } while(0);
@@ -51,29 +37,54 @@ void GameLayer::restart() {
     unscheduleAllSelectors();
     removeAllChildren();
 
+    Size s = Director::getInstance()->getVisibleSize();
+
     mPlaneSprite = PlaneSprite::create();
     addChild(mPlaneSprite, 0, "plane");
 
-    schedule(schedule_selector(GameLayer::repeat), 0.8, kRepeatForever, 1);
+    schedule(schedule_selector(GameLayer::showEnemy), 0.8, kRepeatForever, 1);
     schedule(schedule_selector(GameLayer::showUFO), 40, kRepeatForever, 15);
     scheduleUpdate();
 
     mBomb = 0;
 
-    mBombSprite = Sprite::createWithSpriteFrameName("bomb.png");
-    mBombSprite->setAnchorPoint(Point(0, 0));
-    mBombSprite->setPosition(5, 5);
-    addChild(mBombSprite);
+    Sprite *s1 = Sprite::createWithSpriteFrameName("bomb.png");
+    Sprite *s1p = Sprite::createWithSpriteFrameName("bomb.png");
+    s1p->setColor(Color3B::GRAY);
+    mBombSprite = MenuItemSprite::create(
+            s1, s1p, [&](Ref *sender) { GameLayer::useBomb(); });
+    mBombSprite->setAnchorPoint(Vec2(0, 0));
+    mBombSprite->setPosition(0, 0);
+
+    Sprite *s2 = Sprite::createWithSpriteFrameName("game_pause_nor.png");
+    Sprite *s2p = Sprite::createWithSpriteFrameName("game_pause_pressed.png");
+    mPauseSprite = MenuItemSprite::create(
+            s2, s2p, [&](Ref *sender) { GameLayer::gamePause(); });
+    mPauseSprite->setAnchorPoint(Vec2(1, 1));
+    mPauseSprite->setPosition(s.width, s.height);
+
+    auto menu = Menu::create(mBombSprite, mPauseSprite, nullptr);
+    menu->setPosition(Vec2::ZERO);
+    addChild(menu);
 
     char buf[8];
     snprintf(buf, sizeof(buf), "X%d", mBomb);
     mBombLabel = Label::createWithBMFont("fonts/score.fnt", buf);
     mBombLabel->setAnchorPoint(Vec2(0, 0));
-    Size s = mBombSprite->getContentSize();
-    mBombLabel->setPosition(s.width+5, 15);
+    Size bombSize = mBombSprite->getContentSize();
+    mBombLabel->setPosition(bombSize.width+5, 15);
     addChild(mBombLabel);
 
     updateBomb();
+}
+
+void GameLayer::useBomb() {
+    if (mBomb > 0) {
+        mBomb--;
+        bombAllEnemys();
+        updateBomb();
+        SimpleAudioEngine::getInstance()->playEffect("sound/use_bomb.mp3", false);
+    }
 }
 
 void GameLayer::updateBomb() {
@@ -90,7 +101,7 @@ void GameLayer::updateBomb() {
     }
 }
 
-void GameLayer::repeat(float dt) {
+void GameLayer::showEnemy(float dt) {
     EnemySprite *enemy;
     int score = ScoreLayer::getInstance()->getCurrentScore();
 
@@ -127,8 +138,8 @@ void GameLayer::update(float fDelta) {
 
     if (mPlaneSprite) {
         planeBox = mPlaneSprite->getBoundingBox();
-        planeBox.origin += Vec2(planeBox.size.width/3, planeBox.size.height/3);
-        planeBox.size = planeBox.size * (1.0/3);
+        planeBox.origin += Vec2(planeBox.size/3/2);
+        planeBox.size = planeBox.size * (2.0/3);
 
         for (auto& UFOChild : UFOChilds) {
             UFOBox = UFOChild->getBoundingBox();
@@ -144,7 +155,7 @@ void GameLayer::update(float fDelta) {
                 } else if (type == 3) {
                     mPlaneSprite->blowUp();
                     mPlaneSprite = NULL;
-                    gameover();
+                    gameOver();
                 }
                 removeChild(UFOChild);
             }
@@ -156,6 +167,8 @@ void GameLayer::update(float fDelta) {
                 continue;
 
             enemyBox = enemyChild->getBoundingBox();
+            enemyBox.origin += Vec2(enemyBox.size/3/2);
+            enemyBox.size = enemyBox.size * (2.0/3);
 
             for (auto& bulletChild : bulletChilds) {
                 bulletBox = bulletChild->getBoundingBox();
@@ -177,7 +190,7 @@ void GameLayer::update(float fDelta) {
                 mPlaneSprite = NULL;
                 ((EnemySprite *)enemyChild)->blowUp();
 
-                gameover();
+                gameOver();
 
                 break;
             }
@@ -185,8 +198,8 @@ void GameLayer::update(float fDelta) {
     }
 }
 
-void GameLayer::gameover() {
-    DelayTime *delay = DelayTime::create(1);
+void GameLayer::gameOver() {
+    DelayTime *delay = DelayTime::create(1.0);
     CallFunc *callback = CallFunc::create([]() {
         auto tran = TransitionMoveInT::create(0, GameOverScene::create());
         Director::getInstance()->replaceScene(tran);
@@ -194,3 +207,28 @@ void GameLayer::gameover() {
     Sequence *seq = Sequence::create(delay, callback, nullptr);
     runAction(seq);
 }
+
+void GameLayer::gamePause() {
+    auto callback = [&]() {
+        Size s = Director::getInstance()->getVisibleSize();
+        auto texture = RenderTexture::create(s.width, s.height);
+        texture->begin();
+        getScene()->visit();
+        texture->end();
+
+        Director::getInstance()->pushScene(MenuScene::create(texture));
+    };
+
+    getScheduler()->performFunctionInCocosThread(callback);
+}
+
+void GameLayer::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
+    switch (keyCode) {
+    case EventKeyboard::KeyCode::KEY_BACK:
+        gamePause();
+        break;
+    default:
+        break;
+    }
+}
+
