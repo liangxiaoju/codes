@@ -21,8 +21,8 @@ def main(args):
             #print("Exception")
             pass
         else:
-            print("p%sv%sc%s" %
-                    (data["price"], data["volume"], data["change"]))
+            print("p(%.0f/100)v(%s)c(%s)" %
+                    ((float(data["price"])*100), data["volume"], data["change"]))
             print("")
 
         sleep(10)
