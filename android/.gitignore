@@ -1,0 +1,21 @@
+#
+# generated files
+#
+/**/bin
+gen
+obj
+assets
+
+#
+# .keystore
+#
+*.keystore
+
+#
+# test files
+#
+test
+tmp
+
+tags
+TAGS

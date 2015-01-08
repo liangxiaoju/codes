@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">VoiceRecorder</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_record">Record</string>
+    <string name="button_playback">Playback</string>
+    <string name="button_stop">Stop</string>
+    <string name="button_save">Save</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="title_recorder_fragment">Recorder</string>
+    <string name="title_filelist_fragment">FileList</string>
+    <string name="action_delete">Delete</string>
+
+</resources>
