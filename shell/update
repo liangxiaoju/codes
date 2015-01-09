@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+ERROR()
+{
+    echo "$1"
+    exit 1
+}
+
+if [ -n "$(git submodule status | awk '{ if (match($0,"^-.*")) print "true" }')" ]; then
+    git submodule update --init
+fi
+
+targets=". "
+targets+=$(git submodule status | awk '{ print $2 }')
+
+for target in $targets; do
+    echo "=== update repo [$target] ==="
+    cd "$(pwd)/$target" &>/dev/null
+    git checkout master
+    git pull origin master || ERROR "Failed to pull $target, please check !"
+    cd - &>/dev/null
+done
+

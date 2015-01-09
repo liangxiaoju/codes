@@ -1,0 +1,317 @@
+#!/bin/bash
+
+set -e
+
+usage()
+{
+    echo "usage:"
+    echo -e "\tcompile kernel   -- $0 kernel <rk3288-box.img|rk3288-box-rk808.img|*.img>\n"
+    echo -e "\tcompile android  -- $0 android -j6\n"
+    echo -e "\tgenerate images  -- $0 image [resource|kernel|boot|recovery|system|userdata|vendor]\n"
+    exit 1
+}
+
+notice()
+{
+    echo "NOTICE: $@"
+}
+
+die()
+{
+    echo "ERROR: $@"
+    exit 1
+}
+
+setenv()
+{
+    unset CROSS_COMPILE
+    PATH="$(pwd)/tools:$PATH"
+    IMAGES_DIR="$(pwd)/images"
+    KERNEL_DIR="$(pwd)/kernel"
+    ANDROID_DIR="$(pwd)/android"
+
+    mkdir -p $IMAGES_DIR
+}
+
+gen_misc()
+{
+    echo -n "creating misc.img ..."
+    cp -f rkst/Image/misc.img $IMAGES_DIR/misc.img
+    cp -f rkst/Image/pcba_small_misc.img $IMAGES_DIR/pcba_small_misc.img
+    cp -f rkst/Image/pcba_whole_misc.img $IMAGES_DIR/pcba_whole_misc.img
+    echo "done."
+}
+
+gen_loader()
+{
+    echo -n "creating loader ..."
+    cp -rf RKTools/bootloader/* $IMAGES_DIR
+    cp -f RKTools/*parameter* $IMAGES_DIR
+    echo "done."
+}
+
+gen_resource()
+{
+    echo -n "creating resource.img ..."
+    cp -f $KERNEL_DIR/resource.img $IMAGES_DIR
+    echo "done."
+}
+
+gen_kernel()
+{
+    echo -n "creating kernel.img ..."
+    cp -f $KERNEL_DIR/kernel.img $IMAGES_DIR
+    echo "done."
+}
+
+gen_boot()
+{
+    echo -n "creating boot.img ..."
+    if [ -d $OUT/root ]; then
+        cp -f $KERNEL_DIR/arch/arm/boot/zImage $OUT/kernel
+        mkbootfs $OUT/root | minigzip > $OUT/ramdisk.img
+        rkst/mkkrnlimg $OUT/ramdisk.img $OUT/boot.img >/dev/null
+        #mkbootimg --kernel $OUT/kernel --ramdisk $OUT/ramdisk.img \
+        #    --output $OUT/boot.img
+        cp -f $OUT/boot.img $IMAGES_DIR
+    fi
+    echo "done."
+}
+
+gen_recovery()
+{
+    echo -n "creating recovery.img ..."
+    if [ -d $OUT/recovery/root ]; then
+        cp -f $KERNEL_DIR/arch/arm/boot/zImage $OUT/kernel
+        mkbootfs $OUT/recovery/root | minigzip > $OUT/ramdisk-recovery.img
+        mkbootimg --kernel $OUT/kernel --ramdisk $OUT/ramdisk-recovery.img \
+            --output $OUT/recovery.img
+        cp -f $OUT/recovery.img $IMAGES_DIR
+    fi
+    echo "done."
+}
+
+gen_ext4fs_1()
+{
+    DIR="$1"
+    IMG="$2"
+    label="$(basename $IMG ".img")"
+
+    if [ ! -d $DIR ]; then
+        echo "Cann't find $DIR"
+        return 1
+    fi
+
+    delta=5120
+    num_blocks=$(du -sk $DIR | awk '{print $1}')
+    num_blocks=$(($num_blocks + $delta))
+    num_inodes=$(find $DIR | wc -l)
+    num_inodes=$(($num_inodes + 500))
+
+    ok=0
+    while [ "$ok" = "0" ]; do
+        genext2fs -d $DIR -b $num_blocks -N $num_inodes -m 0 $IMG >/dev/null 2>&1 && \
+        tune2fs -j -L $label -c -1 -i 0 $IMG >/dev/null 2>&1 && \
+        ok=1 || num_blocks=$(($num_blocks + $delta))
+    done
+    e2fsck -fy $IMG >/dev/null 2>&1 || true
+
+    delta=1024
+    num_blocks=$(resize2fs -P $IMG 2>/dev/null | awk -F: '{print $2}')
+
+    ok=0
+    while [ "$ok" = "0" ]; do
+        if [ "$label" == "system" ] || [ "$label" == "userdata" ]; then
+            genext2fs -a -d $DIR -b $num_blocks -N $num_inodes -m 0 $IMG >/dev/null
+        else
+            genext2fs -d $DIR -b $num_blocks -N $num_inodes -m 0 $IMG >/dev/null
+        fi
+        tune2fs -O dir_index,filetype,sparse_super -j -L $label -c -1 -i 0 $IMG >/dev/null 2>&1 && \
+        ok=1 || num_blocks=$(($num_blocks + $delta))
+    done
+    e2fsck -fyD $IMG >/dev/null 2>&1 || true
+}
+
+gen_ext4fs_2()
+{
+    DIR="$1"
+    IMG="$2"
+    label="$(basename $IMG ".img")"
+
+    if [ ! -d $DIR ]; then
+        echo "Cann't find $DIR"
+        return 1
+    fi
+
+    size=$(du -sb $DIR | awk '{print $1}')
+    ext4fs_args="-L $label -S $OUT/root/file_contexts -a $label $IMG $DIR"
+    ok=0
+    while [ "$ok" = "0" ]; do
+        make_ext4fs -l $size $ext4fs_args &>/dev/null && \
+        tune2fs -c -1 -i 0 $IMG &>/dev/null && \
+        ok=1 || size=$(($size + 5242880))
+    done
+    e2fsck -fyD $IMG >/dev/null 2>&1 || true
+}
+
+gen_ext4fs_wrap()
+{
+    DIR="$1"
+    IMG="$2"
+    label="$(basename $IMG ".img")"
+
+    if [ $label == "system" ]; then
+        gen_ext4fs_2 $@
+    else
+        gen_ext4fs_1 $@
+    fi
+
+}
+
+gen_system()
+{
+    echo -n "creating system.img ..."
+    gen_ext4fs_wrap $OUT/system $IMAGES_DIR/system.img
+    echo "done."
+}
+
+gen_userdata()
+{
+    echo -n "creating userdata.img ..."
+    gen_ext4fs_wrap $OUT/data $IMAGES_DIR/userdata.img
+    echo "done."
+}
+
+gen_vendor()
+{
+    echo -n "creating vendor.img ..."
+    VENDOR_SCRIPT="./device/rockchip/$TARGET_PRODUCT/vendor/mkvendor.sh"
+    [ -x $VENDOR_SCRIPT ] && $VENDOR_SCRIPT
+    gen_ext4fs_wrap $OUT/vendor $IMAGES_DIR/vendor.img
+    echo "done."
+}
+
+gen_images()
+{
+    notice "generate images for $@"
+    pushd $ANDROID_DIR
+    if [ -z "$OUT" ]; then
+        source build/envsetup.sh >/dev/null
+        lunch rk3288-eng >/dev/null
+    fi
+
+    targets="misc loader resource kernel boot recovery system vendor"
+    if [ $# -gt 0 ]; then
+        targets="$@"
+    fi
+
+    for target in $targets; do
+        case $target in
+            misc)
+                gen_misc
+                ;;
+            loader)
+                gen_loader
+                ;;
+            resource)
+                gen_resource
+                ;;
+            kernel)
+                gen_kernel
+                ;;
+            boot)
+                gen_boot
+                ;;
+            recovery)
+                gen_recovery
+                ;;
+            system)
+                gen_system
+                ;;
+            userdata)
+                gen_userdata
+                ;;
+            vendor)
+                gen_vendor
+                ;;
+            *)
+                usage
+                ;;
+        esac
+    done
+    popd
+}
+
+build_kernel()
+{
+    notice "build kernel"
+    pushd $KERNEL_DIR
+    if [ ! -e .config ]; then
+        die "kernel: Please select your .config first !"
+    fi
+    make -j8 $@
+    popd
+}
+
+build_android()
+{
+    pushd $ANDROID_DIR
+    notice "build android"
+    source build/envsetup.sh
+    lunch rk3288-eng
+    make -j8 $@
+    popd
+}
+
+main()
+{
+    targets=""
+    args=""
+
+    for arg in $@; do
+        case $arg in
+            image)
+                targets=$arg
+                shift 1
+                args=$@
+                break
+                ;;
+            kernel|android)
+                targets+=" $arg"
+                ;;
+            *)
+                args+=" $arg"
+                ;;
+        esac
+    done
+
+    if [ "x$targets" = "x" ]; then
+        usage
+    fi
+
+    echo "START ..."
+
+    echo -e "\n\t* build $targets *\n"
+
+    setenv
+
+    for target in $targets; do
+        case $target in
+            kernel)
+                build_kernel $args
+                ;;
+            android)
+                build_android $args
+                ;;
+            image)
+                gen_images $args
+                ;;
+        esac
+    done
+
+    echo "END"
+}
+
+if [ $0 = "./build" ]; then
+    main $@
+fi
