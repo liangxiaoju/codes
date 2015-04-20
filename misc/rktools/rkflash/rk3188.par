@@ -1,0 +1,7 @@
+# section offset file
+parameter	0x0			../../android.rk3188_mid_4.2/rockdev/Image/Images/parameter
+misc		0x2000		../../android.rk3188_mid_4.2/rockdev/Image/Images/misc.img
+kernel		0x4000		../../android.rk3188_mid_4.2/rockdev/Image/Images/kernel.img
+boot		0x8000		../../android.rk3188_mid_4.2/rockdev/Image/Images/boot.img
+recovery	0x10000		../../android.rk3188_mid_4.2/rockdev/Image/recovery.img
+system		0x282000	../../android.rk3188_mid_4.2/rockdev/Image/system.img

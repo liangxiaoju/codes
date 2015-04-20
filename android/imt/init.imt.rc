@@ -1,0 +1,3 @@
+service kprop /sbin/kprop
+    class core
+    oneshot

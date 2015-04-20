@@ -1,0 +1,11 @@
+config IMT_USERSPACE_LOGO
+    bool "imt userspace logo driver"
+    default n
+
+if IMT_USERSPACE_LOGO
+
+    config IMT_PNG_LOGO
+    bool "support png logo"
+    default n
+
+endif

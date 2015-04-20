@@ -1,0 +1,128 @@
+#!/bin/bash
+
+MAKESELF=$(pwd)/bin/makeself.sh
+IMAGES_DIR=$(pwd)/images
+ENCRYPT=$(pwd)/bin/encrypt
+KEYFILE=$(pwd)/bin/keyfile
+mkkrnlimg=$(pwd)/bin/mkkrnlimg
+
+set -e 
+ 
+targets="misc kernel boot recovery system version update-script logo oem"
+
+while true
+do
+	case "$1" in
+		--debug)
+			targets+=" parameter_debug"
+			shift 1
+			;;
+		*)
+			targets+=" parameter"
+			break
+			;;
+	esac
+
+	if [[ $# -eq 0 ]]; then
+		break
+	fi
+done
+
+files=( \
+		parameter		"${IMAGES_DIR}/parameter.img"			"${IMAGES_DIR}/update/parameter.img"	\
+		parameter_debug	"${IMAGES_DIR}/parameter_debug.img"		"${IMAGES_DIR}/update/parameter.img"	\
+		misc			"${IMAGES_DIR}/misc.img"				"${IMAGES_DIR}/update/misc.img"			\
+		kernel			"${IMAGES_DIR}/kernel.img.C60"			"${IMAGES_DIR}/update/kernel.img"		\
+		boot			"${IMAGES_DIR}/boot.img"				"${IMAGES_DIR}/update/boot.img"			\
+		recovery		"${IMAGES_DIR}/recovery.img"			"${IMAGES_DIR}/update/recovery.img"		\
+		system			"${IMAGES_DIR}/system.img"				"${IMAGES_DIR}/update/system.img"		\
+		logo			"${IMAGES_DIR}/logo"					"${IMAGES_DIR}/update/logo"				\
+		version			"$(pwd)/bin/version"					"${IMAGES_DIR}/update/version"			\
+		update-script	"$(pwd)/bin/update-script"				"${IMAGES_DIR}/update/update-script"	\
+		oem				"${IMAGES_DIR}/oem"						"${IMAGES_DIR}/update/oem"				\
+		)
+
+encrypt_img ()
+{
+	dd if=$1 2>/dev/null | ${ENCRYPT} -k ${KEYFILE} | dd of=$1.crypt 2>/dev/null
+	mv -f $1.crypt $1
+}
+
+append_logo ()
+{
+	cd ${IMAGES_DIR}/update
+	target=$1
+	size=$(ls -l ${target} | awk '{ print $5 }')
+	begin=28
+	end=$((${size}-4))
+
+	dd if=${target} ibs=${begin} skip=1 obs=$((${end}-${begin})) 2>/dev/null | \
+	dd of=${target}.gz bs=$((${end}-${begin})) count=1 2>/dev/null
+	rm ${target}
+
+	gzip -d ${target}.gz -c > ${target}.cpio
+	rm ${target}.gz
+
+	mkdir cpio && cd cpio
+	cpio -i < ../${target}.cpio 2>/dev/null
+	cp -f ../logo logo
+	find . | cpio -H newc -o -O ../${target}.cpio 2>/dev/null
+	cd .. && rm -rf cpio
+
+	gzip -9 ${target}.cpio -c > ${target}.gz
+	rm ${target}.cpio
+
+	prefix="$( ls -l ${target}.gz | awk '{printf "size:%-15s", $5}' )"
+	sed -i "1s/^/$prefix/" ${target}.gz
+
+	$mkkrnlimg ${target}.gz ${target} &>/dev/null
+	rm ${target}.gz
+}
+
+if [[ $# -gt 0 ]]; then
+	targets=$@
+fi
+
+rm -rf ${IMAGES_DIR}/update
+mkdir -p ${IMAGES_DIR}/update
+
+for target in ${targets}; do
+	for i in $(seq 0 ${#files[*]}); do
+		if [[ $target == ${files[i]} ]]; then
+			SRC=${files[i+1]}
+			DST=${files[i+2]}
+
+			cp -f ${SRC} ${DST}
+		fi
+	done
+done
+
+append_logo boot.img
+append_logo recovery.img
+rm -f logo
+
+cd ${IMAGES_DIR}
+
+encrypt_img update/system.img
+encrypt_img update/oem
+mv update/system.img system.crypt
+
+system_size=$(stat system.crypt | awk '/Size/ { print $2 }')
+echo "system: ${system_size}" > lsm
+
+${MAKESELF} --lsm lsm --nocomp --current update/ update.img C60 ./update-script
+
+updateimg_size=$(stat update.img | awk '/Size/ { print $2 }')
+size_16k=$((16*1024))
+updateimg_size=$(((${updateimg_size}+${size_16k}-1)/${size_16k}*${size_16k}))
+
+dd if=/dev/zero of=update.tmp bs=${updateimg_size} count=1 2>/dev/null
+dd if=update.img of=update.tmp conv=notrunc 2>/dev/null
+dd if=system.crypt of=update.tmp bs=${updateimg_size} seek=1 2>/dev/null
+mv -f update.tmp update.img && chmod +x update.img
+
+rm -rf ${IMAGES_DIR}/update lsm system.crypt
+
+mv -f update.img ../
+
+echo "update.img generated"

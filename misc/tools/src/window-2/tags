@@ -1,0 +1,1595 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ASOUNDLIB_H	include/asoundlib.h	30;"	d
+ASOUNDLIB_H	modules/include/asoundlib.h	30;"	d
+CC	Makefile	/^CC		:= gcc$/;"	m
+CC	modules/Makefile	/^CC		:= gcc$/;"	m
+CFLAGS	modules/Makefile	/^CFLAGS	= -shared -fPIC -Iinclude -lcdkw -lncursesw -lpthread -Wall -ltinyalsa$/;"	m
+DEFAULT_VOLUME	modules/sound.c	21;"	d	file:
+EVENT_EXIT	include/event.h	8;"	d
+EVENT_EXIT	modules/include/event.h	8;"	d
+EVENT_FOCUS	include/event.h	9;"	d
+EVENT_FOCUS	modules/include/event.h	9;"	d
+EVENT_UEVENT	include/event.h	7;"	d
+EVENT_UEVENT	modules/include/event.h	7;"	d
+EVENT_UNKNOWN	include/event.h	6;"	d
+EVENT_UNKNOWN	modules/include/event.h	6;"	d
+FLAGS	Makefile	/^FLAGS	= -lcdkw -lncursesw -lpthread -rdynamic -ldl -Iinclude$/;"	m
+FORMAT_PCM	modules/sound.c	19;"	d	file:
+ID_DATA	modules/sound.c	17;"	d	file:
+ID_FMT	modules/sound.c	16;"	d	file:
+ID_RIFF	modules/sound.c	14;"	d	file:
+ID_WAVE	modules/sound.c	15;"	d	file:
+MAX_MODULE	include/win.h	8;"	d
+MAX_MODULE	modules/include/win.h	8;"	d
+MIXER_CTL_TYPE_BOOL	include/asoundlib.h	/^    MIXER_CTL_TYPE_BOOL,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_BOOL	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_BOOL,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_BYTE	include/asoundlib.h	/^    MIXER_CTL_TYPE_BYTE,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_BYTE	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_BYTE,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_ENUM	include/asoundlib.h	/^    MIXER_CTL_TYPE_ENUM,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_ENUM	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_ENUM,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_IEC958	include/asoundlib.h	/^    MIXER_CTL_TYPE_IEC958,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_IEC958	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_IEC958,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_INT	include/asoundlib.h	/^    MIXER_CTL_TYPE_INT,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_INT	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_INT,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_INT64	include/asoundlib.h	/^    MIXER_CTL_TYPE_INT64,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_INT64	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_INT64,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_MAX	include/asoundlib.h	/^    MIXER_CTL_TYPE_MAX,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_MAX	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_MAX,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_UNKNOWN	include/asoundlib.h	/^    MIXER_CTL_TYPE_UNKNOWN,$/;"	e	enum:mixer_ctl_type
+MIXER_CTL_TYPE_UNKNOWN	modules/include/asoundlib.h	/^    MIXER_CTL_TYPE_UNKNOWN,$/;"	e	enum:mixer_ctl_type
+MODULES_DIR	include/module.h	7;"	d
+MODULES_DIR	modules/include/module.h	7;"	d
+MODULE_INFO_SYM	include/module.h	8;"	d
+MODULE_INFO_SYM	modules/include/module.h	8;"	d
+PCM_FORMAT_MAX	include/asoundlib.h	/^    PCM_FORMAT_MAX,$/;"	e	enum:pcm_format
+PCM_FORMAT_MAX	modules/include/asoundlib.h	/^    PCM_FORMAT_MAX,$/;"	e	enum:pcm_format
+PCM_FORMAT_S16_LE	include/asoundlib.h	/^    PCM_FORMAT_S16_LE = 0,$/;"	e	enum:pcm_format
+PCM_FORMAT_S16_LE	modules/include/asoundlib.h	/^    PCM_FORMAT_S16_LE = 0,$/;"	e	enum:pcm_format
+PCM_FORMAT_S32_LE	include/asoundlib.h	/^    PCM_FORMAT_S32_LE,$/;"	e	enum:pcm_format
+PCM_FORMAT_S32_LE	modules/include/asoundlib.h	/^    PCM_FORMAT_S32_LE,$/;"	e	enum:pcm_format
+PCM_IN	include/asoundlib.h	45;"	d
+PCM_IN	modules/include/asoundlib.h	45;"	d
+PCM_MMAP	include/asoundlib.h	46;"	d
+PCM_MMAP	modules/include/asoundlib.h	46;"	d
+PCM_NOIRQ	include/asoundlib.h	47;"	d
+PCM_NOIRQ	modules/include/asoundlib.h	47;"	d
+PCM_NORESTART	include/asoundlib.h	48;"	d
+PCM_NORESTART	modules/include/asoundlib.h	48;"	d
+PCM_OUT	include/asoundlib.h	44;"	d
+PCM_OUT	modules/include/asoundlib.h	44;"	d
+PCM_STATE_DISCONNECTED	include/asoundlib.h	67;"	d
+PCM_STATE_DISCONNECTED	modules/include/asoundlib.h	67;"	d
+PCM_STATE_DRAINING	include/asoundlib.h	64;"	d
+PCM_STATE_DRAINING	modules/include/asoundlib.h	64;"	d
+PCM_STATE_OPEN	include/asoundlib.h	59;"	d
+PCM_STATE_OPEN	modules/include/asoundlib.h	59;"	d
+PCM_STATE_PAUSED	include/asoundlib.h	65;"	d
+PCM_STATE_PAUSED	modules/include/asoundlib.h	65;"	d
+PCM_STATE_PREPARED	include/asoundlib.h	61;"	d
+PCM_STATE_PREPARED	modules/include/asoundlib.h	61;"	d
+PCM_STATE_RUNNING	include/asoundlib.h	62;"	d
+PCM_STATE_RUNNING	modules/include/asoundlib.h	62;"	d
+PCM_STATE_SETUP	include/asoundlib.h	60;"	d
+PCM_STATE_SETUP	modules/include/asoundlib.h	60;"	d
+PCM_STATE_SUSPENDED	include/asoundlib.h	66;"	d
+PCM_STATE_SUSPENDED	modules/include/asoundlib.h	66;"	d
+PCM_STATE_XRUN	include/asoundlib.h	63;"	d
+PCM_STATE_XRUN	modules/include/asoundlib.h	63;"	d
+SNDRV_CTL_ELEM_ACCESS_INACTIVE	include/asound.h	664;"	d
+SNDRV_CTL_ELEM_ACCESS_INACTIVE	modules/include/asound.h	664;"	d
+SNDRV_CTL_ELEM_ACCESS_LOCK	include/asound.h	665;"	d
+SNDRV_CTL_ELEM_ACCESS_LOCK	modules/include/asound.h	665;"	d
+SNDRV_CTL_ELEM_ACCESS_OWNER	include/asound.h	666;"	d
+SNDRV_CTL_ELEM_ACCESS_OWNER	modules/include/asound.h	666;"	d
+SNDRV_CTL_ELEM_ACCESS_READ	include/asound.h	655;"	d
+SNDRV_CTL_ELEM_ACCESS_READ	modules/include/asound.h	655;"	d
+SNDRV_CTL_ELEM_ACCESS_READWRITE	include/asound.h	657;"	d
+SNDRV_CTL_ELEM_ACCESS_READWRITE	modules/include/asound.h	657;"	d
+SNDRV_CTL_ELEM_ACCESS_TIMESTAMP	include/asound.h	659;"	d
+SNDRV_CTL_ELEM_ACCESS_TIMESTAMP	modules/include/asound.h	659;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK	include/asound.h	667;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK	modules/include/asound.h	667;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_COMMAND	include/asound.h	663;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_COMMAND	modules/include/asound.h	663;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_READ	include/asound.h	660;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_READ	modules/include/asound.h	660;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_READWRITE	include/asound.h	662;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_READWRITE	modules/include/asound.h	662;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_WRITE	include/asound.h	661;"	d
+SNDRV_CTL_ELEM_ACCESS_TLV_WRITE	modules/include/asound.h	661;"	d
+SNDRV_CTL_ELEM_ACCESS_USER	include/asound.h	668;"	d
+SNDRV_CTL_ELEM_ACCESS_USER	modules/include/asound.h	668;"	d
+SNDRV_CTL_ELEM_ACCESS_VOLATILE	include/asound.h	658;"	d
+SNDRV_CTL_ELEM_ACCESS_VOLATILE	modules/include/asound.h	658;"	d
+SNDRV_CTL_ELEM_ACCESS_WRITE	include/asound.h	656;"	d
+SNDRV_CTL_ELEM_ACCESS_WRITE	modules/include/asound.h	656;"	d
+SNDRV_CTL_ELEM_IFACE_CARD	include/asound.h	646;"	d
+SNDRV_CTL_ELEM_IFACE_CARD	modules/include/asound.h	646;"	d
+SNDRV_CTL_ELEM_IFACE_HWDEP	include/asound.h	647;"	d
+SNDRV_CTL_ELEM_IFACE_HWDEP	modules/include/asound.h	647;"	d
+SNDRV_CTL_ELEM_IFACE_LAST	include/asound.h	653;"	d
+SNDRV_CTL_ELEM_IFACE_LAST	modules/include/asound.h	653;"	d
+SNDRV_CTL_ELEM_IFACE_MIXER	include/asound.h	648;"	d
+SNDRV_CTL_ELEM_IFACE_MIXER	modules/include/asound.h	648;"	d
+SNDRV_CTL_ELEM_IFACE_PCM	include/asound.h	649;"	d
+SNDRV_CTL_ELEM_IFACE_PCM	modules/include/asound.h	649;"	d
+SNDRV_CTL_ELEM_IFACE_RAWMIDI	include/asound.h	650;"	d
+SNDRV_CTL_ELEM_IFACE_RAWMIDI	modules/include/asound.h	650;"	d
+SNDRV_CTL_ELEM_IFACE_SEQUENCER	include/asound.h	652;"	d
+SNDRV_CTL_ELEM_IFACE_SEQUENCER	modules/include/asound.h	652;"	d
+SNDRV_CTL_ELEM_IFACE_TIMER	include/asound.h	651;"	d
+SNDRV_CTL_ELEM_IFACE_TIMER	modules/include/asound.h	651;"	d
+SNDRV_CTL_ELEM_TYPE_BOOLEAN	include/asound.h	637;"	d
+SNDRV_CTL_ELEM_TYPE_BOOLEAN	modules/include/asound.h	637;"	d
+SNDRV_CTL_ELEM_TYPE_BYTES	include/asound.h	640;"	d
+SNDRV_CTL_ELEM_TYPE_BYTES	modules/include/asound.h	640;"	d
+SNDRV_CTL_ELEM_TYPE_ENUMERATED	include/asound.h	639;"	d
+SNDRV_CTL_ELEM_TYPE_ENUMERATED	modules/include/asound.h	639;"	d
+SNDRV_CTL_ELEM_TYPE_IEC958	include/asound.h	641;"	d
+SNDRV_CTL_ELEM_TYPE_IEC958	modules/include/asound.h	641;"	d
+SNDRV_CTL_ELEM_TYPE_INTEGER	include/asound.h	638;"	d
+SNDRV_CTL_ELEM_TYPE_INTEGER	modules/include/asound.h	638;"	d
+SNDRV_CTL_ELEM_TYPE_INTEGER64	include/asound.h	642;"	d
+SNDRV_CTL_ELEM_TYPE_INTEGER64	modules/include/asound.h	642;"	d
+SNDRV_CTL_ELEM_TYPE_LAST	include/asound.h	643;"	d
+SNDRV_CTL_ELEM_TYPE_LAST	modules/include/asound.h	643;"	d
+SNDRV_CTL_ELEM_TYPE_NONE	include/asound.h	636;"	d
+SNDRV_CTL_ELEM_TYPE_NONE	modules/include/asound.h	636;"	d
+SNDRV_CTL_EVENT_ELEM	include/asound.h	/^ SNDRV_CTL_EVENT_ELEM = 0,$/;"	e	enum:sndrv_ctl_event_type
+SNDRV_CTL_EVENT_ELEM	modules/include/asound.h	/^ SNDRV_CTL_EVENT_ELEM = 0,$/;"	e	enum:sndrv_ctl_event_type
+SNDRV_CTL_EVENT_LAST	include/asound.h	/^ SNDRV_CTL_EVENT_LAST = SNDRV_CTL_EVENT_ELEM,$/;"	e	enum:sndrv_ctl_event_type
+SNDRV_CTL_EVENT_LAST	modules/include/asound.h	/^ SNDRV_CTL_EVENT_LAST = SNDRV_CTL_EVENT_ELEM,$/;"	e	enum:sndrv_ctl_event_type
+SNDRV_CTL_EVENT_MASK_ADD	include/asound.h	791;"	d
+SNDRV_CTL_EVENT_MASK_ADD	modules/include/asound.h	791;"	d
+SNDRV_CTL_EVENT_MASK_INFO	include/asound.h	790;"	d
+SNDRV_CTL_EVENT_MASK_INFO	modules/include/asound.h	790;"	d
+SNDRV_CTL_EVENT_MASK_REMOVE	include/asound.h	793;"	d
+SNDRV_CTL_EVENT_MASK_REMOVE	modules/include/asound.h	793;"	d
+SNDRV_CTL_EVENT_MASK_TLV	include/asound.h	792;"	d
+SNDRV_CTL_EVENT_MASK_TLV	modules/include/asound.h	792;"	d
+SNDRV_CTL_EVENT_MASK_VALUE	include/asound.h	789;"	d
+SNDRV_CTL_EVENT_MASK_VALUE	modules/include/asound.h	789;"	d
+SNDRV_CTL_IOCTL_CARD_INFO	include/asound.h	759;"	d
+SNDRV_CTL_IOCTL_CARD_INFO	modules/include/asound.h	759;"	d
+SNDRV_CTL_IOCTL_ELEM_ADD	include/asound.h	767;"	d
+SNDRV_CTL_IOCTL_ELEM_ADD	modules/include/asound.h	767;"	d
+SNDRV_CTL_IOCTL_ELEM_INFO	include/asound.h	761;"	d
+SNDRV_CTL_IOCTL_ELEM_INFO	modules/include/asound.h	761;"	d
+SNDRV_CTL_IOCTL_ELEM_LIST	include/asound.h	760;"	d
+SNDRV_CTL_IOCTL_ELEM_LIST	modules/include/asound.h	760;"	d
+SNDRV_CTL_IOCTL_ELEM_LOCK	include/asound.h	764;"	d
+SNDRV_CTL_IOCTL_ELEM_LOCK	modules/include/asound.h	764;"	d
+SNDRV_CTL_IOCTL_ELEM_READ	include/asound.h	762;"	d
+SNDRV_CTL_IOCTL_ELEM_READ	modules/include/asound.h	762;"	d
+SNDRV_CTL_IOCTL_ELEM_REMOVE	include/asound.h	769;"	d
+SNDRV_CTL_IOCTL_ELEM_REMOVE	modules/include/asound.h	769;"	d
+SNDRV_CTL_IOCTL_ELEM_REPLACE	include/asound.h	768;"	d
+SNDRV_CTL_IOCTL_ELEM_REPLACE	modules/include/asound.h	768;"	d
+SNDRV_CTL_IOCTL_ELEM_UNLOCK	include/asound.h	765;"	d
+SNDRV_CTL_IOCTL_ELEM_UNLOCK	modules/include/asound.h	765;"	d
+SNDRV_CTL_IOCTL_ELEM_WRITE	include/asound.h	763;"	d
+SNDRV_CTL_IOCTL_ELEM_WRITE	modules/include/asound.h	763;"	d
+SNDRV_CTL_IOCTL_HWDEP_INFO	include/asound.h	774;"	d
+SNDRV_CTL_IOCTL_HWDEP_INFO	modules/include/asound.h	774;"	d
+SNDRV_CTL_IOCTL_HWDEP_NEXT_DEVICE	include/asound.h	773;"	d
+SNDRV_CTL_IOCTL_HWDEP_NEXT_DEVICE	modules/include/asound.h	773;"	d
+SNDRV_CTL_IOCTL_PCM_INFO	include/asound.h	776;"	d
+SNDRV_CTL_IOCTL_PCM_INFO	modules/include/asound.h	776;"	d
+SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE	include/asound.h	775;"	d
+SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE	modules/include/asound.h	775;"	d
+SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE	include/asound.h	777;"	d
+SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE	modules/include/asound.h	777;"	d
+SNDRV_CTL_IOCTL_POWER	include/asound.h	781;"	d
+SNDRV_CTL_IOCTL_POWER	modules/include/asound.h	781;"	d
+SNDRV_CTL_IOCTL_POWER_STATE	include/asound.h	782;"	d
+SNDRV_CTL_IOCTL_POWER_STATE	modules/include/asound.h	782;"	d
+SNDRV_CTL_IOCTL_PVERSION	include/asound.h	758;"	d
+SNDRV_CTL_IOCTL_PVERSION	modules/include/asound.h	758;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_INFO	include/asound.h	779;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_INFO	modules/include/asound.h	779;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_NEXT_DEVICE	include/asound.h	778;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_NEXT_DEVICE	modules/include/asound.h	778;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_PREFER_SUBDEVICE	include/asound.h	780;"	d
+SNDRV_CTL_IOCTL_RAWMIDI_PREFER_SUBDEVICE	modules/include/asound.h	780;"	d
+SNDRV_CTL_IOCTL_SUBSCRIBE_EVENTS	include/asound.h	766;"	d
+SNDRV_CTL_IOCTL_SUBSCRIBE_EVENTS	modules/include/asound.h	766;"	d
+SNDRV_CTL_IOCTL_TLV_COMMAND	include/asound.h	772;"	d
+SNDRV_CTL_IOCTL_TLV_COMMAND	modules/include/asound.h	772;"	d
+SNDRV_CTL_IOCTL_TLV_READ	include/asound.h	770;"	d
+SNDRV_CTL_IOCTL_TLV_READ	modules/include/asound.h	770;"	d
+SNDRV_CTL_IOCTL_TLV_WRITE	include/asound.h	771;"	d
+SNDRV_CTL_IOCTL_TLV_WRITE	modules/include/asound.h	771;"	d
+SNDRV_CTL_NAME_CAPTURE	include/asound.h	808;"	d
+SNDRV_CTL_NAME_CAPTURE	modules/include/asound.h	808;"	d
+SNDRV_CTL_NAME_IEC958	include/asound.h	818;"	d
+SNDRV_CTL_NAME_IEC958	modules/include/asound.h	818;"	d
+SNDRV_CTL_NAME_IEC958_CON_MASK	include/asound.h	815;"	d
+SNDRV_CTL_NAME_IEC958_CON_MASK	modules/include/asound.h	815;"	d
+SNDRV_CTL_NAME_IEC958_DEFAULT	include/asound.h	813;"	d
+SNDRV_CTL_NAME_IEC958_DEFAULT	modules/include/asound.h	813;"	d
+SNDRV_CTL_NAME_IEC958_MASK	include/asound.h	814;"	d
+SNDRV_CTL_NAME_IEC958_MASK	modules/include/asound.h	814;"	d
+SNDRV_CTL_NAME_IEC958_NONE	include/asound.h	810;"	d
+SNDRV_CTL_NAME_IEC958_NONE	modules/include/asound.h	810;"	d
+SNDRV_CTL_NAME_IEC958_PCM_STREAM	include/asound.h	817;"	d
+SNDRV_CTL_NAME_IEC958_PCM_STREAM	modules/include/asound.h	817;"	d
+SNDRV_CTL_NAME_IEC958_PRO_MASK	include/asound.h	816;"	d
+SNDRV_CTL_NAME_IEC958_PRO_MASK	modules/include/asound.h	816;"	d
+SNDRV_CTL_NAME_IEC958_SWITCH	include/asound.h	811;"	d
+SNDRV_CTL_NAME_IEC958_SWITCH	modules/include/asound.h	811;"	d
+SNDRV_CTL_NAME_IEC958_VOLUME	include/asound.h	812;"	d
+SNDRV_CTL_NAME_IEC958_VOLUME	modules/include/asound.h	812;"	d
+SNDRV_CTL_NAME_NONE	include/asound.h	806;"	d
+SNDRV_CTL_NAME_NONE	modules/include/asound.h	806;"	d
+SNDRV_CTL_NAME_PLAYBACK	include/asound.h	807;"	d
+SNDRV_CTL_NAME_PLAYBACK	modules/include/asound.h	807;"	d
+SNDRV_CTL_POWER_D0	include/asound.h	670;"	d
+SNDRV_CTL_POWER_D0	modules/include/asound.h	670;"	d
+SNDRV_CTL_POWER_D1	include/asound.h	671;"	d
+SNDRV_CTL_POWER_D1	modules/include/asound.h	671;"	d
+SNDRV_CTL_POWER_D2	include/asound.h	672;"	d
+SNDRV_CTL_POWER_D2	modules/include/asound.h	672;"	d
+SNDRV_CTL_POWER_D3	include/asound.h	673;"	d
+SNDRV_CTL_POWER_D3	modules/include/asound.h	673;"	d
+SNDRV_CTL_POWER_D3cold	include/asound.h	675;"	d
+SNDRV_CTL_POWER_D3cold	modules/include/asound.h	675;"	d
+SNDRV_CTL_POWER_D3hot	include/asound.h	674;"	d
+SNDRV_CTL_POWER_D3hot	modules/include/asound.h	674;"	d
+SNDRV_CTL_VERSION	include/asound.h	621;"	d
+SNDRV_CTL_VERSION	modules/include/asound.h	621;"	d
+SNDRV_HWDEP_IFACE_BLUETOOTH	include/asound.h	/^ SNDRV_HWDEP_IFACE_BLUETOOTH,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_BLUETOOTH	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_BLUETOOTH,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_EMU10K1	include/asound.h	/^ SNDRV_HWDEP_IFACE_EMU10K1,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_EMU10K1	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_EMU10K1,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_EMUX_WAVETABLE	include/asound.h	/^ SNDRV_HWDEP_IFACE_EMUX_WAVETABLE,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_EMUX_WAVETABLE	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_EMUX_WAVETABLE,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_HDA	include/asound.h	/^ SNDRV_HWDEP_IFACE_HDA,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_HDA	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_HDA,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_ICS2115	include/asound.h	/^ SNDRV_HWDEP_IFACE_ICS2115,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_ICS2115	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_ICS2115,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_LAST	include/asound.h	/^ SNDRV_HWDEP_IFACE_LAST = SNDRV_HWDEP_IFACE_USB_STREAM$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_LAST	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_LAST = SNDRV_HWDEP_IFACE_USB_STREAM$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_MIXART	include/asound.h	/^ SNDRV_HWDEP_IFACE_MIXART,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_MIXART	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_MIXART,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_OPL2	include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL2 = 0,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_OPL2	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL2 = 0,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_OPL3	include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL3,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_OPL3	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL3,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_OPL4	include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL4,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_OPL4	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_OPL4,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_PCXHR	include/asound.h	/^ SNDRV_HWDEP_IFACE_PCXHR,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_PCXHR	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_PCXHR,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_SB16CSP	include/asound.h	/^ SNDRV_HWDEP_IFACE_SB16CSP,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_SB16CSP	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_SB16CSP,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_SB_RC	include/asound.h	/^ SNDRV_HWDEP_IFACE_SB_RC,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_SB_RC	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_SB_RC,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_SSCAPE	include/asound.h	/^ SNDRV_HWDEP_IFACE_SSCAPE,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_SSCAPE	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_SSCAPE,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_USB_STREAM	include/asound.h	/^ SNDRV_HWDEP_IFACE_USB_STREAM,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_USB_STREAM	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_USB_STREAM,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_USX2Y	include/asound.h	/^ SNDRV_HWDEP_IFACE_USX2Y,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_USX2Y	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_USX2Y,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_USX2Y_PCM	include/asound.h	/^ SNDRV_HWDEP_IFACE_USX2Y_PCM,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_USX2Y_PCM	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_USX2Y_PCM,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_VX	include/asound.h	/^ SNDRV_HWDEP_IFACE_VX,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_VX	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_VX,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IFACE_YSS225	include/asound.h	/^ SNDRV_HWDEP_IFACE_YSS225,$/;"	e	enum:__anon34
+SNDRV_HWDEP_IFACE_YSS225	modules/include/asound.h	/^ SNDRV_HWDEP_IFACE_YSS225,$/;"	e	enum:__anon5
+SNDRV_HWDEP_IOCTL_DSP_LOAD	include/asound.h	84;"	d
+SNDRV_HWDEP_IOCTL_DSP_LOAD	modules/include/asound.h	84;"	d
+SNDRV_HWDEP_IOCTL_DSP_STATUS	include/asound.h	83;"	d
+SNDRV_HWDEP_IOCTL_DSP_STATUS	modules/include/asound.h	83;"	d
+SNDRV_HWDEP_IOCTL_INFO	include/asound.h	82;"	d
+SNDRV_HWDEP_IOCTL_INFO	modules/include/asound.h	82;"	d
+SNDRV_HWDEP_IOCTL_PVERSION	include/asound.h	81;"	d
+SNDRV_HWDEP_IOCTL_PVERSION	modules/include/asound.h	81;"	d
+SNDRV_HWDEP_VERSION	include/asound.h	30;"	d
+SNDRV_HWDEP_VERSION	modules/include/asound.h	30;"	d
+SNDRV_MASK_MAX	include/asound.h	284;"	d
+SNDRV_MASK_MAX	modules/include/asound.h	284;"	d
+SNDRV_PCM_ACCESS_LAST	include/asound.h	119;"	d
+SNDRV_PCM_ACCESS_LAST	modules/include/asound.h	119;"	d
+SNDRV_PCM_ACCESS_MMAP_COMPLEX	include/asound.h	116;"	d
+SNDRV_PCM_ACCESS_MMAP_COMPLEX	modules/include/asound.h	116;"	d
+SNDRV_PCM_ACCESS_MMAP_INTERLEAVED	include/asound.h	114;"	d
+SNDRV_PCM_ACCESS_MMAP_INTERLEAVED	modules/include/asound.h	114;"	d
+SNDRV_PCM_ACCESS_MMAP_NONINTERLEAVED	include/asound.h	115;"	d
+SNDRV_PCM_ACCESS_MMAP_NONINTERLEAVED	modules/include/asound.h	115;"	d
+SNDRV_PCM_ACCESS_RW_INTERLEAVED	include/asound.h	117;"	d
+SNDRV_PCM_ACCESS_RW_INTERLEAVED	modules/include/asound.h	117;"	d
+SNDRV_PCM_ACCESS_RW_NONINTERLEAVED	include/asound.h	118;"	d
+SNDRV_PCM_ACCESS_RW_NONINTERLEAVED	modules/include/asound.h	118;"	d
+SNDRV_PCM_CLASS_DIGITIZER	include/asound.h	/^ SNDRV_PCM_CLASS_DIGITIZER,$/;"	e	enum:__anon35
+SNDRV_PCM_CLASS_DIGITIZER	modules/include/asound.h	/^ SNDRV_PCM_CLASS_DIGITIZER,$/;"	e	enum:__anon6
+SNDRV_PCM_CLASS_GENERIC	include/asound.h	/^ SNDRV_PCM_CLASS_GENERIC = 0,$/;"	e	enum:__anon35
+SNDRV_PCM_CLASS_GENERIC	modules/include/asound.h	/^ SNDRV_PCM_CLASS_GENERIC = 0,$/;"	e	enum:__anon6
+SNDRV_PCM_CLASS_LAST	include/asound.h	/^ SNDRV_PCM_CLASS_LAST = SNDRV_PCM_CLASS_DIGITIZER,$/;"	e	enum:__anon35
+SNDRV_PCM_CLASS_LAST	modules/include/asound.h	/^ SNDRV_PCM_CLASS_LAST = SNDRV_PCM_CLASS_DIGITIZER,$/;"	e	enum:__anon6
+SNDRV_PCM_CLASS_MODEM	include/asound.h	/^ SNDRV_PCM_CLASS_MODEM,$/;"	e	enum:__anon35
+SNDRV_PCM_CLASS_MODEM	modules/include/asound.h	/^ SNDRV_PCM_CLASS_MODEM,$/;"	e	enum:__anon6
+SNDRV_PCM_CLASS_MULTI	include/asound.h	/^ SNDRV_PCM_CLASS_MULTI,$/;"	e	enum:__anon35
+SNDRV_PCM_CLASS_MULTI	modules/include/asound.h	/^ SNDRV_PCM_CLASS_MULTI,$/;"	e	enum:__anon6
+SNDRV_PCM_FORMAT_A_LAW	include/asound.h	143;"	d
+SNDRV_PCM_FORMAT_A_LAW	modules/include/asound.h	143;"	d
+SNDRV_PCM_FORMAT_FLOAT	include/asound.h	173;"	d
+SNDRV_PCM_FORMAT_FLOAT	include/asound.h	184;"	d
+SNDRV_PCM_FORMAT_FLOAT	modules/include/asound.h	173;"	d
+SNDRV_PCM_FORMAT_FLOAT	modules/include/asound.h	184;"	d
+SNDRV_PCM_FORMAT_FLOAT64	include/asound.h	174;"	d
+SNDRV_PCM_FORMAT_FLOAT64	include/asound.h	185;"	d
+SNDRV_PCM_FORMAT_FLOAT64	modules/include/asound.h	174;"	d
+SNDRV_PCM_FORMAT_FLOAT64	modules/include/asound.h	185;"	d
+SNDRV_PCM_FORMAT_FLOAT64_BE	include/asound.h	139;"	d
+SNDRV_PCM_FORMAT_FLOAT64_BE	modules/include/asound.h	139;"	d
+SNDRV_PCM_FORMAT_FLOAT64_LE	include/asound.h	138;"	d
+SNDRV_PCM_FORMAT_FLOAT64_LE	modules/include/asound.h	138;"	d
+SNDRV_PCM_FORMAT_FLOAT_BE	include/asound.h	137;"	d
+SNDRV_PCM_FORMAT_FLOAT_BE	modules/include/asound.h	137;"	d
+SNDRV_PCM_FORMAT_FLOAT_LE	include/asound.h	136;"	d
+SNDRV_PCM_FORMAT_FLOAT_LE	modules/include/asound.h	136;"	d
+SNDRV_PCM_FORMAT_G723_24	include/asound.h	160;"	d
+SNDRV_PCM_FORMAT_G723_24	modules/include/asound.h	160;"	d
+SNDRV_PCM_FORMAT_G723_24_1B	include/asound.h	161;"	d
+SNDRV_PCM_FORMAT_G723_24_1B	modules/include/asound.h	161;"	d
+SNDRV_PCM_FORMAT_G723_40	include/asound.h	162;"	d
+SNDRV_PCM_FORMAT_G723_40	modules/include/asound.h	162;"	d
+SNDRV_PCM_FORMAT_G723_40_1B	include/asound.h	163;"	d
+SNDRV_PCM_FORMAT_G723_40_1B	modules/include/asound.h	163;"	d
+SNDRV_PCM_FORMAT_GSM	include/asound.h	146;"	d
+SNDRV_PCM_FORMAT_GSM	modules/include/asound.h	146;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME	include/asound.h	175;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME	include/asound.h	186;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME	modules/include/asound.h	175;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME	modules/include/asound.h	186;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME_BE	include/asound.h	141;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME_BE	modules/include/asound.h	141;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE	include/asound.h	140;"	d
+SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE	modules/include/asound.h	140;"	d
+SNDRV_PCM_FORMAT_IMA_ADPCM	include/asound.h	144;"	d
+SNDRV_PCM_FORMAT_IMA_ADPCM	modules/include/asound.h	144;"	d
+SNDRV_PCM_FORMAT_LAST	include/asound.h	164;"	d
+SNDRV_PCM_FORMAT_LAST	modules/include/asound.h	164;"	d
+SNDRV_PCM_FORMAT_MPEG	include/asound.h	145;"	d
+SNDRV_PCM_FORMAT_MPEG	modules/include/asound.h	145;"	d
+SNDRV_PCM_FORMAT_MU_LAW	include/asound.h	142;"	d
+SNDRV_PCM_FORMAT_MU_LAW	modules/include/asound.h	142;"	d
+SNDRV_PCM_FORMAT_S16	include/asound.h	167;"	d
+SNDRV_PCM_FORMAT_S16	include/asound.h	178;"	d
+SNDRV_PCM_FORMAT_S16	modules/include/asound.h	167;"	d
+SNDRV_PCM_FORMAT_S16	modules/include/asound.h	178;"	d
+SNDRV_PCM_FORMAT_S16_BE	include/asound.h	125;"	d
+SNDRV_PCM_FORMAT_S16_BE	modules/include/asound.h	125;"	d
+SNDRV_PCM_FORMAT_S16_LE	include/asound.h	124;"	d
+SNDRV_PCM_FORMAT_S16_LE	modules/include/asound.h	124;"	d
+SNDRV_PCM_FORMAT_S18_3BE	include/asound.h	157;"	d
+SNDRV_PCM_FORMAT_S18_3BE	modules/include/asound.h	157;"	d
+SNDRV_PCM_FORMAT_S18_3LE	include/asound.h	156;"	d
+SNDRV_PCM_FORMAT_S18_3LE	modules/include/asound.h	156;"	d
+SNDRV_PCM_FORMAT_S20_3BE	include/asound.h	153;"	d
+SNDRV_PCM_FORMAT_S20_3BE	modules/include/asound.h	153;"	d
+SNDRV_PCM_FORMAT_S20_3LE	include/asound.h	152;"	d
+SNDRV_PCM_FORMAT_S20_3LE	modules/include/asound.h	152;"	d
+SNDRV_PCM_FORMAT_S24	include/asound.h	169;"	d
+SNDRV_PCM_FORMAT_S24	include/asound.h	180;"	d
+SNDRV_PCM_FORMAT_S24	modules/include/asound.h	169;"	d
+SNDRV_PCM_FORMAT_S24	modules/include/asound.h	180;"	d
+SNDRV_PCM_FORMAT_S24_3BE	include/asound.h	149;"	d
+SNDRV_PCM_FORMAT_S24_3BE	modules/include/asound.h	149;"	d
+SNDRV_PCM_FORMAT_S24_3LE	include/asound.h	148;"	d
+SNDRV_PCM_FORMAT_S24_3LE	modules/include/asound.h	148;"	d
+SNDRV_PCM_FORMAT_S24_BE	include/asound.h	129;"	d
+SNDRV_PCM_FORMAT_S24_BE	modules/include/asound.h	129;"	d
+SNDRV_PCM_FORMAT_S24_LE	include/asound.h	128;"	d
+SNDRV_PCM_FORMAT_S24_LE	modules/include/asound.h	128;"	d
+SNDRV_PCM_FORMAT_S32	include/asound.h	171;"	d
+SNDRV_PCM_FORMAT_S32	include/asound.h	182;"	d
+SNDRV_PCM_FORMAT_S32	modules/include/asound.h	171;"	d
+SNDRV_PCM_FORMAT_S32	modules/include/asound.h	182;"	d
+SNDRV_PCM_FORMAT_S32_BE	include/asound.h	133;"	d
+SNDRV_PCM_FORMAT_S32_BE	modules/include/asound.h	133;"	d
+SNDRV_PCM_FORMAT_S32_LE	include/asound.h	132;"	d
+SNDRV_PCM_FORMAT_S32_LE	modules/include/asound.h	132;"	d
+SNDRV_PCM_FORMAT_S8	include/asound.h	122;"	d
+SNDRV_PCM_FORMAT_S8	modules/include/asound.h	122;"	d
+SNDRV_PCM_FORMAT_SPECIAL	include/asound.h	147;"	d
+SNDRV_PCM_FORMAT_SPECIAL	modules/include/asound.h	147;"	d
+SNDRV_PCM_FORMAT_U16	include/asound.h	168;"	d
+SNDRV_PCM_FORMAT_U16	include/asound.h	179;"	d
+SNDRV_PCM_FORMAT_U16	modules/include/asound.h	168;"	d
+SNDRV_PCM_FORMAT_U16	modules/include/asound.h	179;"	d
+SNDRV_PCM_FORMAT_U16_BE	include/asound.h	127;"	d
+SNDRV_PCM_FORMAT_U16_BE	modules/include/asound.h	127;"	d
+SNDRV_PCM_FORMAT_U16_LE	include/asound.h	126;"	d
+SNDRV_PCM_FORMAT_U16_LE	modules/include/asound.h	126;"	d
+SNDRV_PCM_FORMAT_U18_3BE	include/asound.h	159;"	d
+SNDRV_PCM_FORMAT_U18_3BE	modules/include/asound.h	159;"	d
+SNDRV_PCM_FORMAT_U18_3LE	include/asound.h	158;"	d
+SNDRV_PCM_FORMAT_U18_3LE	modules/include/asound.h	158;"	d
+SNDRV_PCM_FORMAT_U20_3BE	include/asound.h	155;"	d
+SNDRV_PCM_FORMAT_U20_3BE	modules/include/asound.h	155;"	d
+SNDRV_PCM_FORMAT_U20_3LE	include/asound.h	154;"	d
+SNDRV_PCM_FORMAT_U20_3LE	modules/include/asound.h	154;"	d
+SNDRV_PCM_FORMAT_U24	include/asound.h	170;"	d
+SNDRV_PCM_FORMAT_U24	include/asound.h	181;"	d
+SNDRV_PCM_FORMAT_U24	modules/include/asound.h	170;"	d
+SNDRV_PCM_FORMAT_U24	modules/include/asound.h	181;"	d
+SNDRV_PCM_FORMAT_U24_3BE	include/asound.h	151;"	d
+SNDRV_PCM_FORMAT_U24_3BE	modules/include/asound.h	151;"	d
+SNDRV_PCM_FORMAT_U24_3LE	include/asound.h	150;"	d
+SNDRV_PCM_FORMAT_U24_3LE	modules/include/asound.h	150;"	d
+SNDRV_PCM_FORMAT_U24_BE	include/asound.h	131;"	d
+SNDRV_PCM_FORMAT_U24_BE	modules/include/asound.h	131;"	d
+SNDRV_PCM_FORMAT_U24_LE	include/asound.h	130;"	d
+SNDRV_PCM_FORMAT_U24_LE	modules/include/asound.h	130;"	d
+SNDRV_PCM_FORMAT_U32	include/asound.h	172;"	d
+SNDRV_PCM_FORMAT_U32	include/asound.h	183;"	d
+SNDRV_PCM_FORMAT_U32	modules/include/asound.h	172;"	d
+SNDRV_PCM_FORMAT_U32	modules/include/asound.h	183;"	d
+SNDRV_PCM_FORMAT_U32_BE	include/asound.h	135;"	d
+SNDRV_PCM_FORMAT_U32_BE	modules/include/asound.h	135;"	d
+SNDRV_PCM_FORMAT_U32_LE	include/asound.h	134;"	d
+SNDRV_PCM_FORMAT_U32_LE	modules/include/asound.h	134;"	d
+SNDRV_PCM_FORMAT_U8	include/asound.h	123;"	d
+SNDRV_PCM_FORMAT_U8	modules/include/asound.h	123;"	d
+SNDRV_PCM_HW_PARAMS_EXPORT_BUFFER	include/asound.h	273;"	d
+SNDRV_PCM_HW_PARAMS_EXPORT_BUFFER	modules/include/asound.h	273;"	d
+SNDRV_PCM_HW_PARAMS_NORESAMPLE	include/asound.h	272;"	d
+SNDRV_PCM_HW_PARAMS_NORESAMPLE	modules/include/asound.h	272;"	d
+SNDRV_PCM_HW_PARAMS_NO_PERIOD_WAKEUP	include/asound.h	274;"	d
+SNDRV_PCM_HW_PARAMS_NO_PERIOD_WAKEUP	modules/include/asound.h	274;"	d
+SNDRV_PCM_HW_PARAM_ACCESS	include/asound.h	251;"	d
+SNDRV_PCM_HW_PARAM_ACCESS	modules/include/asound.h	251;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_BYTES	include/asound.h	267;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_BYTES	modules/include/asound.h	267;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_SIZE	include/asound.h	266;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_SIZE	modules/include/asound.h	266;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_TIME	include/asound.h	265;"	d
+SNDRV_PCM_HW_PARAM_BUFFER_TIME	modules/include/asound.h	265;"	d
+SNDRV_PCM_HW_PARAM_CHANNELS	include/asound.h	259;"	d
+SNDRV_PCM_HW_PARAM_CHANNELS	modules/include/asound.h	259;"	d
+SNDRV_PCM_HW_PARAM_FIRST_INTERVAL	include/asound.h	269;"	d
+SNDRV_PCM_HW_PARAM_FIRST_INTERVAL	modules/include/asound.h	269;"	d
+SNDRV_PCM_HW_PARAM_FIRST_MASK	include/asound.h	254;"	d
+SNDRV_PCM_HW_PARAM_FIRST_MASK	modules/include/asound.h	254;"	d
+SNDRV_PCM_HW_PARAM_FORMAT	include/asound.h	252;"	d
+SNDRV_PCM_HW_PARAM_FORMAT	modules/include/asound.h	252;"	d
+SNDRV_PCM_HW_PARAM_FRAME_BITS	include/asound.h	258;"	d
+SNDRV_PCM_HW_PARAM_FRAME_BITS	modules/include/asound.h	258;"	d
+SNDRV_PCM_HW_PARAM_LAST_INTERVAL	include/asound.h	270;"	d
+SNDRV_PCM_HW_PARAM_LAST_INTERVAL	modules/include/asound.h	270;"	d
+SNDRV_PCM_HW_PARAM_LAST_MASK	include/asound.h	255;"	d
+SNDRV_PCM_HW_PARAM_LAST_MASK	modules/include/asound.h	255;"	d
+SNDRV_PCM_HW_PARAM_PERIODS	include/asound.h	264;"	d
+SNDRV_PCM_HW_PARAM_PERIODS	modules/include/asound.h	264;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_BYTES	include/asound.h	263;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_BYTES	modules/include/asound.h	263;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_SIZE	include/asound.h	262;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_SIZE	modules/include/asound.h	262;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_TIME	include/asound.h	261;"	d
+SNDRV_PCM_HW_PARAM_PERIOD_TIME	modules/include/asound.h	261;"	d
+SNDRV_PCM_HW_PARAM_RATE	include/asound.h	260;"	d
+SNDRV_PCM_HW_PARAM_RATE	modules/include/asound.h	260;"	d
+SNDRV_PCM_HW_PARAM_SAMPLE_BITS	include/asound.h	257;"	d
+SNDRV_PCM_HW_PARAM_SAMPLE_BITS	modules/include/asound.h	257;"	d
+SNDRV_PCM_HW_PARAM_SUBFORMAT	include/asound.h	253;"	d
+SNDRV_PCM_HW_PARAM_SUBFORMAT	modules/include/asound.h	253;"	d
+SNDRV_PCM_HW_PARAM_TICK_TIME	include/asound.h	268;"	d
+SNDRV_PCM_HW_PARAM_TICK_TIME	modules/include/asound.h	268;"	d
+SNDRV_PCM_INFO_BATCH	include/asound.h	196;"	d
+SNDRV_PCM_INFO_BATCH	modules/include/asound.h	196;"	d
+SNDRV_PCM_INFO_BLOCK_TRANSFER	include/asound.h	200;"	d
+SNDRV_PCM_INFO_BLOCK_TRANSFER	modules/include/asound.h	200;"	d
+SNDRV_PCM_INFO_COMPLEX	include/asound.h	199;"	d
+SNDRV_PCM_INFO_COMPLEX	modules/include/asound.h	199;"	d
+SNDRV_PCM_INFO_DOUBLE	include/asound.h	195;"	d
+SNDRV_PCM_INFO_DOUBLE	modules/include/asound.h	195;"	d
+SNDRV_PCM_INFO_FIFO_IN_FRAMES	include/asound.h	208;"	d
+SNDRV_PCM_INFO_FIFO_IN_FRAMES	modules/include/asound.h	208;"	d
+SNDRV_PCM_INFO_HALF_DUPLEX	include/asound.h	204;"	d
+SNDRV_PCM_INFO_HALF_DUPLEX	modules/include/asound.h	204;"	d
+SNDRV_PCM_INFO_INTERLEAVED	include/asound.h	197;"	d
+SNDRV_PCM_INFO_INTERLEAVED	modules/include/asound.h	197;"	d
+SNDRV_PCM_INFO_JOINT_DUPLEX	include/asound.h	205;"	d
+SNDRV_PCM_INFO_JOINT_DUPLEX	modules/include/asound.h	205;"	d
+SNDRV_PCM_INFO_MMAP	include/asound.h	193;"	d
+SNDRV_PCM_INFO_MMAP	modules/include/asound.h	193;"	d
+SNDRV_PCM_INFO_MMAP_VALID	include/asound.h	194;"	d
+SNDRV_PCM_INFO_MMAP_VALID	modules/include/asound.h	194;"	d
+SNDRV_PCM_INFO_NONINTERLEAVED	include/asound.h	198;"	d
+SNDRV_PCM_INFO_NONINTERLEAVED	modules/include/asound.h	198;"	d
+SNDRV_PCM_INFO_NO_PERIOD_WAKEUP	include/asound.h	207;"	d
+SNDRV_PCM_INFO_NO_PERIOD_WAKEUP	modules/include/asound.h	207;"	d
+SNDRV_PCM_INFO_OVERRANGE	include/asound.h	201;"	d
+SNDRV_PCM_INFO_OVERRANGE	modules/include/asound.h	201;"	d
+SNDRV_PCM_INFO_PAUSE	include/asound.h	203;"	d
+SNDRV_PCM_INFO_PAUSE	modules/include/asound.h	203;"	d
+SNDRV_PCM_INFO_RESUME	include/asound.h	202;"	d
+SNDRV_PCM_INFO_RESUME	modules/include/asound.h	202;"	d
+SNDRV_PCM_INFO_SYNC_START	include/asound.h	206;"	d
+SNDRV_PCM_INFO_SYNC_START	modules/include/asound.h	206;"	d
+SNDRV_PCM_IOCTL_CHANNEL_INFO	include/asound.h	408;"	d
+SNDRV_PCM_IOCTL_CHANNEL_INFO	modules/include/asound.h	408;"	d
+SNDRV_PCM_IOCTL_DELAY	include/asound.h	405;"	d
+SNDRV_PCM_IOCTL_DELAY	modules/include/asound.h	405;"	d
+SNDRV_PCM_IOCTL_DRAIN	include/asound.h	413;"	d
+SNDRV_PCM_IOCTL_DRAIN	modules/include/asound.h	413;"	d
+SNDRV_PCM_IOCTL_DROP	include/asound.h	412;"	d
+SNDRV_PCM_IOCTL_DROP	modules/include/asound.h	412;"	d
+SNDRV_PCM_IOCTL_FORWARD	include/asound.h	418;"	d
+SNDRV_PCM_IOCTL_FORWARD	modules/include/asound.h	418;"	d
+SNDRV_PCM_IOCTL_HWSYNC	include/asound.h	406;"	d
+SNDRV_PCM_IOCTL_HWSYNC	modules/include/asound.h	406;"	d
+SNDRV_PCM_IOCTL_HW_FREE	include/asound.h	402;"	d
+SNDRV_PCM_IOCTL_HW_FREE	modules/include/asound.h	402;"	d
+SNDRV_PCM_IOCTL_HW_PARAMS	include/asound.h	401;"	d
+SNDRV_PCM_IOCTL_HW_PARAMS	modules/include/asound.h	401;"	d
+SNDRV_PCM_IOCTL_HW_REFINE	include/asound.h	400;"	d
+SNDRV_PCM_IOCTL_HW_REFINE	modules/include/asound.h	400;"	d
+SNDRV_PCM_IOCTL_INFO	include/asound.h	397;"	d
+SNDRV_PCM_IOCTL_INFO	modules/include/asound.h	397;"	d
+SNDRV_PCM_IOCTL_LINK	include/asound.h	423;"	d
+SNDRV_PCM_IOCTL_LINK	modules/include/asound.h	423;"	d
+SNDRV_PCM_IOCTL_PAUSE	include/asound.h	414;"	d
+SNDRV_PCM_IOCTL_PAUSE	modules/include/asound.h	414;"	d
+SNDRV_PCM_IOCTL_PREPARE	include/asound.h	409;"	d
+SNDRV_PCM_IOCTL_PREPARE	modules/include/asound.h	409;"	d
+SNDRV_PCM_IOCTL_PVERSION	include/asound.h	396;"	d
+SNDRV_PCM_IOCTL_PVERSION	modules/include/asound.h	396;"	d
+SNDRV_PCM_IOCTL_READI_FRAMES	include/asound.h	420;"	d
+SNDRV_PCM_IOCTL_READI_FRAMES	modules/include/asound.h	420;"	d
+SNDRV_PCM_IOCTL_READN_FRAMES	include/asound.h	422;"	d
+SNDRV_PCM_IOCTL_READN_FRAMES	modules/include/asound.h	422;"	d
+SNDRV_PCM_IOCTL_RESET	include/asound.h	410;"	d
+SNDRV_PCM_IOCTL_RESET	modules/include/asound.h	410;"	d
+SNDRV_PCM_IOCTL_RESUME	include/asound.h	416;"	d
+SNDRV_PCM_IOCTL_RESUME	modules/include/asound.h	416;"	d
+SNDRV_PCM_IOCTL_REWIND	include/asound.h	415;"	d
+SNDRV_PCM_IOCTL_REWIND	modules/include/asound.h	415;"	d
+SNDRV_PCM_IOCTL_START	include/asound.h	411;"	d
+SNDRV_PCM_IOCTL_START	modules/include/asound.h	411;"	d
+SNDRV_PCM_IOCTL_STATUS	include/asound.h	404;"	d
+SNDRV_PCM_IOCTL_STATUS	modules/include/asound.h	404;"	d
+SNDRV_PCM_IOCTL_SW_PARAMS	include/asound.h	403;"	d
+SNDRV_PCM_IOCTL_SW_PARAMS	modules/include/asound.h	403;"	d
+SNDRV_PCM_IOCTL_SYNC_PTR	include/asound.h	407;"	d
+SNDRV_PCM_IOCTL_SYNC_PTR	modules/include/asound.h	407;"	d
+SNDRV_PCM_IOCTL_TSTAMP	include/asound.h	398;"	d
+SNDRV_PCM_IOCTL_TSTAMP	modules/include/asound.h	398;"	d
+SNDRV_PCM_IOCTL_TTSTAMP	include/asound.h	399;"	d
+SNDRV_PCM_IOCTL_TTSTAMP	modules/include/asound.h	399;"	d
+SNDRV_PCM_IOCTL_UNLINK	include/asound.h	424;"	d
+SNDRV_PCM_IOCTL_UNLINK	modules/include/asound.h	424;"	d
+SNDRV_PCM_IOCTL_WRITEI_FRAMES	include/asound.h	419;"	d
+SNDRV_PCM_IOCTL_WRITEI_FRAMES	modules/include/asound.h	419;"	d
+SNDRV_PCM_IOCTL_WRITEN_FRAMES	include/asound.h	421;"	d
+SNDRV_PCM_IOCTL_WRITEN_FRAMES	modules/include/asound.h	421;"	d
+SNDRV_PCM_IOCTL_XRUN	include/asound.h	417;"	d
+SNDRV_PCM_IOCTL_XRUN	modules/include/asound.h	417;"	d
+SNDRV_PCM_MMAP_OFFSET_CONTROL	include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_CONTROL = 0x81000000,$/;"	e	enum:__anon38
+SNDRV_PCM_MMAP_OFFSET_CONTROL	modules/include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_CONTROL = 0x81000000,$/;"	e	enum:__anon9
+SNDRV_PCM_MMAP_OFFSET_DATA	include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_DATA = 0x00000000,$/;"	e	enum:__anon38
+SNDRV_PCM_MMAP_OFFSET_DATA	modules/include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_DATA = 0x00000000,$/;"	e	enum:__anon9
+SNDRV_PCM_MMAP_OFFSET_STATUS	include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_STATUS = 0x80000000,$/;"	e	enum:__anon38
+SNDRV_PCM_MMAP_OFFSET_STATUS	modules/include/asound.h	/^ SNDRV_PCM_MMAP_OFFSET_STATUS = 0x80000000,$/;"	e	enum:__anon9
+SNDRV_PCM_STATE_DISCONNECTED	include/asound.h	219;"	d
+SNDRV_PCM_STATE_DISCONNECTED	modules/include/asound.h	219;"	d
+SNDRV_PCM_STATE_DRAINING	include/asound.h	216;"	d
+SNDRV_PCM_STATE_DRAINING	modules/include/asound.h	216;"	d
+SNDRV_PCM_STATE_LAST	include/asound.h	220;"	d
+SNDRV_PCM_STATE_LAST	modules/include/asound.h	220;"	d
+SNDRV_PCM_STATE_OPEN	include/asound.h	211;"	d
+SNDRV_PCM_STATE_OPEN	modules/include/asound.h	211;"	d
+SNDRV_PCM_STATE_PAUSED	include/asound.h	217;"	d
+SNDRV_PCM_STATE_PAUSED	modules/include/asound.h	217;"	d
+SNDRV_PCM_STATE_PREPARED	include/asound.h	213;"	d
+SNDRV_PCM_STATE_PREPARED	modules/include/asound.h	213;"	d
+SNDRV_PCM_STATE_RUNNING	include/asound.h	214;"	d
+SNDRV_PCM_STATE_RUNNING	modules/include/asound.h	214;"	d
+SNDRV_PCM_STATE_SETUP	include/asound.h	212;"	d
+SNDRV_PCM_STATE_SETUP	modules/include/asound.h	212;"	d
+SNDRV_PCM_STATE_SUSPENDED	include/asound.h	218;"	d
+SNDRV_PCM_STATE_SUSPENDED	modules/include/asound.h	218;"	d
+SNDRV_PCM_STATE_XRUN	include/asound.h	215;"	d
+SNDRV_PCM_STATE_XRUN	modules/include/asound.h	215;"	d
+SNDRV_PCM_STREAM_CAPTURE	include/asound.h	/^ SNDRV_PCM_STREAM_CAPTURE,$/;"	e	enum:__anon37
+SNDRV_PCM_STREAM_CAPTURE	modules/include/asound.h	/^ SNDRV_PCM_STREAM_CAPTURE,$/;"	e	enum:__anon8
+SNDRV_PCM_STREAM_LAST	include/asound.h	/^ SNDRV_PCM_STREAM_LAST = SNDRV_PCM_STREAM_CAPTURE,$/;"	e	enum:__anon37
+SNDRV_PCM_STREAM_LAST	modules/include/asound.h	/^ SNDRV_PCM_STREAM_LAST = SNDRV_PCM_STREAM_CAPTURE,$/;"	e	enum:__anon8
+SNDRV_PCM_STREAM_PLAYBACK	include/asound.h	/^ SNDRV_PCM_STREAM_PLAYBACK = 0,$/;"	e	enum:__anon37
+SNDRV_PCM_STREAM_PLAYBACK	modules/include/asound.h	/^ SNDRV_PCM_STREAM_PLAYBACK = 0,$/;"	e	enum:__anon8
+SNDRV_PCM_SUBCLASS_GENERIC_MIX	include/asound.h	/^ SNDRV_PCM_SUBCLASS_GENERIC_MIX = 0,$/;"	e	enum:__anon36
+SNDRV_PCM_SUBCLASS_GENERIC_MIX	modules/include/asound.h	/^ SNDRV_PCM_SUBCLASS_GENERIC_MIX = 0,$/;"	e	enum:__anon7
+SNDRV_PCM_SUBCLASS_LAST	include/asound.h	/^ SNDRV_PCM_SUBCLASS_LAST = SNDRV_PCM_SUBCLASS_MULTI_MIX,$/;"	e	enum:__anon36
+SNDRV_PCM_SUBCLASS_LAST	modules/include/asound.h	/^ SNDRV_PCM_SUBCLASS_LAST = SNDRV_PCM_SUBCLASS_MULTI_MIX,$/;"	e	enum:__anon7
+SNDRV_PCM_SUBCLASS_MULTI_MIX	include/asound.h	/^ SNDRV_PCM_SUBCLASS_MULTI_MIX,$/;"	e	enum:__anon36
+SNDRV_PCM_SUBCLASS_MULTI_MIX	modules/include/asound.h	/^ SNDRV_PCM_SUBCLASS_MULTI_MIX,$/;"	e	enum:__anon7
+SNDRV_PCM_SUBFORMAT_LAST	include/asound.h	191;"	d
+SNDRV_PCM_SUBFORMAT_LAST	modules/include/asound.h	191;"	d
+SNDRV_PCM_SUBFORMAT_STD	include/asound.h	190;"	d
+SNDRV_PCM_SUBFORMAT_STD	modules/include/asound.h	190;"	d
+SNDRV_PCM_SYNC_PTR_APPL	include/asound.h	363;"	d
+SNDRV_PCM_SYNC_PTR_APPL	modules/include/asound.h	363;"	d
+SNDRV_PCM_SYNC_PTR_AVAIL_MIN	include/asound.h	364;"	d
+SNDRV_PCM_SYNC_PTR_AVAIL_MIN	modules/include/asound.h	364;"	d
+SNDRV_PCM_SYNC_PTR_HWSYNC	include/asound.h	362;"	d
+SNDRV_PCM_SYNC_PTR_HWSYNC	modules/include/asound.h	362;"	d
+SNDRV_PCM_TSTAMP_ENABLE	include/asound.h	/^ SNDRV_PCM_TSTAMP_ENABLE,$/;"	e	enum:__anon39
+SNDRV_PCM_TSTAMP_ENABLE	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_ENABLE,$/;"	e	enum:__anon10
+SNDRV_PCM_TSTAMP_LAST	include/asound.h	/^ SNDRV_PCM_TSTAMP_LAST = SNDRV_PCM_TSTAMP_ENABLE,$/;"	e	enum:__anon39
+SNDRV_PCM_TSTAMP_LAST	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_LAST = SNDRV_PCM_TSTAMP_ENABLE,$/;"	e	enum:__anon10
+SNDRV_PCM_TSTAMP_NONE	include/asound.h	/^ SNDRV_PCM_TSTAMP_NONE = 0,$/;"	e	enum:__anon39
+SNDRV_PCM_TSTAMP_NONE	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_NONE = 0,$/;"	e	enum:__anon10
+SNDRV_PCM_TSTAMP_TYPE_GETTIMEOFDAY	include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_GETTIMEOFDAY = 0,$/;"	e	enum:__anon42
+SNDRV_PCM_TSTAMP_TYPE_GETTIMEOFDAY	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_GETTIMEOFDAY = 0,$/;"	e	enum:__anon13
+SNDRV_PCM_TSTAMP_TYPE_LAST	include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_LAST = SNDRV_PCM_TSTAMP_TYPE_MONOTONIC,$/;"	e	enum:__anon42
+SNDRV_PCM_TSTAMP_TYPE_LAST	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_LAST = SNDRV_PCM_TSTAMP_TYPE_MONOTONIC,$/;"	e	enum:__anon13
+SNDRV_PCM_TSTAMP_TYPE_MONOTONIC	include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_MONOTONIC,$/;"	e	enum:__anon42
+SNDRV_PCM_TSTAMP_TYPE_MONOTONIC	modules/include/asound.h	/^ SNDRV_PCM_TSTAMP_TYPE_MONOTONIC,$/;"	e	enum:__anon13
+SNDRV_PCM_VERSION	include/asound.h	86;"	d
+SNDRV_PCM_VERSION	modules/include/asound.h	86;"	d
+SNDRV_PROTOCOL_INCOMPATIBLE	include/asound.h	21;"	d
+SNDRV_PROTOCOL_INCOMPATIBLE	modules/include/asound.h	21;"	d
+SNDRV_PROTOCOL_MAJOR	include/asound.h	18;"	d
+SNDRV_PROTOCOL_MAJOR	modules/include/asound.h	18;"	d
+SNDRV_PROTOCOL_MICRO	include/asound.h	20;"	d
+SNDRV_PROTOCOL_MICRO	modules/include/asound.h	20;"	d
+SNDRV_PROTOCOL_MINOR	include/asound.h	19;"	d
+SNDRV_PROTOCOL_MINOR	modules/include/asound.h	19;"	d
+SNDRV_PROTOCOL_VERSION	include/asound.h	17;"	d
+SNDRV_PROTOCOL_VERSION	modules/include/asound.h	17;"	d
+SNDRV_RAWMIDI_INFO_DUPLEX	include/asound.h	436;"	d
+SNDRV_RAWMIDI_INFO_DUPLEX	modules/include/asound.h	436;"	d
+SNDRV_RAWMIDI_INFO_INPUT	include/asound.h	435;"	d
+SNDRV_RAWMIDI_INFO_INPUT	modules/include/asound.h	435;"	d
+SNDRV_RAWMIDI_INFO_OUTPUT	include/asound.h	434;"	d
+SNDRV_RAWMIDI_INFO_OUTPUT	modules/include/asound.h	434;"	d
+SNDRV_RAWMIDI_IOCTL_DRAIN	include/asound.h	473;"	d
+SNDRV_RAWMIDI_IOCTL_DRAIN	modules/include/asound.h	473;"	d
+SNDRV_RAWMIDI_IOCTL_DROP	include/asound.h	472;"	d
+SNDRV_RAWMIDI_IOCTL_DROP	modules/include/asound.h	472;"	d
+SNDRV_RAWMIDI_IOCTL_INFO	include/asound.h	469;"	d
+SNDRV_RAWMIDI_IOCTL_INFO	modules/include/asound.h	469;"	d
+SNDRV_RAWMIDI_IOCTL_PARAMS	include/asound.h	470;"	d
+SNDRV_RAWMIDI_IOCTL_PARAMS	modules/include/asound.h	470;"	d
+SNDRV_RAWMIDI_IOCTL_PVERSION	include/asound.h	468;"	d
+SNDRV_RAWMIDI_IOCTL_PVERSION	modules/include/asound.h	468;"	d
+SNDRV_RAWMIDI_IOCTL_STATUS	include/asound.h	471;"	d
+SNDRV_RAWMIDI_IOCTL_STATUS	modules/include/asound.h	471;"	d
+SNDRV_RAWMIDI_STREAM_INPUT	include/asound.h	/^ SNDRV_RAWMIDI_STREAM_INPUT,$/;"	e	enum:__anon43
+SNDRV_RAWMIDI_STREAM_INPUT	modules/include/asound.h	/^ SNDRV_RAWMIDI_STREAM_INPUT,$/;"	e	enum:__anon14
+SNDRV_RAWMIDI_STREAM_LAST	include/asound.h	/^ SNDRV_RAWMIDI_STREAM_LAST = SNDRV_RAWMIDI_STREAM_INPUT,$/;"	e	enum:__anon43
+SNDRV_RAWMIDI_STREAM_LAST	modules/include/asound.h	/^ SNDRV_RAWMIDI_STREAM_LAST = SNDRV_RAWMIDI_STREAM_INPUT,$/;"	e	enum:__anon14
+SNDRV_RAWMIDI_STREAM_OUTPUT	include/asound.h	/^ SNDRV_RAWMIDI_STREAM_OUTPUT = 0,$/;"	e	enum:__anon43
+SNDRV_RAWMIDI_STREAM_OUTPUT	modules/include/asound.h	/^ SNDRV_RAWMIDI_STREAM_OUTPUT = 0,$/;"	e	enum:__anon14
+SNDRV_RAWMIDI_VERSION	include/asound.h	426;"	d
+SNDRV_RAWMIDI_VERSION	modules/include/asound.h	426;"	d
+SNDRV_TIMER_CLASS_CARD	include/asound.h	/^ SNDRV_TIMER_CLASS_CARD,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_CARD	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_CARD,$/;"	e	enum:__anon15
+SNDRV_TIMER_CLASS_GLOBAL	include/asound.h	/^ SNDRV_TIMER_CLASS_GLOBAL,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_GLOBAL	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_GLOBAL,$/;"	e	enum:__anon15
+SNDRV_TIMER_CLASS_LAST	include/asound.h	/^ SNDRV_TIMER_CLASS_LAST = SNDRV_TIMER_CLASS_PCM,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_LAST	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_LAST = SNDRV_TIMER_CLASS_PCM,$/;"	e	enum:__anon15
+SNDRV_TIMER_CLASS_NONE	include/asound.h	/^ SNDRV_TIMER_CLASS_NONE = -1,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_NONE	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_NONE = -1,$/;"	e	enum:__anon15
+SNDRV_TIMER_CLASS_PCM	include/asound.h	/^ SNDRV_TIMER_CLASS_PCM,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_PCM	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_PCM,$/;"	e	enum:__anon15
+SNDRV_TIMER_CLASS_SLAVE	include/asound.h	/^ SNDRV_TIMER_CLASS_SLAVE = 0,$/;"	e	enum:__anon44
+SNDRV_TIMER_CLASS_SLAVE	modules/include/asound.h	/^ SNDRV_TIMER_CLASS_SLAVE = 0,$/;"	e	enum:__anon15
+SNDRV_TIMER_EVENT_CONTINUE	include/asound.h	/^ SNDRV_TIMER_EVENT_CONTINUE,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_CONTINUE	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_CONTINUE,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_EARLY	include/asound.h	/^ SNDRV_TIMER_EVENT_EARLY,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_EARLY	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_EARLY,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MCONTINUE	include/asound.h	/^ SNDRV_TIMER_EVENT_MCONTINUE = SNDRV_TIMER_EVENT_CONTINUE + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MCONTINUE	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MCONTINUE = SNDRV_TIMER_EVENT_CONTINUE + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MPAUSE	include/asound.h	/^ SNDRV_TIMER_EVENT_MPAUSE = SNDRV_TIMER_EVENT_PAUSE + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MPAUSE	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MPAUSE = SNDRV_TIMER_EVENT_PAUSE + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MRESUME	include/asound.h	/^ SNDRV_TIMER_EVENT_MRESUME = SNDRV_TIMER_EVENT_RESUME + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MRESUME	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MRESUME = SNDRV_TIMER_EVENT_RESUME + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MSTART	include/asound.h	/^ SNDRV_TIMER_EVENT_MSTART = SNDRV_TIMER_EVENT_START + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MSTART	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MSTART = SNDRV_TIMER_EVENT_START + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MSTOP	include/asound.h	/^ SNDRV_TIMER_EVENT_MSTOP = SNDRV_TIMER_EVENT_STOP + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MSTOP	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MSTOP = SNDRV_TIMER_EVENT_STOP + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_MSUSPEND	include/asound.h	/^ SNDRV_TIMER_EVENT_MSUSPEND = SNDRV_TIMER_EVENT_SUSPEND + 10,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_MSUSPEND	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_MSUSPEND = SNDRV_TIMER_EVENT_SUSPEND + 10,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_PAUSE	include/asound.h	/^ SNDRV_TIMER_EVENT_PAUSE,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_PAUSE	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_PAUSE,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_RESOLUTION	include/asound.h	/^ SNDRV_TIMER_EVENT_RESOLUTION = 0,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_RESOLUTION	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_RESOLUTION = 0,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_RESUME	include/asound.h	/^ SNDRV_TIMER_EVENT_RESUME,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_RESUME	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_RESUME,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_START	include/asound.h	/^ SNDRV_TIMER_EVENT_START,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_START	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_START,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_STOP	include/asound.h	/^ SNDRV_TIMER_EVENT_STOP,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_STOP	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_STOP,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_SUSPEND	include/asound.h	/^ SNDRV_TIMER_EVENT_SUSPEND,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_SUSPEND	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_SUSPEND,$/;"	e	enum:__anon17
+SNDRV_TIMER_EVENT_TICK	include/asound.h	/^ SNDRV_TIMER_EVENT_TICK,$/;"	e	enum:__anon46
+SNDRV_TIMER_EVENT_TICK	modules/include/asound.h	/^ SNDRV_TIMER_EVENT_TICK,$/;"	e	enum:__anon17
+SNDRV_TIMER_FLG_SLAVE	include/asound.h	499;"	d
+SNDRV_TIMER_FLG_SLAVE	modules/include/asound.h	499;"	d
+SNDRV_TIMER_GLOBAL_HPET	include/asound.h	496;"	d
+SNDRV_TIMER_GLOBAL_HPET	modules/include/asound.h	496;"	d
+SNDRV_TIMER_GLOBAL_HRTIMER	include/asound.h	497;"	d
+SNDRV_TIMER_GLOBAL_HRTIMER	modules/include/asound.h	497;"	d
+SNDRV_TIMER_GLOBAL_RTC	include/asound.h	495;"	d
+SNDRV_TIMER_GLOBAL_RTC	modules/include/asound.h	495;"	d
+SNDRV_TIMER_GLOBAL_SYSTEM	include/asound.h	494;"	d
+SNDRV_TIMER_GLOBAL_SYSTEM	modules/include/asound.h	494;"	d
+SNDRV_TIMER_IOCTL_CONTINUE	include/asound.h	588;"	d
+SNDRV_TIMER_IOCTL_CONTINUE	modules/include/asound.h	588;"	d
+SNDRV_TIMER_IOCTL_GINFO	include/asound.h	578;"	d
+SNDRV_TIMER_IOCTL_GINFO	modules/include/asound.h	578;"	d
+SNDRV_TIMER_IOCTL_GPARAMS	include/asound.h	579;"	d
+SNDRV_TIMER_IOCTL_GPARAMS	modules/include/asound.h	579;"	d
+SNDRV_TIMER_IOCTL_GSTATUS	include/asound.h	580;"	d
+SNDRV_TIMER_IOCTL_GSTATUS	modules/include/asound.h	580;"	d
+SNDRV_TIMER_IOCTL_INFO	include/asound.h	582;"	d
+SNDRV_TIMER_IOCTL_INFO	modules/include/asound.h	582;"	d
+SNDRV_TIMER_IOCTL_NEXT_DEVICE	include/asound.h	576;"	d
+SNDRV_TIMER_IOCTL_NEXT_DEVICE	modules/include/asound.h	576;"	d
+SNDRV_TIMER_IOCTL_PARAMS	include/asound.h	583;"	d
+SNDRV_TIMER_IOCTL_PARAMS	modules/include/asound.h	583;"	d
+SNDRV_TIMER_IOCTL_PAUSE	include/asound.h	589;"	d
+SNDRV_TIMER_IOCTL_PAUSE	modules/include/asound.h	589;"	d
+SNDRV_TIMER_IOCTL_PVERSION	include/asound.h	575;"	d
+SNDRV_TIMER_IOCTL_PVERSION	modules/include/asound.h	575;"	d
+SNDRV_TIMER_IOCTL_SELECT	include/asound.h	581;"	d
+SNDRV_TIMER_IOCTL_SELECT	modules/include/asound.h	581;"	d
+SNDRV_TIMER_IOCTL_START	include/asound.h	586;"	d
+SNDRV_TIMER_IOCTL_START	modules/include/asound.h	586;"	d
+SNDRV_TIMER_IOCTL_STATUS	include/asound.h	584;"	d
+SNDRV_TIMER_IOCTL_STATUS	modules/include/asound.h	584;"	d
+SNDRV_TIMER_IOCTL_STOP	include/asound.h	587;"	d
+SNDRV_TIMER_IOCTL_STOP	modules/include/asound.h	587;"	d
+SNDRV_TIMER_IOCTL_TREAD	include/asound.h	577;"	d
+SNDRV_TIMER_IOCTL_TREAD	modules/include/asound.h	577;"	d
+SNDRV_TIMER_PSFLG_AUTO	include/asound.h	553;"	d
+SNDRV_TIMER_PSFLG_AUTO	modules/include/asound.h	553;"	d
+SNDRV_TIMER_PSFLG_EARLY_EVENT	include/asound.h	555;"	d
+SNDRV_TIMER_PSFLG_EARLY_EVENT	modules/include/asound.h	555;"	d
+SNDRV_TIMER_PSFLG_EXCLUSIVE	include/asound.h	554;"	d
+SNDRV_TIMER_PSFLG_EXCLUSIVE	modules/include/asound.h	554;"	d
+SNDRV_TIMER_SCLASS_APPLICATION	include/asound.h	/^ SNDRV_TIMER_SCLASS_APPLICATION,$/;"	e	enum:__anon45
+SNDRV_TIMER_SCLASS_APPLICATION	modules/include/asound.h	/^ SNDRV_TIMER_SCLASS_APPLICATION,$/;"	e	enum:__anon16
+SNDRV_TIMER_SCLASS_LAST	include/asound.h	/^ SNDRV_TIMER_SCLASS_LAST = SNDRV_TIMER_SCLASS_OSS_SEQUENCER,$/;"	e	enum:__anon45
+SNDRV_TIMER_SCLASS_LAST	modules/include/asound.h	/^ SNDRV_TIMER_SCLASS_LAST = SNDRV_TIMER_SCLASS_OSS_SEQUENCER,$/;"	e	enum:__anon16
+SNDRV_TIMER_SCLASS_NONE	include/asound.h	/^ SNDRV_TIMER_SCLASS_NONE = 0,$/;"	e	enum:__anon45
+SNDRV_TIMER_SCLASS_NONE	modules/include/asound.h	/^ SNDRV_TIMER_SCLASS_NONE = 0,$/;"	e	enum:__anon16
+SNDRV_TIMER_SCLASS_OSS_SEQUENCER	include/asound.h	/^ SNDRV_TIMER_SCLASS_OSS_SEQUENCER,$/;"	e	enum:__anon45
+SNDRV_TIMER_SCLASS_OSS_SEQUENCER	modules/include/asound.h	/^ SNDRV_TIMER_SCLASS_OSS_SEQUENCER,$/;"	e	enum:__anon16
+SNDRV_TIMER_SCLASS_SEQUENCER	include/asound.h	/^ SNDRV_TIMER_SCLASS_SEQUENCER,$/;"	e	enum:__anon45
+SNDRV_TIMER_SCLASS_SEQUENCER	modules/include/asound.h	/^ SNDRV_TIMER_SCLASS_SEQUENCER,$/;"	e	enum:__anon16
+SNDRV_TIMER_VERSION	include/asound.h	475;"	d
+SNDRV_TIMER_VERSION	modules/include/asound.h	475;"	d
+TARGETS	modules/Makefile	/^TARGETS	= libkeyboard.so libsound.so libwifi.so libevent.so libsdcard.so$/;"	m
+__EVENT_H__	include/event.h	2;"	d
+__EVENT_H__	modules/include/event.h	2;"	d
+__MODULE_H__	include/module.h	2;"	d
+__MODULE_H__	modules/include/module.h	2;"	d
+__MUTEX_H__	include/thread.h	2;"	d
+__MUTEX_H__	modules/include/thread.h	2;"	d
+__SOUND_ASOUND_H	include/asound.h	13;"	d
+__SOUND_ASOUND_H	modules/include/asound.h	13;"	d
+__WIN_H__	include/win.h	2;"	d
+__WIN_H__	modules/include/win.h	2;"	d
+access	include/asound.h	/^ unsigned int access;$/;"	m	struct:snd_ctl_elem_info
+access	modules/include/asound.h	/^ unsigned int access;$/;"	m	struct:snd_ctl_elem_info
+appl_ptr	include/asound.h	/^ snd_pcm_uframes_t appl_ptr;$/;"	m	struct:snd_pcm_mmap_control
+appl_ptr	include/asound.h	/^ snd_pcm_uframes_t appl_ptr;$/;"	m	struct:snd_pcm_status
+appl_ptr	modules/include/asound.h	/^ snd_pcm_uframes_t appl_ptr;$/;"	m	struct:snd_pcm_mmap_control
+appl_ptr	modules/include/asound.h	/^ snd_pcm_uframes_t appl_ptr;$/;"	m	struct:snd_pcm_status
+assign_subwin	layout.c	/^int assign_subwin(mainwin_t *mainwin)$/;"	f
+assigned	include/win.h	/^	int assigned;$/;"	m	struct:__anon33
+assigned	modules/include/win.h	/^	int assigned;$/;"	m	struct:__anon4
+audio_format	modules/sound.c	/^    uint16_t audio_format;$/;"	m	struct:chunk_fmt	file:
+audio_format	modules/sound.c	/^    uint16_t audio_format;$/;"	m	struct:wav_header	file:
+avail	include/asound.h	/^ size_t avail;$/;"	m	struct:snd_rawmidi_status
+avail	include/asound.h	/^ snd_pcm_uframes_t avail;$/;"	m	struct:snd_pcm_status
+avail	modules/include/asound.h	/^ size_t avail;$/;"	m	struct:snd_rawmidi_status
+avail	modules/include/asound.h	/^ snd_pcm_uframes_t avail;$/;"	m	struct:snd_pcm_status
+avail_max	include/asound.h	/^ snd_pcm_uframes_t avail_max;$/;"	m	struct:snd_pcm_status
+avail_max	modules/include/asound.h	/^ snd_pcm_uframes_t avail_max;$/;"	m	struct:snd_pcm_status
+avail_min	include/asound.h	/^ size_t avail_min;$/;"	m	struct:snd_rawmidi_params
+avail_min	include/asound.h	/^ snd_pcm_uframes_t avail_min;$/;"	m	struct:snd_pcm_mmap_control
+avail_min	include/asound.h	/^ snd_pcm_uframes_t avail_min;$/;"	m	struct:snd_pcm_sw_params
+avail_min	modules/include/asound.h	/^ size_t avail_min;$/;"	m	struct:snd_rawmidi_params
+avail_min	modules/include/asound.h	/^ snd_pcm_uframes_t avail_min;$/;"	m	struct:snd_pcm_mmap_control
+avail_min	modules/include/asound.h	/^ snd_pcm_uframes_t avail_min;$/;"	m	struct:snd_pcm_sw_params
+bar	include/win.h	/^	barwin_t bar;$/;"	m	struct:mainwin
+bar	modules/include/win.h	/^	barwin_t bar;$/;"	m	struct:mainwin
+barwin_t	include/win.h	/^} barwin_t;$/;"	t	typeref:struct:__anon30
+barwin_t	modules/include/win.h	/^} barwin_t;$/;"	t	typeref:struct:__anon1
+bits	include/asound.h	/^ __u32 bits[(SNDRV_MASK_MAX+31)\/32];$/;"	m	struct:snd_mask
+bits	modules/include/asound.h	/^ __u32 bits[(SNDRV_MASK_MAX+31)\/32];$/;"	m	struct:snd_mask
+bits_per_sample	modules/sound.c	/^    uint16_t bits_per_sample;$/;"	m	struct:chunk_fmt	file:
+bits_per_sample	modules/sound.c	/^    uint16_t bits_per_sample;$/;"	m	struct:wav_header	file:
+block_align	modules/sound.c	/^    uint16_t block_align;$/;"	m	struct:chunk_fmt	file:
+block_align	modules/sound.c	/^    uint16_t block_align;$/;"	m	struct:wav_header	file:
+boundary	include/asound.h	/^ snd_pcm_uframes_t boundary;$/;"	m	struct:snd_pcm_sw_params
+boundary	modules/include/asound.h	/^ snd_pcm_uframes_t boundary;$/;"	m	struct:snd_pcm_sw_params
+box	include/win.h	/^	boxwin_t box;$/;"	m	struct:mainwin
+box	modules/include/win.h	/^	boxwin_t box;$/;"	m	struct:mainwin
+boxwin	include/win.h	/^	struct boxwin *boxwin;$/;"	m	struct:__anon33	typeref:struct:__anon33::boxwin
+boxwin	include/win.h	/^typedef struct boxwin {$/;"	s
+boxwin	modules/include/win.h	/^	struct boxwin *boxwin;$/;"	m	struct:__anon4	typeref:struct:__anon4::boxwin
+boxwin	modules/include/win.h	/^typedef struct boxwin {$/;"	s
+boxwin_t	include/win.h	/^} boxwin_t;$/;"	t	typeref:struct:boxwin
+boxwin_t	modules/include/win.h	/^} boxwin_t;$/;"	t	typeref:struct:boxwin
+buf	include/asound.h	/^ void __user *buf;$/;"	m	struct:snd_xferi
+buf	modules/include/asound.h	/^ void __user *buf;$/;"	m	struct:snd_xferi
+buffer_size	include/asound.h	/^ size_t buffer_size;$/;"	m	struct:snd_rawmidi_params
+buffer_size	modules/include/asound.h	/^ size_t buffer_size;$/;"	m	struct:snd_rawmidi_params
+bufs	include/asound.h	/^ void __user * __user *bufs;$/;"	m	struct:snd_xfern
+bufs	modules/include/asound.h	/^ void __user * __user *bufs;$/;"	m	struct:snd_xfern
+byte_rate	modules/sound.c	/^    uint32_t byte_rate;$/;"	m	struct:chunk_fmt	file:
+byte_rate	modules/sound.c	/^    uint32_t byte_rate;$/;"	m	struct:wav_header	file:
+bytes	include/asound.h	/^ } bytes;$/;"	m	union:snd_ctl_elem_value::__anon52	typeref:union:snd_ctl_elem_value::__anon52::__anon56
+bytes	modules/include/asound.h	/^ } bytes;$/;"	m	union:snd_ctl_elem_value::__anon23	typeref:union:snd_ctl_elem_value::__anon23::__anon27
+c	include/asound.h	/^ } c;$/;"	m	struct:snd_pcm_sync_ptr	typeref:union:snd_pcm_sync_ptr::__anon41
+c	modules/include/asound.h	/^ } c;$/;"	m	struct:snd_pcm_sync_ptr	typeref:union:snd_pcm_sync_ptr::__anon12
+cancel_pending	include/win.h	/^	int cancel_pending;$/;"	m	struct:__anon33
+cancel_pending	modules/include/win.h	/^	int cancel_pending;$/;"	m	struct:__anon4
+cancel_subwin	event.c	/^int cancel_subwin(modwin_t *modwin)$/;"	f
+capture_sample	modules/sound.c	/^unsigned int capture_sample(FILE *file, unsigned int card, unsigned int device,$/;"	f
+capture_wave	modules/sound.c	/^int capture_wave(const char *filename)$/;"	f
+captureloop	modules/sound.c	/^void captureloop(void)$/;"	f
+capturing	modules/sound.c	/^int capturing = 1;$/;"	v
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_ctl_card_info
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_hwdep_info
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_pcm_info
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_rawmidi_info
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_timer_ginfo
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_timer_id
+card	include/asound.h	/^ int card;$/;"	m	struct:snd_timer_info
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_ctl_card_info
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_hwdep_info
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_pcm_info
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_rawmidi_info
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_timer_ginfo
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_timer_id
+card	modules/include/asound.h	/^ int card;$/;"	m	struct:snd_timer_info
+channel	include/asound.h	/^ unsigned int channel;$/;"	m	struct:snd_pcm_channel_info
+channel	modules/include/asound.h	/^ unsigned int channel;$/;"	m	struct:snd_pcm_channel_info
+channels	include/asoundlib.h	/^    unsigned int channels;$/;"	m	struct:pcm_config
+channels	modules/include/asoundlib.h	/^    unsigned int channels;$/;"	m	struct:pcm_config
+chip_ready	include/asound.h	/^ unsigned int chip_ready;$/;"	m	struct:snd_hwdep_dsp_status
+chip_ready	modules/include/asound.h	/^ unsigned int chip_ready;$/;"	m	struct:snd_hwdep_dsp_status
+chunk_fmt	modules/sound.c	/^struct chunk_fmt {$/;"	s	file:
+chunk_header	modules/sound.c	/^struct chunk_header {$/;"	s	file:
+clients	include/asound.h	/^ unsigned int clients;$/;"	m	struct:snd_timer_ginfo
+clients	modules/include/asound.h	/^ unsigned int clients;$/;"	m	struct:snd_timer_ginfo
+cmask	include/asound.h	/^ unsigned int cmask;$/;"	m	struct:snd_pcm_hw_params
+cmask	modules/include/asound.h	/^ unsigned int cmask;$/;"	m	struct:snd_pcm_hw_params
+components	include/asound.h	/^ unsigned char components[128];$/;"	m	struct:snd_ctl_card_info
+components	modules/include/asound.h	/^ unsigned char components[128];$/;"	m	struct:snd_ctl_card_info
+container_of	include/win.h	14;"	d
+container_of	modules/include/win.h	14;"	d
+control	include/asound.h	/^ struct snd_pcm_mmap_control control;$/;"	m	union:snd_pcm_sync_ptr::__anon41	typeref:struct:snd_pcm_sync_ptr::__anon41::snd_pcm_mmap_control
+control	modules/include/asound.h	/^ struct snd_pcm_mmap_control control;$/;"	m	union:snd_pcm_sync_ptr::__anon12	typeref:struct:snd_pcm_sync_ptr::__anon12::snd_pcm_mmap_control
+count	include/asound.h	/^ unsigned int count;$/;"	m	struct:snd_ctl_elem_info
+count	include/asound.h	/^ unsigned int count;$/;"	m	struct:snd_ctl_elem_list
+count	modules/include/asound.h	/^ unsigned int count;$/;"	m	struct:snd_ctl_elem_info
+count	modules/include/asound.h	/^ unsigned int count;$/;"	m	struct:snd_ctl_elem_list
+curr	include/win.h	/^	int curr;$/;"	m	struct:boxwin
+curr	modules/include/win.h	/^	int curr;$/;"	m	struct:boxwin
+d	include/asound.h	/^ unsigned short d[4];$/;"	m	union:snd_ctl_elem_info::__anon51
+d	modules/include/asound.h	/^ unsigned short d[4];$/;"	m	union:snd_ctl_elem_info::__anon22
+d_ptr	include/asound.h	/^ unsigned short *d_ptr;$/;"	m	union:snd_ctl_elem_info::__anon51
+d_ptr	modules/include/asound.h	/^ unsigned short *d_ptr;$/;"	m	union:snd_ctl_elem_info::__anon22
+data	include/asound.h	/^ unsigned char data[512];$/;"	m	union:snd_ctl_elem_value::__anon52::__anon56
+data	include/asound.h	/^ } data;$/;"	m	struct:snd_ctl_event	typeref:union:snd_ctl_event::__anon57
+data	modules/include/asound.h	/^ unsigned char data[512];$/;"	m	union:snd_ctl_elem_value::__anon23::__anon27
+data	modules/include/asound.h	/^ } data;$/;"	m	struct:snd_ctl_event	typeref:union:snd_ctl_event::__anon28
+data8	include/asound.h	/^ unsigned char data8[60];$/;"	m	union:snd_ctl_event::__anon57
+data8	modules/include/asound.h	/^ unsigned char data8[60];$/;"	m	union:snd_ctl_event::__anon28
+data_id	modules/sound.c	/^    uint32_t data_id;$/;"	m	struct:wav_header	file:
+data_ptr	include/asound.h	/^ unsigned char *data_ptr;$/;"	m	union:snd_ctl_elem_value::__anon52::__anon56
+data_ptr	modules/include/asound.h	/^ unsigned char *data_ptr;$/;"	m	union:snd_ctl_elem_value::__anon23::__anon27
+data_sz	modules/sound.c	/^    uint32_t data_sz;$/;"	m	struct:wav_header	file:
+delay	include/asound.h	/^ snd_pcm_sframes_t delay;$/;"	m	struct:snd_pcm_status
+delay	modules/include/asound.h	/^ snd_pcm_sframes_t delay;$/;"	m	struct:snd_pcm_status
+dev_class	include/asound.h	/^ int dev_class;$/;"	m	struct:snd_pcm_info
+dev_class	include/asound.h	/^ int dev_class;$/;"	m	struct:snd_timer_id
+dev_class	modules/include/asound.h	/^ int dev_class;$/;"	m	struct:snd_pcm_info
+dev_class	modules/include/asound.h	/^ int dev_class;$/;"	m	struct:snd_timer_id
+dev_sclass	include/asound.h	/^ int dev_sclass;$/;"	m	struct:snd_timer_id
+dev_sclass	modules/include/asound.h	/^ int dev_sclass;$/;"	m	struct:snd_timer_id
+dev_subclass	include/asound.h	/^ int dev_subclass;$/;"	m	struct:snd_pcm_info
+dev_subclass	modules/include/asound.h	/^ int dev_subclass;$/;"	m	struct:snd_pcm_info
+device	include/asound.h	/^ int device;$/;"	m	struct:snd_timer_id
+device	include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_ctl_elem_id
+device	include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_hwdep_info
+device	include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_pcm_info
+device	include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_rawmidi_info
+device	modules/include/asound.h	/^ int device;$/;"	m	struct:snd_timer_id
+device	modules/include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_ctl_elem_id
+device	modules/include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_hwdep_info
+device	modules/include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_pcm_info
+device	modules/include/asound.h	/^ unsigned int device;$/;"	m	struct:snd_rawmidi_info
+dig_subframe	include/asound.h	/^ unsigned char dig_subframe[4];$/;"	m	struct:snd_aes_iec958
+dig_subframe	modules/include/asound.h	/^ unsigned char dig_subframe[4];$/;"	m	struct:snd_aes_iec958
+dimen	include/asound.h	/^ } dimen;$/;"	m	struct:snd_ctl_elem_info	typeref:union:snd_ctl_elem_info::__anon51
+dimen	modules/include/asound.h	/^ } dimen;$/;"	m	struct:snd_ctl_elem_info	typeref:union:snd_ctl_elem_info::__anon22
+driver	include/asound.h	/^ unsigned char driver[16];$/;"	m	struct:snd_ctl_card_info
+driver	modules/include/asound.h	/^ unsigned char driver[16];$/;"	m	struct:snd_ctl_card_info
+driver_data	include/asound.h	/^ unsigned long driver_data;$/;"	m	struct:snd_hwdep_dsp_image
+driver_data	modules/include/asound.h	/^ unsigned long driver_data;$/;"	m	struct:snd_hwdep_dsp_image
+dsp_loaded	include/asound.h	/^ unsigned int dsp_loaded;$/;"	m	struct:snd_hwdep_dsp_status
+dsp_loaded	modules/include/asound.h	/^ unsigned int dsp_loaded;$/;"	m	struct:snd_hwdep_dsp_status
+elem	include/asound.h	/^ } elem;$/;"	m	union:snd_ctl_event::__anon57	typeref:struct:snd_ctl_event::__anon57::__anon58
+elem	modules/include/asound.h	/^ } elem;$/;"	m	union:snd_ctl_event::__anon28	typeref:struct:snd_ctl_event::__anon28::__anon29
+empty	include/asound.h	/^ empty:1;$/;"	m	struct:snd_interval
+empty	modules/include/asound.h	/^ empty:1;$/;"	m	struct:snd_interval
+enter_subwin	event.c	/^int enter_subwin(modwin_t *modwin)$/;"	f
+enumerated	include/asound.h	/^ } enumerated;$/;"	m	union:snd_ctl_elem_info::__anon47	typeref:struct:snd_ctl_elem_info::__anon47::__anon50
+enumerated	include/asound.h	/^ } enumerated;$/;"	m	union:snd_ctl_elem_value::__anon52	typeref:union:snd_ctl_elem_value::__anon52::__anon55
+enumerated	modules/include/asound.h	/^ } enumerated;$/;"	m	union:snd_ctl_elem_info::__anon18	typeref:struct:snd_ctl_elem_info::__anon18::__anon21
+enumerated	modules/include/asound.h	/^ } enumerated;$/;"	m	union:snd_ctl_elem_value::__anon23	typeref:union:snd_ctl_elem_value::__anon23::__anon26
+event	include/asound.h	/^ int event;$/;"	m	struct:snd_timer_tread
+event	modules/include/asound.h	/^ int event;$/;"	m	struct:snd_timer_tread
+event_cond	event.c	/^static pthread_cond_t event_cond = PTHREAD_COND_INITIALIZER;$/;"	v	file:
+event_handler	modules/event.c	/^void *event_handler(void *arg)$/;"	f
+event_init	event.c	/^int event_init(mainwin_t *mainwin)$/;"	f
+event_lock	event.c	/^static pthread_mutex_t event_lock = PTHREAD_MUTEX_INITIALIZER;$/;"	v	file:
+exit_mainwin	win.c	/^int exit_mainwin(mainwin_t *mainwin)$/;"	f
+exit_subwin	event.c	/^int exit_subwin(modwin_t *modwin)$/;"	f
+fifo_size	include/asound.h	/^ snd_pcm_uframes_t fifo_size;$/;"	m	struct:snd_pcm_hw_params
+fifo_size	modules/include/asound.h	/^ snd_pcm_uframes_t fifo_size;$/;"	m	struct:snd_pcm_hw_params
+file	Makefile	/^file	= module.c thread.c event.c win.c$/;"	m
+filter	include/asound.h	/^ unsigned int filter;$/;"	m	struct:snd_timer_params
+filter	modules/include/asound.h	/^ unsigned int filter;$/;"	m	struct:snd_timer_params
+find_type	layout.c	/^int find_type(mainwin_t *mainwin, int type)$/;"	f
+first	include/asound.h	/^ unsigned int first;$/;"	m	struct:snd_pcm_channel_info
+first	modules/include/asound.h	/^ unsigned int first;$/;"	m	struct:snd_pcm_channel_info
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_pcm_hw_params
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_pcm_sync_ptr
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_rawmidi_info
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_ginfo
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_info
+flags	include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_params
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_pcm_hw_params
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_pcm_sync_ptr
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_rawmidi_info
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_ginfo
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_info
+flags	modules/include/asound.h	/^ unsigned int flags;$/;"	m	struct:snd_timer_params
+fmt_id	modules/sound.c	/^    uint32_t fmt_id;$/;"	m	struct:wav_header	file:
+fmt_sz	modules/sound.c	/^    uint32_t fmt_sz;$/;"	m	struct:wav_header	file:
+focus_changed	include/win.h	/^	int focus_changed;$/;"	m	struct:__anon33
+focus_changed	modules/include/win.h	/^	int focus_changed;$/;"	m	struct:__anon4
+format	include/asoundlib.h	/^    enum pcm_format format;$/;"	m	struct:pcm_config	typeref:enum:pcm_config::pcm_format
+format	modules/include/asoundlib.h	/^    enum pcm_format format;$/;"	m	struct:pcm_config	typeref:enum:pcm_config::pcm_format
+frames	include/asound.h	/^ snd_pcm_uframes_t frames;$/;"	m	struct:snd_xferi
+frames	include/asound.h	/^ snd_pcm_uframes_t frames;$/;"	m	struct:snd_xfern
+frames	modules/include/asound.h	/^ snd_pcm_uframes_t frames;$/;"	m	struct:snd_xferi
+frames	modules/include/asound.h	/^ snd_pcm_uframes_t frames;$/;"	m	struct:snd_xfern
+g_lock	thread.c	/^pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;$/;"	v
+g_mainwin	win.c	/^mainwin_t g_mainwin;$/;"	v
+get_batt_cap	modules/event.c	/^int get_batt_cap(void)$/;"	f
+get_batt_curr	modules/event.c	/^int get_batt_curr(void)$/;"	f
+get_batt_status	modules/event.c	/^int get_batt_status(char *status, int n)$/;"	f
+get_batt_temp	modules/event.c	/^int get_batt_temp(void)$/;"	f
+get_batt_volt	modules/event.c	/^int get_batt_volt(void)$/;"	f
+get_event	event.c	/^int get_event(modwin_t *modwin)$/;"	f
+get_group_members	win.c	/^int get_group_members(boxwin_t *box, int igroup)$/;"	f
+get_mmc_mountpath	modules/sdcard.c	/^int get_mmc_mountpath(char *path, int n)$/;"	f
+get_modules	module.c	/^int get_modules(mainwin_t *mainwin)$/;"	f
+get_subwin_index	win.c	/^int get_subwin_index(int index, int igroup)$/;"	f
+group	include/win.h	/^	int group;$/;"	m	struct:__anon33
+group	modules/include/win.h	/^	int group;$/;"	m	struct:__anon4
+groups	include/win.h	/^	int groups;$/;"	m	struct:boxwin
+groups	modules/include/win.h	/^	int groups;$/;"	m	struct:boxwin
+handle_info	modules/sdcard.c	/^void handle_info(modwin_t *modwin, WINDOW *win)$/;"	f
+handle_loop	win.c	/^int handle_loop(mainwin_t *mainwin)$/;"	f
+handler	include/module.h	/^	handler_t handler;$/;"	m	struct:module
+handler	modules/include/module.h	/^	handler_t handler;$/;"	m	struct:module
+handler_t	include/module.h	/^typedef void *(*handler_t)(void *arg);$/;"	t
+handler_t	modules/include/module.h	/^typedef void *(*handler_t)(void *arg);$/;"	t
+hw_ptr	include/asound.h	/^ snd_pcm_uframes_t hw_ptr;$/;"	m	struct:snd_pcm_mmap_status
+hw_ptr	include/asound.h	/^ snd_pcm_uframes_t hw_ptr;$/;"	m	struct:snd_pcm_status
+hw_ptr	modules/include/asound.h	/^ snd_pcm_uframes_t hw_ptr;$/;"	m	struct:snd_pcm_mmap_status
+hw_ptr	modules/include/asound.h	/^ snd_pcm_uframes_t hw_ptr;$/;"	m	struct:snd_pcm_status
+id	include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_elem_info	typeref:struct:snd_ctl_elem_info::snd_ctl_elem_id
+id	include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_elem_value	typeref:struct:snd_ctl_elem_value::snd_ctl_elem_id
+id	include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_event::__anon57::__anon58	typeref:struct:snd_ctl_event::__anon57::__anon58::snd_ctl_elem_id
+id	include/asound.h	/^ struct snd_timer_id id;$/;"	m	struct:snd_timer_select	typeref:struct:snd_timer_select::snd_timer_id
+id	include/asound.h	/^ unsigned char id[16];$/;"	m	struct:snd_ctl_card_info
+id	include/asound.h	/^ unsigned char id[16];$/;"	m	union:snd_pcm_sync_id
+id	include/asound.h	/^ unsigned char id[32];$/;"	m	struct:snd_hwdep_dsp_status
+id	include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_hwdep_info
+id	include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_pcm_info
+id	include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_rawmidi_info
+id	include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_timer_ginfo
+id	include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_timer_info
+id	include/win.h	/^	int id;$/;"	m	struct:__anon33
+id	modules/include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_elem_info	typeref:struct:snd_ctl_elem_info::snd_ctl_elem_id
+id	modules/include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_elem_value	typeref:struct:snd_ctl_elem_value::snd_ctl_elem_id
+id	modules/include/asound.h	/^ struct snd_ctl_elem_id id;$/;"	m	struct:snd_ctl_event::__anon28::__anon29	typeref:struct:snd_ctl_event::__anon28::__anon29::snd_ctl_elem_id
+id	modules/include/asound.h	/^ struct snd_timer_id id;$/;"	m	struct:snd_timer_select	typeref:struct:snd_timer_select::snd_timer_id
+id	modules/include/asound.h	/^ unsigned char id[16];$/;"	m	struct:snd_ctl_card_info
+id	modules/include/asound.h	/^ unsigned char id[16];$/;"	m	union:snd_pcm_sync_id
+id	modules/include/asound.h	/^ unsigned char id[32];$/;"	m	struct:snd_hwdep_dsp_status
+id	modules/include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_hwdep_info
+id	modules/include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_pcm_info
+id	modules/include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_rawmidi_info
+id	modules/include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_timer_ginfo
+id	modules/include/asound.h	/^ unsigned char id[64];$/;"	m	struct:snd_timer_info
+id	modules/include/win.h	/^	int id;$/;"	m	struct:__anon4
+id	modules/sound.c	/^    uint32_t id;$/;"	m	struct:chunk_header	file:
+id16	include/asound.h	/^ unsigned short id16[8];$/;"	m	union:snd_pcm_sync_id
+id16	modules/include/asound.h	/^ unsigned short id16[8];$/;"	m	union:snd_pcm_sync_id
+id32	include/asound.h	/^ unsigned int id32[4];$/;"	m	union:snd_pcm_sync_id
+id32	modules/include/asound.h	/^ unsigned int id32[4];$/;"	m	union:snd_pcm_sync_id
+iec958	include/asound.h	/^ struct snd_aes_iec958 iec958;$/;"	m	union:snd_ctl_elem_value::__anon52	typeref:struct:snd_ctl_elem_value::__anon52::snd_aes_iec958
+iec958	modules/include/asound.h	/^ struct snd_aes_iec958 iec958;$/;"	m	union:snd_ctl_elem_value::__anon23	typeref:struct:snd_ctl_elem_value::__anon23::snd_aes_iec958
+iface	include/asound.h	/^ int iface;$/;"	m	struct:snd_hwdep_info
+iface	include/asound.h	/^ snd_ctl_elem_iface_t iface;$/;"	m	struct:snd_ctl_elem_id
+iface	modules/include/asound.h	/^ int iface;$/;"	m	struct:snd_hwdep_info
+iface	modules/include/asound.h	/^ snd_ctl_elem_iface_t iface;$/;"	m	struct:snd_ctl_elem_id
+igroup	include/win.h	/^	int igroup;$/;"	m	struct:boxwin
+igroup	modules/include/win.h	/^	int igroup;$/;"	m	struct:boxwin
+image	include/asound.h	/^ unsigned char __user *image;$/;"	m	struct:snd_hwdep_dsp_image
+image	modules/include/asound.h	/^ unsigned char __user *image;$/;"	m	struct:snd_hwdep_dsp_image
+index	include/asound.h	/^ unsigned int index;$/;"	m	struct:snd_ctl_elem_id
+index	include/asound.h	/^ unsigned int index;$/;"	m	struct:snd_hwdep_dsp_image
+index	modules/include/asound.h	/^ unsigned int index;$/;"	m	struct:snd_ctl_elem_id
+index	modules/include/asound.h	/^ unsigned int index;$/;"	m	struct:snd_hwdep_dsp_image
+indirect	include/asound.h	/^ unsigned int indirect: 1;$/;"	m	struct:snd_ctl_elem_value
+indirect	modules/include/asound.h	/^ unsigned int indirect: 1;$/;"	m	struct:snd_ctl_elem_value
+info	include/asound.h	/^ unsigned int info;$/;"	m	struct:snd_pcm_hw_params
+info	modules/include/asound.h	/^ unsigned int info;$/;"	m	struct:snd_pcm_hw_params
+init_bar	win.c	/^int init_bar(barwin_t *barwin)$/;"	f
+init_box	win.c	/^int init_box(boxwin_t *boxwin)$/;"	f
+init_key	win.c	/^int init_key(mainwin_t *mainwin)$/;"	f
+init_mainwin	win.c	/^int init_mainwin(mainwin_t *mainwin)$/;"	f
+init_subwin	win.c	/^int init_subwin(subwin_t *subwin)$/;"	f
+insmod	modules/wifi.c	/^int insmod(const char *filename, const char *args)$/;"	f
+integer	include/asound.h	/^ integer:1,$/;"	m	struct:snd_interval
+integer	include/asound.h	/^ } integer;$/;"	m	union:snd_ctl_elem_info::__anon47	typeref:struct:snd_ctl_elem_info::__anon47::__anon48
+integer	include/asound.h	/^ } integer;$/;"	m	union:snd_ctl_elem_value::__anon52	typeref:union:snd_ctl_elem_value::__anon52::__anon53
+integer	modules/include/asound.h	/^ integer:1,$/;"	m	struct:snd_interval
+integer	modules/include/asound.h	/^ } integer;$/;"	m	union:snd_ctl_elem_info::__anon18	typeref:struct:snd_ctl_elem_info::__anon18::__anon19
+integer	modules/include/asound.h	/^ } integer;$/;"	m	union:snd_ctl_elem_value::__anon23	typeref:union:snd_ctl_elem_value::__anon23::__anon24
+integer64	include/asound.h	/^ } integer64;$/;"	m	union:snd_ctl_elem_info::__anon47	typeref:struct:snd_ctl_elem_info::__anon47::__anon49
+integer64	include/asound.h	/^ } integer64;$/;"	m	union:snd_ctl_elem_value::__anon52	typeref:union:snd_ctl_elem_value::__anon52::__anon54
+integer64	modules/include/asound.h	/^ } integer64;$/;"	m	union:snd_ctl_elem_info::__anon18	typeref:struct:snd_ctl_elem_info::__anon18::__anon20
+integer64	modules/include/asound.h	/^ } integer64;$/;"	m	union:snd_ctl_elem_value::__anon23	typeref:union:snd_ctl_elem_value::__anon23::__anon25
+intervals	include/asound.h	/^ struct snd_interval intervals[SNDRV_PCM_HW_PARAM_LAST_INTERVAL -$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_interval
+intervals	modules/include/asound.h	/^ struct snd_interval intervals[SNDRV_PCM_HW_PARAM_LAST_INTERVAL -$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_interval
+ires	include/asound.h	/^ struct snd_interval ires[9];$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_interval
+ires	modules/include/asound.h	/^ struct snd_interval ires[9];$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_interval
+isAcOnline	modules/event.c	/^int isAcOnline(void)$/;"	f
+isBattOnline	modules/event.c	/^int isBattOnline(void)$/;"	f
+isHeadPhoneOnline	modules/event.c	/^int isHeadPhoneOnline(void)$/;"	f
+isUsbOnline	modules/event.c	/^int isUsbOnline(void)$/;"	f
+isUsbOnline	modules/sdcard.c	/^int isUsbOnline(void)$/;"	f
+is_focus	event.c	/^int is_focus(modwin_t *modwin)$/;"	f
+is_mmc_present	modules/sdcard.c	/^int is_mmc_present(void)$/;"	f
+item	include/asound.h	/^ unsigned int item;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon50
+item	include/asound.h	/^ unsigned int item[128];$/;"	m	union:snd_ctl_elem_value::__anon52::__anon55
+item	modules/include/asound.h	/^ unsigned int item;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon21
+item	modules/include/asound.h	/^ unsigned int item[128];$/;"	m	union:snd_ctl_elem_value::__anon23::__anon26
+item_ptr	include/asound.h	/^ unsigned int *item_ptr;$/;"	m	union:snd_ctl_elem_value::__anon52::__anon55
+item_ptr	modules/include/asound.h	/^ unsigned int *item_ptr;$/;"	m	union:snd_ctl_elem_value::__anon23::__anon26
+items	include/asound.h	/^ unsigned int items;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon50
+items	modules/include/asound.h	/^ unsigned int items;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon21
+keyboard_handler	modules/keyboard.c	/^void *keyboard_handler(void *arg)$/;"	f
+length	include/asound.h	/^ size_t length;$/;"	m	struct:snd_hwdep_dsp_image
+length	include/asound.h	/^ unsigned int length;$/;"	m	struct:snd_ctl_tlv
+length	modules/include/asound.h	/^ size_t length;$/;"	m	struct:snd_hwdep_dsp_image
+length	modules/include/asound.h	/^ unsigned int length;$/;"	m	struct:snd_ctl_tlv
+level	include/module.h	/^	int level;$/;"	m	struct:module
+level	modules/include/module.h	/^	int level;$/;"	m	struct:module
+load_driver	modules/wifi.c	/^int load_driver()$/;"	f
+longname	include/asound.h	/^ unsigned char longname[80];$/;"	m	struct:snd_ctl_card_info
+longname	modules/include/asound.h	/^ unsigned char longname[80];$/;"	m	struct:snd_ctl_card_info
+lost	include/asound.h	/^ unsigned int lost;$/;"	m	struct:snd_timer_status
+lost	modules/include/asound.h	/^ unsigned int lost;$/;"	m	struct:snd_timer_status
+main	win.c	/^int main(int argc, char *argv[])$/;"	f
+mainwin	include/win.h	/^typedef struct mainwin {$/;"	s
+mainwin	modules/include/win.h	/^typedef struct mainwin {$/;"	s
+mainwin_t	include/win.h	/^} mainwin_t;$/;"	t	typeref:struct:mainwin
+mainwin_t	modules/include/win.h	/^} mainwin_t;$/;"	t	typeref:struct:mainwin
+mask	include/asound.h	/^ unsigned int mask;$/;"	m	struct:snd_ctl_event::__anon57::__anon58
+mask	modules/include/asound.h	/^ unsigned int mask;$/;"	m	struct:snd_ctl_event::__anon28::__anon29
+masks	include/asound.h	/^ struct snd_mask masks[SNDRV_PCM_HW_PARAM_LAST_MASK -$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_mask
+masks	modules/include/asound.h	/^ struct snd_mask masks[SNDRV_PCM_HW_PARAM_LAST_MASK -$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_mask
+max	include/asound.h	/^ long long max;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon49
+max	include/asound.h	/^ long max;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon48
+max	include/asound.h	/^ unsigned int min, max;$/;"	m	struct:snd_interval
+max	modules/include/asound.h	/^ long long max;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon20
+max	modules/include/asound.h	/^ long max;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon19
+max	modules/include/asound.h	/^ unsigned int min, max;$/;"	m	struct:snd_interval
+min	include/asound.h	/^ long long min;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon49
+min	include/asound.h	/^ long min;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon48
+min	include/asound.h	/^ unsigned int min, max;$/;"	m	struct:snd_interval
+min	modules/include/asound.h	/^ long long min;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon20
+min	modules/include/asound.h	/^ long min;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon19
+min	modules/include/asound.h	/^ unsigned int min, max;$/;"	m	struct:snd_interval
+mixer_ctl_type	include/asoundlib.h	/^enum mixer_ctl_type {$/;"	g
+mixer_ctl_type	modules/include/asoundlib.h	/^enum mixer_ctl_type {$/;"	g
+mixername	include/asound.h	/^ unsigned char mixername[80];$/;"	m	struct:snd_ctl_card_info
+mixername	modules/include/asound.h	/^ unsigned char mixername[80];$/;"	m	struct:snd_ctl_card_info
+module	include/module.h	/^typedef struct module {$/;"	s
+module	include/win.h	/^	struct module *module;$/;"	m	struct:__anon33	typeref:struct:__anon33::module
+module	modules/include/module.h	/^typedef struct module {$/;"	s
+module	modules/include/win.h	/^	struct module *module;$/;"	m	struct:__anon4	typeref:struct:__anon4::module
+module_info_sym	modules/event.c	/^module_t module_info_sym = {$/;"	v
+module_info_sym	modules/keyboard.c	/^module_t module_info_sym = {$/;"	v
+module_info_sym	modules/sdcard.c	/^module_t module_info_sym = {$/;"	v
+module_info_sym	modules/sound.c	/^module_t module_info_sym = {$/;"	v
+module_info_sym	modules/sound.c	/^module_t module_info_sym;$/;"	v
+module_info_sym	modules/wifi.c	/^module_t module_info_sym = {$/;"	v
+module_info_sym	modules/wifi.c	/^module_t module_info_sym;$/;"	v
+module_t	include/module.h	/^} module_t;$/;"	t	typeref:struct:module
+module_t	modules/include/module.h	/^} module_t;$/;"	t	typeref:struct:module
+modules_filter	module.c	/^int modules_filter(const struct dirent *dirent)$/;"	f
+modwin	include/win.h	/^	modwin_t modwin;$/;"	m	struct:__anon33
+modwin	modules/event.c	/^modwin_t *modwin;$/;"	v
+modwin	modules/include/win.h	/^	modwin_t modwin;$/;"	m	struct:__anon4
+modwin	modules/sound.c	/^modwin_t *modwin;$/;"	v
+modwin	modules/wifi.c	/^modwin_t *modwin;$/;"	v
+modwin_t	include/win.h	/^} modwin_t;$/;"	t	typeref:struct:__anon31
+modwin_t	modules/include/win.h	/^} modwin_t;$/;"	t	typeref:struct:__anon2
+mres	include/asound.h	/^ struct snd_mask mres[5];$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_mask
+mres	modules/include/asound.h	/^ struct snd_mask mres[5];$/;"	m	struct:snd_pcm_hw_params	typeref:struct:snd_pcm_hw_params::snd_mask
+msbits	include/asound.h	/^ unsigned int msbits;$/;"	m	struct:snd_pcm_hw_params
+msbits	modules/include/asound.h	/^ unsigned int msbits;$/;"	m	struct:snd_pcm_hw_params
+name	include/asound.h	/^ char name[64];$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon50
+name	include/asound.h	/^ unsigned char name[32];$/;"	m	struct:snd_ctl_card_info
+name	include/asound.h	/^ unsigned char name[44];$/;"	m	struct:snd_ctl_elem_id
+name	include/asound.h	/^ unsigned char name[64];$/;"	m	struct:snd_hwdep_dsp_image
+name	include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_hwdep_info
+name	include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_pcm_info
+name	include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_rawmidi_info
+name	include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_timer_ginfo
+name	include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_timer_info
+name	include/module.h	/^	const char *name;$/;"	m	struct:module
+name	modules/include/asound.h	/^ char name[64];$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon21
+name	modules/include/asound.h	/^ unsigned char name[32];$/;"	m	struct:snd_ctl_card_info
+name	modules/include/asound.h	/^ unsigned char name[44];$/;"	m	struct:snd_ctl_elem_id
+name	modules/include/asound.h	/^ unsigned char name[64];$/;"	m	struct:snd_hwdep_dsp_image
+name	modules/include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_hwdep_info
+name	modules/include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_pcm_info
+name	modules/include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_rawmidi_info
+name	modules/include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_timer_ginfo
+name	modules/include/asound.h	/^ unsigned char name[80];$/;"	m	struct:snd_timer_info
+name	modules/include/module.h	/^	const char *name;$/;"	m	struct:module
+no_active_sensing	include/asound.h	/^ unsigned int no_active_sensing: 1;$/;"	m	struct:snd_rawmidi_params
+no_active_sensing	modules/include/asound.h	/^ unsigned int no_active_sensing: 1;$/;"	m	struct:snd_rawmidi_params
+nsubs	include/win.h	/^	int nsubs;$/;"	m	struct:boxwin
+nsubs	modules/include/win.h	/^	int nsubs;$/;"	m	struct:boxwin
+num_channels	modules/sound.c	/^    uint16_t num_channels;$/;"	m	struct:chunk_fmt	file:
+num_channels	modules/sound.c	/^    uint16_t num_channels;$/;"	m	struct:wav_header	file:
+num_dsps	include/asound.h	/^ unsigned int num_dsps;$/;"	m	struct:snd_hwdep_dsp_status
+num_dsps	modules/include/asound.h	/^ unsigned int num_dsps;$/;"	m	struct:snd_hwdep_dsp_status
+numid	include/asound.h	/^ unsigned int numid;$/;"	m	struct:snd_ctl_elem_id
+numid	include/asound.h	/^ unsigned int numid;$/;"	m	struct:snd_ctl_tlv
+numid	modules/include/asound.h	/^ unsigned int numid;$/;"	m	struct:snd_ctl_elem_id
+numid	modules/include/asound.h	/^ unsigned int numid;$/;"	m	struct:snd_ctl_tlv
+offset	include/asound.h	/^ __kernel_off_t offset;$/;"	m	struct:snd_pcm_channel_info
+offset	include/asound.h	/^ unsigned int offset;$/;"	m	struct:snd_ctl_elem_list
+offset	modules/include/asound.h	/^ __kernel_off_t offset;$/;"	m	struct:snd_pcm_channel_info
+offset	modules/include/asound.h	/^ unsigned int offset;$/;"	m	struct:snd_ctl_elem_list
+offsetof	include/win.h	11;"	d
+offsetof	modules/include/win.h	11;"	d
+openmax	include/asound.h	/^ openmax:1,$/;"	m	struct:snd_interval
+openmax	modules/include/asound.h	/^ openmax:1,$/;"	m	struct:snd_interval
+openmin	include/asound.h	/^ unsigned int openmin:1,$/;"	m	struct:snd_interval
+openmin	modules/include/asound.h	/^ unsigned int openmin:1,$/;"	m	struct:snd_interval
+overrange	include/asound.h	/^ snd_pcm_uframes_t overrange;$/;"	m	struct:snd_pcm_status
+overrange	modules/include/asound.h	/^ snd_pcm_uframes_t overrange;$/;"	m	struct:snd_pcm_status
+overrun	include/asound.h	/^ unsigned int overrun;$/;"	m	struct:snd_timer_status
+overrun	modules/include/asound.h	/^ unsigned int overrun;$/;"	m	struct:snd_timer_status
+owner	include/asound.h	/^ __kernel_pid_t owner;$/;"	m	struct:snd_ctl_elem_info
+owner	modules/include/asound.h	/^ __kernel_pid_t owner;$/;"	m	struct:snd_ctl_elem_info
+pad	include/asound.h	/^ int pad;$/;"	m	struct:snd_ctl_card_info
+pad	include/asound.h	/^ unsigned char pad;$/;"	m	struct:snd_aes_iec958
+pad	modules/include/asound.h	/^ int pad;$/;"	m	struct:snd_ctl_card_info
+pad	modules/include/asound.h	/^ unsigned char pad;$/;"	m	struct:snd_aes_iec958
+pad1	include/asound.h	/^ int pad1;$/;"	m	struct:snd_pcm_mmap_status
+pad1	modules/include/asound.h	/^ int pad1;$/;"	m	struct:snd_pcm_mmap_status
+pcm_config	include/asoundlib.h	/^struct pcm_config {$/;"	s
+pcm_config	modules/include/asoundlib.h	/^struct pcm_config {$/;"	s
+pcm_format	include/asoundlib.h	/^enum pcm_format {$/;"	g
+pcm_format	modules/include/asoundlib.h	/^enum pcm_format {$/;"	g
+period_count	include/asoundlib.h	/^    unsigned int period_count;$/;"	m	struct:pcm_config
+period_count	modules/include/asoundlib.h	/^    unsigned int period_count;$/;"	m	struct:pcm_config
+period_den	include/asound.h	/^ unsigned long period_den;$/;"	m	struct:snd_timer_gparams
+period_den	modules/include/asound.h	/^ unsigned long period_den;$/;"	m	struct:snd_timer_gparams
+period_num	include/asound.h	/^ unsigned long period_num;$/;"	m	struct:snd_timer_gparams
+period_num	modules/include/asound.h	/^ unsigned long period_num;$/;"	m	struct:snd_timer_gparams
+period_size	include/asoundlib.h	/^    unsigned int period_size;$/;"	m	struct:pcm_config
+period_size	modules/include/asoundlib.h	/^    unsigned int period_size;$/;"	m	struct:pcm_config
+period_step	include/asound.h	/^ unsigned int period_step;$/;"	m	struct:snd_pcm_sw_params
+period_step	modules/include/asound.h	/^ unsigned int period_step;$/;"	m	struct:snd_pcm_sw_params
+pids	include/asound.h	/^ struct snd_ctl_elem_id __user *pids;$/;"	m	struct:snd_ctl_elem_list	typeref:struct:snd_ctl_elem_list::__user
+pids	modules/include/asound.h	/^ struct snd_ctl_elem_id __user *pids;$/;"	m	struct:snd_ctl_elem_list	typeref:struct:snd_ctl_elem_list::__user
+play_sample	modules/sound.c	/^void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned int channels,$/;"	f
+play_wave	modules/sound.c	/^int play_wave(const char *filename)$/;"	f
+playbackloop	modules/sound.c	/^void playbackloop(void)$/;"	f
+playloop	modules/sound.c	/^void playloop(void)$/;"	f
+poweroff	modules/wifi.c	/^int poweroff(void)$/;"	f
+poweron	modules/wifi.c	/^int poweron(void)$/;"	f
+prog	Makefile	/^prog	= win$/;"	m
+queue	include/asound.h	/^ unsigned int queue;$/;"	m	struct:snd_timer_status
+queue	modules/include/asound.h	/^ unsigned int queue;$/;"	m	struct:snd_timer_status
+queue_size	include/asound.h	/^ unsigned int queue_size;$/;"	m	struct:snd_timer_params
+queue_size	modules/include/asound.h	/^ unsigned int queue_size;$/;"	m	struct:snd_timer_params
+rate	include/asoundlib.h	/^    unsigned int rate;$/;"	m	struct:pcm_config
+rate	modules/include/asoundlib.h	/^    unsigned int rate;$/;"	m	struct:pcm_config
+rate_den	include/asound.h	/^ unsigned int rate_den;$/;"	m	struct:snd_pcm_hw_params
+rate_den	modules/include/asound.h	/^ unsigned int rate_den;$/;"	m	struct:snd_pcm_hw_params
+rate_num	include/asound.h	/^ unsigned int rate_num;$/;"	m	struct:snd_pcm_hw_params
+rate_num	modules/include/asound.h	/^ unsigned int rate_num;$/;"	m	struct:snd_pcm_hw_params
+reserved	include/asound.h	/^ unsigned char reserved[128-sizeof(struct timespec)];$/;"	m	struct:snd_ctl_elem_value
+reserved	include/asound.h	/^ unsigned char reserved[128];$/;"	m	union:snd_ctl_elem_info::__anon47
+reserved	include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_hwdep_dsp_status
+reserved	include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_rawmidi_params
+reserved	include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_rawmidi_status
+reserved	include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_ginfo
+reserved	include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_gparams
+reserved	include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_gstatus
+reserved	include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_select
+reserved	include/asound.h	/^ unsigned char reserved[50];$/;"	m	struct:snd_ctl_elem_list
+reserved	include/asound.h	/^ unsigned char reserved[60];$/;"	m	struct:snd_pcm_status
+reserved	include/asound.h	/^ unsigned char reserved[60];$/;"	m	struct:snd_timer_params
+reserved	include/asound.h	/^ unsigned char reserved[64-4*sizeof(unsigned short)];$/;"	m	struct:snd_ctl_elem_info
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_hwdep_info
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_hw_params
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_info
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_sw_params
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_rawmidi_info
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_timer_info
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_timer_status
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	union:snd_pcm_sync_ptr::__anon40
+reserved	include/asound.h	/^ unsigned char reserved[64];$/;"	m	union:snd_pcm_sync_ptr::__anon41
+reserved	modules/include/asound.h	/^ unsigned char reserved[128-sizeof(struct timespec)];$/;"	m	struct:snd_ctl_elem_value
+reserved	modules/include/asound.h	/^ unsigned char reserved[128];$/;"	m	union:snd_ctl_elem_info::__anon18
+reserved	modules/include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_hwdep_dsp_status
+reserved	modules/include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_rawmidi_params
+reserved	modules/include/asound.h	/^ unsigned char reserved[16];$/;"	m	struct:snd_rawmidi_status
+reserved	modules/include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_ginfo
+reserved	modules/include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_gparams
+reserved	modules/include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_gstatus
+reserved	modules/include/asound.h	/^ unsigned char reserved[32];$/;"	m	struct:snd_timer_select
+reserved	modules/include/asound.h	/^ unsigned char reserved[50];$/;"	m	struct:snd_ctl_elem_list
+reserved	modules/include/asound.h	/^ unsigned char reserved[60];$/;"	m	struct:snd_pcm_status
+reserved	modules/include/asound.h	/^ unsigned char reserved[60];$/;"	m	struct:snd_timer_params
+reserved	modules/include/asound.h	/^ unsigned char reserved[64-4*sizeof(unsigned short)];$/;"	m	struct:snd_ctl_elem_info
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_hwdep_info
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_hw_params
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_info
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_pcm_sw_params
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_rawmidi_info
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_timer_info
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	struct:snd_timer_status
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	union:snd_pcm_sync_ptr::__anon11
+reserved	modules/include/asound.h	/^ unsigned char reserved[64];$/;"	m	union:snd_pcm_sync_ptr::__anon12
+reserved0	include/asound.h	/^ unsigned int reserved0;$/;"	m	struct:snd_timer_params
+reserved0	include/asound.h	/^ unsigned long reserved0;$/;"	m	struct:snd_timer_ginfo
+reserved0	include/asound.h	/^ unsigned long reserved0;$/;"	m	struct:snd_timer_info
+reserved0	modules/include/asound.h	/^ unsigned int reserved0;$/;"	m	struct:snd_timer_params
+reserved0	modules/include/asound.h	/^ unsigned long reserved0;$/;"	m	struct:snd_timer_ginfo
+reserved0	modules/include/asound.h	/^ unsigned long reserved0;$/;"	m	struct:snd_timer_info
+reserved_	include/asound.h	/^ unsigned char reserved_[16];$/;"	m	struct:snd_ctl_card_info
+reserved_	modules/include/asound.h	/^ unsigned char reserved_[16];$/;"	m	struct:snd_ctl_card_info
+resolution	include/asound.h	/^ unsigned int resolution;$/;"	m	struct:snd_timer_read
+resolution	include/asound.h	/^ unsigned int resolution;$/;"	m	struct:snd_timer_status
+resolution	include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_ginfo
+resolution	include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_gstatus
+resolution	include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_info
+resolution	modules/include/asound.h	/^ unsigned int resolution;$/;"	m	struct:snd_timer_read
+resolution	modules/include/asound.h	/^ unsigned int resolution;$/;"	m	struct:snd_timer_status
+resolution	modules/include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_ginfo
+resolution	modules/include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_gstatus
+resolution	modules/include/asound.h	/^ unsigned long resolution;$/;"	m	struct:snd_timer_info
+resolution_den	include/asound.h	/^ unsigned long resolution_den;$/;"	m	struct:snd_timer_gstatus
+resolution_den	modules/include/asound.h	/^ unsigned long resolution_den;$/;"	m	struct:snd_timer_gstatus
+resolution_max	include/asound.h	/^ unsigned long resolution_max;$/;"	m	struct:snd_timer_ginfo
+resolution_max	modules/include/asound.h	/^ unsigned long resolution_max;$/;"	m	struct:snd_timer_ginfo
+resolution_min	include/asound.h	/^ unsigned long resolution_min;$/;"	m	struct:snd_timer_ginfo
+resolution_min	modules/include/asound.h	/^ unsigned long resolution_min;$/;"	m	struct:snd_timer_ginfo
+resolution_num	include/asound.h	/^ unsigned long resolution_num;$/;"	m	struct:snd_timer_gstatus
+resolution_num	modules/include/asound.h	/^ unsigned long resolution_num;$/;"	m	struct:snd_timer_gstatus
+result	include/asound.h	/^ snd_pcm_sframes_t result;$/;"	m	struct:snd_xferi
+result	include/asound.h	/^ snd_pcm_sframes_t result;$/;"	m	struct:snd_xfern
+result	modules/include/asound.h	/^ snd_pcm_sframes_t result;$/;"	m	struct:snd_xferi
+result	modules/include/asound.h	/^ snd_pcm_sframes_t result;$/;"	m	struct:snd_xfern
+riff_fmt	modules/sound.c	/^    uint32_t riff_fmt;$/;"	m	struct:wav_header	file:
+riff_id	modules/sound.c	/^    uint32_t riff_id;$/;"	m	struct:riff_wave_header	file:
+riff_id	modules/sound.c	/^    uint32_t riff_id;$/;"	m	struct:wav_header	file:
+riff_sz	modules/sound.c	/^    uint32_t riff_sz;$/;"	m	struct:riff_wave_header	file:
+riff_sz	modules/sound.c	/^    uint32_t riff_sz;$/;"	m	struct:wav_header	file:
+riff_wave_header	modules/sound.c	/^struct riff_wave_header {$/;"	s	file:
+rmask	include/asound.h	/^ unsigned int rmask;$/;"	m	struct:snd_pcm_hw_params
+rmask	modules/include/asound.h	/^ unsigned int rmask;$/;"	m	struct:snd_pcm_hw_params
+rmmod	modules/wifi.c	/^int rmmod(const char *modname)$/;"	f
+s	include/asound.h	/^ } s;$/;"	m	struct:snd_pcm_sync_ptr	typeref:union:snd_pcm_sync_ptr::__anon40
+s	modules/include/asound.h	/^ } s;$/;"	m	struct:snd_pcm_sync_ptr	typeref:union:snd_pcm_sync_ptr::__anon11
+sample_rate	modules/sound.c	/^    uint32_t sample_rate;$/;"	m	struct:chunk_fmt	file:
+sample_rate	modules/sound.c	/^    uint32_t sample_rate;$/;"	m	struct:wav_header	file:
+sbarwin	include/win.h	/^	sbarwin_t sbarwin;$/;"	m	struct:__anon33
+sbarwin	modules/include/win.h	/^	sbarwin_t sbarwin;$/;"	m	struct:__anon4
+sbarwin_t	include/win.h	/^} sbarwin_t;$/;"	t	typeref:struct:__anon32
+sbarwin_t	modules/include/win.h	/^} sbarwin_t;$/;"	t	typeref:struct:__anon3
+sdcard_handler	modules/sdcard.c	/^void *sdcard_handler(void *arg)$/;"	f
+selection_capture	modules/sound.c	/^int selection_capture(CDKSCREEN *screen)$/;"	f
+selection_playback	modules/sound.c	/^int selection_playback(CDKSCREEN *screen)$/;"	f
+selection_volume	modules/sound.c	/^int selection_volume(CDKSCREEN *screen)$/;"	f
+setSoundVolume	modules/sound.c	/^int setSoundVolume(int value)$/;"	f
+show_event_info	modules/event.c	/^void show_event_info(WINDOW *win)$/;"	f
+show_info	modules/wifi.c	/^int show_info(CDKSCREEN *screen)$/;"	f
+sigint_handler	modules/sound.c	/^void sigint_handler(int sig)$/;"	f
+silence_size	include/asound.h	/^ snd_pcm_uframes_t silence_size;$/;"	m	struct:snd_pcm_sw_params
+silence_size	modules/include/asound.h	/^ snd_pcm_uframes_t silence_size;$/;"	m	struct:snd_pcm_sw_params
+silence_threshold	include/asound.h	/^ snd_pcm_uframes_t silence_threshold;$/;"	m	struct:snd_pcm_sw_params
+silence_threshold	include/asoundlib.h	/^    unsigned int silence_threshold;$/;"	m	struct:pcm_config
+silence_threshold	modules/include/asound.h	/^ snd_pcm_uframes_t silence_threshold;$/;"	m	struct:snd_pcm_sw_params
+silence_threshold	modules/include/asoundlib.h	/^    unsigned int silence_threshold;$/;"	m	struct:pcm_config
+sleep_min	include/asound.h	/^ unsigned int sleep_min;$/;"	m	struct:snd_pcm_sw_params
+sleep_min	modules/include/asound.h	/^ unsigned int sleep_min;$/;"	m	struct:snd_pcm_sw_params
+snd_aes_iec958	include/asound.h	/^struct snd_aes_iec958 {$/;"	s
+snd_aes_iec958	modules/include/asound.h	/^struct snd_aes_iec958 {$/;"	s
+snd_ctl_card_info	include/asound.h	/^struct snd_ctl_card_info {$/;"	s
+snd_ctl_card_info	modules/include/asound.h	/^struct snd_ctl_card_info {$/;"	s
+snd_ctl_elem_id	include/asound.h	/^struct snd_ctl_elem_id {$/;"	s
+snd_ctl_elem_id	modules/include/asound.h	/^struct snd_ctl_elem_id {$/;"	s
+snd_ctl_elem_iface_t	include/asound.h	/^typedef int __bitwise snd_ctl_elem_iface_t;$/;"	t
+snd_ctl_elem_iface_t	modules/include/asound.h	/^typedef int __bitwise snd_ctl_elem_iface_t;$/;"	t
+snd_ctl_elem_info	include/asound.h	/^struct snd_ctl_elem_info {$/;"	s
+snd_ctl_elem_info	modules/include/asound.h	/^struct snd_ctl_elem_info {$/;"	s
+snd_ctl_elem_list	include/asound.h	/^struct snd_ctl_elem_list {$/;"	s
+snd_ctl_elem_list	modules/include/asound.h	/^struct snd_ctl_elem_list {$/;"	s
+snd_ctl_elem_type_t	include/asound.h	/^typedef int __bitwise snd_ctl_elem_type_t;$/;"	t
+snd_ctl_elem_type_t	modules/include/asound.h	/^typedef int __bitwise snd_ctl_elem_type_t;$/;"	t
+snd_ctl_elem_value	include/asound.h	/^struct snd_ctl_elem_value {$/;"	s
+snd_ctl_elem_value	modules/include/asound.h	/^struct snd_ctl_elem_value {$/;"	s
+snd_ctl_event	include/asound.h	/^struct snd_ctl_event {$/;"	s
+snd_ctl_event	modules/include/asound.h	/^struct snd_ctl_event {$/;"	s
+snd_ctl_tlv	include/asound.h	/^struct snd_ctl_tlv {$/;"	s
+snd_ctl_tlv	modules/include/asound.h	/^struct snd_ctl_tlv {$/;"	s
+snd_hwdep_dsp_image	include/asound.h	/^struct snd_hwdep_dsp_image {$/;"	s
+snd_hwdep_dsp_image	modules/include/asound.h	/^struct snd_hwdep_dsp_image {$/;"	s
+snd_hwdep_dsp_status	include/asound.h	/^struct snd_hwdep_dsp_status {$/;"	s
+snd_hwdep_dsp_status	modules/include/asound.h	/^struct snd_hwdep_dsp_status {$/;"	s
+snd_hwdep_info	include/asound.h	/^struct snd_hwdep_info {$/;"	s
+snd_hwdep_info	modules/include/asound.h	/^struct snd_hwdep_info {$/;"	s
+snd_interval	include/asound.h	/^struct snd_interval {$/;"	s
+snd_interval	modules/include/asound.h	/^struct snd_interval {$/;"	s
+snd_mask	include/asound.h	/^struct snd_mask {$/;"	s
+snd_mask	modules/include/asound.h	/^struct snd_mask {$/;"	s
+snd_pcm_access_t	include/asound.h	/^typedef int __bitwise snd_pcm_access_t;$/;"	t
+snd_pcm_access_t	modules/include/asound.h	/^typedef int __bitwise snd_pcm_access_t;$/;"	t
+snd_pcm_channel_info	include/asound.h	/^struct snd_pcm_channel_info {$/;"	s
+snd_pcm_channel_info	modules/include/asound.h	/^struct snd_pcm_channel_info {$/;"	s
+snd_pcm_format_t	include/asound.h	/^typedef int __bitwise snd_pcm_format_t;$/;"	t
+snd_pcm_format_t	modules/include/asound.h	/^typedef int __bitwise snd_pcm_format_t;$/;"	t
+snd_pcm_hw_param_t	include/asound.h	/^typedef int snd_pcm_hw_param_t;$/;"	t
+snd_pcm_hw_param_t	modules/include/asound.h	/^typedef int snd_pcm_hw_param_t;$/;"	t
+snd_pcm_hw_params	include/asound.h	/^struct snd_pcm_hw_params {$/;"	s
+snd_pcm_hw_params	modules/include/asound.h	/^struct snd_pcm_hw_params {$/;"	s
+snd_pcm_info	include/asound.h	/^struct snd_pcm_info {$/;"	s
+snd_pcm_info	modules/include/asound.h	/^struct snd_pcm_info {$/;"	s
+snd_pcm_mmap_control	include/asound.h	/^struct snd_pcm_mmap_control {$/;"	s
+snd_pcm_mmap_control	modules/include/asound.h	/^struct snd_pcm_mmap_control {$/;"	s
+snd_pcm_mmap_status	include/asound.h	/^struct snd_pcm_mmap_status {$/;"	s
+snd_pcm_mmap_status	modules/include/asound.h	/^struct snd_pcm_mmap_status {$/;"	s
+snd_pcm_sframes_t	include/asound.h	/^typedef signed long snd_pcm_sframes_t;$/;"	t
+snd_pcm_sframes_t	modules/include/asound.h	/^typedef signed long snd_pcm_sframes_t;$/;"	t
+snd_pcm_state_t	include/asound.h	/^typedef int __bitwise snd_pcm_state_t;$/;"	t
+snd_pcm_state_t	modules/include/asound.h	/^typedef int __bitwise snd_pcm_state_t;$/;"	t
+snd_pcm_status	include/asound.h	/^struct snd_pcm_status {$/;"	s
+snd_pcm_status	modules/include/asound.h	/^struct snd_pcm_status {$/;"	s
+snd_pcm_subformat_t	include/asound.h	/^typedef int __bitwise snd_pcm_subformat_t;$/;"	t
+snd_pcm_subformat_t	modules/include/asound.h	/^typedef int __bitwise snd_pcm_subformat_t;$/;"	t
+snd_pcm_sw_params	include/asound.h	/^struct snd_pcm_sw_params {$/;"	s
+snd_pcm_sw_params	modules/include/asound.h	/^struct snd_pcm_sw_params {$/;"	s
+snd_pcm_sync_id	include/asound.h	/^union snd_pcm_sync_id {$/;"	u
+snd_pcm_sync_id	modules/include/asound.h	/^union snd_pcm_sync_id {$/;"	u
+snd_pcm_sync_ptr	include/asound.h	/^struct snd_pcm_sync_ptr {$/;"	s
+snd_pcm_sync_ptr	modules/include/asound.h	/^struct snd_pcm_sync_ptr {$/;"	s
+snd_pcm_uframes_t	include/asound.h	/^typedef unsigned long snd_pcm_uframes_t;$/;"	t
+snd_pcm_uframes_t	modules/include/asound.h	/^typedef unsigned long snd_pcm_uframes_t;$/;"	t
+snd_rawmidi_info	include/asound.h	/^struct snd_rawmidi_info {$/;"	s
+snd_rawmidi_info	modules/include/asound.h	/^struct snd_rawmidi_info {$/;"	s
+snd_rawmidi_params	include/asound.h	/^struct snd_rawmidi_params {$/;"	s
+snd_rawmidi_params	modules/include/asound.h	/^struct snd_rawmidi_params {$/;"	s
+snd_rawmidi_status	include/asound.h	/^struct snd_rawmidi_status {$/;"	s
+snd_rawmidi_status	modules/include/asound.h	/^struct snd_rawmidi_status {$/;"	s
+snd_timer_ginfo	include/asound.h	/^struct snd_timer_ginfo {$/;"	s
+snd_timer_ginfo	modules/include/asound.h	/^struct snd_timer_ginfo {$/;"	s
+snd_timer_gparams	include/asound.h	/^struct snd_timer_gparams {$/;"	s
+snd_timer_gparams	modules/include/asound.h	/^struct snd_timer_gparams {$/;"	s
+snd_timer_gstatus	include/asound.h	/^struct snd_timer_gstatus {$/;"	s
+snd_timer_gstatus	modules/include/asound.h	/^struct snd_timer_gstatus {$/;"	s
+snd_timer_id	include/asound.h	/^struct snd_timer_id {$/;"	s
+snd_timer_id	modules/include/asound.h	/^struct snd_timer_id {$/;"	s
+snd_timer_info	include/asound.h	/^struct snd_timer_info {$/;"	s
+snd_timer_info	modules/include/asound.h	/^struct snd_timer_info {$/;"	s
+snd_timer_params	include/asound.h	/^struct snd_timer_params {$/;"	s
+snd_timer_params	modules/include/asound.h	/^struct snd_timer_params {$/;"	s
+snd_timer_read	include/asound.h	/^struct snd_timer_read {$/;"	s
+snd_timer_read	modules/include/asound.h	/^struct snd_timer_read {$/;"	s
+snd_timer_select	include/asound.h	/^struct snd_timer_select {$/;"	s
+snd_timer_select	modules/include/asound.h	/^struct snd_timer_select {$/;"	s
+snd_timer_status	include/asound.h	/^struct snd_timer_status {$/;"	s
+snd_timer_status	modules/include/asound.h	/^struct snd_timer_status {$/;"	s
+snd_timer_tread	include/asound.h	/^struct snd_timer_tread {$/;"	s
+snd_timer_tread	modules/include/asound.h	/^struct snd_timer_tread {$/;"	s
+snd_xferi	include/asound.h	/^struct snd_xferi {$/;"	s
+snd_xferi	modules/include/asound.h	/^struct snd_xferi {$/;"	s
+snd_xfern	include/asound.h	/^struct snd_xfern {$/;"	s
+snd_xfern	modules/include/asound.h	/^struct snd_xfern {$/;"	s
+sndrv_ctl_event_type	include/asound.h	/^enum sndrv_ctl_event_type {$/;"	g
+sndrv_ctl_event_type	modules/include/asound.h	/^enum sndrv_ctl_event_type {$/;"	g
+sound_handler	modules/sound.c	/^void *sound_handler(void *arg)$/;"	f
+space	include/asound.h	/^ unsigned int space;$/;"	m	struct:snd_ctl_elem_list
+space	modules/include/asound.h	/^ unsigned int space;$/;"	m	struct:snd_ctl_elem_list
+start_pthread	win.c	/^int start_pthread(mainwin_t *mainwin, int igroup)$/;"	f
+start_threshold	include/asound.h	/^ snd_pcm_uframes_t start_threshold;$/;"	m	struct:snd_pcm_sw_params
+start_threshold	include/asoundlib.h	/^    unsigned int start_threshold;$/;"	m	struct:pcm_config
+start_threshold	modules/include/asound.h	/^ snd_pcm_uframes_t start_threshold;$/;"	m	struct:snd_pcm_sw_params
+start_threshold	modules/include/asoundlib.h	/^    unsigned int start_threshold;$/;"	m	struct:pcm_config
+state	include/asound.h	/^ snd_pcm_state_t state;$/;"	m	struct:snd_pcm_mmap_status
+state	include/asound.h	/^ snd_pcm_state_t state;$/;"	m	struct:snd_pcm_status
+state	modules/include/asound.h	/^ snd_pcm_state_t state;$/;"	m	struct:snd_pcm_mmap_status
+state	modules/include/asound.h	/^ snd_pcm_state_t state;$/;"	m	struct:snd_pcm_status
+status	include/asound.h	/^ struct snd_pcm_mmap_status status;$/;"	m	union:snd_pcm_sync_ptr::__anon40	typeref:struct:snd_pcm_sync_ptr::__anon40::snd_pcm_mmap_status
+status	include/asound.h	/^ unsigned char status[24];$/;"	m	struct:snd_aes_iec958
+status	modules/include/asound.h	/^ struct snd_pcm_mmap_status status;$/;"	m	union:snd_pcm_sync_ptr::__anon11	typeref:struct:snd_pcm_sync_ptr::__anon11::snd_pcm_mmap_status
+status	modules/include/asound.h	/^ unsigned char status[24];$/;"	m	struct:snd_aes_iec958
+step	include/asound.h	/^ long long step;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon49
+step	include/asound.h	/^ long step;$/;"	m	struct:snd_ctl_elem_info::__anon47::__anon48
+step	include/asound.h	/^ unsigned int step;$/;"	m	struct:snd_pcm_channel_info
+step	modules/include/asound.h	/^ long long step;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon20
+step	modules/include/asound.h	/^ long step;$/;"	m	struct:snd_ctl_elem_info::__anon18::__anon19
+step	modules/include/asound.h	/^ unsigned int step;$/;"	m	struct:snd_pcm_channel_info
+stop_pthread	win.c	/^int stop_pthread(mainwin_t *mainwin, int igroup)$/;"	f
+stop_threshold	include/asound.h	/^ snd_pcm_uframes_t stop_threshold;$/;"	m	struct:snd_pcm_sw_params
+stop_threshold	include/asoundlib.h	/^    unsigned int stop_threshold;$/;"	m	struct:pcm_config
+stop_threshold	modules/include/asound.h	/^ snd_pcm_uframes_t stop_threshold;$/;"	m	struct:snd_pcm_sw_params
+stop_threshold	modules/include/asoundlib.h	/^    unsigned int stop_threshold;$/;"	m	struct:pcm_config
+stream	include/asound.h	/^ int stream;$/;"	m	struct:snd_pcm_info
+stream	include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_info
+stream	include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_params
+stream	include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_status
+stream	modules/include/asound.h	/^ int stream;$/;"	m	struct:snd_pcm_info
+stream	modules/include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_info
+stream	modules/include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_params
+stream	modules/include/asound.h	/^ int stream;$/;"	m	struct:snd_rawmidi_status
+subcode	include/asound.h	/^ unsigned char subcode[147];$/;"	m	struct:snd_aes_iec958
+subcode	modules/include/asound.h	/^ unsigned char subcode[147];$/;"	m	struct:snd_aes_iec958
+subdevice	include/asound.h	/^ int subdevice;$/;"	m	struct:snd_timer_id
+subdevice	include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_ctl_elem_id
+subdevice	include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_pcm_info
+subdevice	include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_rawmidi_info
+subdevice	modules/include/asound.h	/^ int subdevice;$/;"	m	struct:snd_timer_id
+subdevice	modules/include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_ctl_elem_id
+subdevice	modules/include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_pcm_info
+subdevice	modules/include/asound.h	/^ unsigned int subdevice;$/;"	m	struct:snd_rawmidi_info
+subdevices_avail	include/asound.h	/^ unsigned int subdevices_avail;$/;"	m	struct:snd_pcm_info
+subdevices_avail	include/asound.h	/^ unsigned int subdevices_avail;$/;"	m	struct:snd_rawmidi_info
+subdevices_avail	modules/include/asound.h	/^ unsigned int subdevices_avail;$/;"	m	struct:snd_pcm_info
+subdevices_avail	modules/include/asound.h	/^ unsigned int subdevices_avail;$/;"	m	struct:snd_rawmidi_info
+subdevices_count	include/asound.h	/^ unsigned int subdevices_count;$/;"	m	struct:snd_pcm_info
+subdevices_count	include/asound.h	/^ unsigned int subdevices_count;$/;"	m	struct:snd_rawmidi_info
+subdevices_count	modules/include/asound.h	/^ unsigned int subdevices_count;$/;"	m	struct:snd_pcm_info
+subdevices_count	modules/include/asound.h	/^ unsigned int subdevices_count;$/;"	m	struct:snd_rawmidi_info
+subname	include/asound.h	/^ unsigned char subname[32];$/;"	m	struct:snd_pcm_info
+subname	include/asound.h	/^ unsigned char subname[32];$/;"	m	struct:snd_rawmidi_info
+subname	modules/include/asound.h	/^ unsigned char subname[32];$/;"	m	struct:snd_pcm_info
+subname	modules/include/asound.h	/^ unsigned char subname[32];$/;"	m	struct:snd_rawmidi_info
+subwin	include/win.h	/^	subwin_t subwin[MAX_MODULE];$/;"	m	struct:boxwin
+subwin	modules/include/win.h	/^	subwin_t subwin[MAX_MODULE];$/;"	m	struct:boxwin
+subwin_t	include/win.h	/^} subwin_t;$/;"	t	typeref:struct:__anon33
+subwin_t	modules/include/win.h	/^} subwin_t;$/;"	t	typeref:struct:__anon4
+suspended_state	include/asound.h	/^ snd_pcm_state_t suspended_state;$/;"	m	struct:snd_pcm_mmap_status
+suspended_state	include/asound.h	/^ snd_pcm_state_t suspended_state;$/;"	m	struct:snd_pcm_status
+suspended_state	modules/include/asound.h	/^ snd_pcm_state_t suspended_state;$/;"	m	struct:snd_pcm_mmap_status
+suspended_state	modules/include/asound.h	/^ snd_pcm_state_t suspended_state;$/;"	m	struct:snd_pcm_status
+sync	include/asound.h	/^ union snd_pcm_sync_id sync;$/;"	m	struct:snd_pcm_info	typeref:union:snd_pcm_info::snd_pcm_sync_id
+sync	modules/include/asound.h	/^ union snd_pcm_sync_id sync;$/;"	m	struct:snd_pcm_info	typeref:union:snd_pcm_info::snd_pcm_sync_id
+sysfs_getstr	modules/event.c	/^int sysfs_getstr(char *file, char *buf, int n)$/;"	f
+sysfs_getstr	modules/sdcard.c	/^int sysfs_getstr(char *file, char *buf, int n)$/;"	f
+sysfs_writes	modules/sdcard.c	/^int sysfs_writes(char *file, char *buf)$/;"	f
+sz	modules/sound.c	/^    uint32_t sz;$/;"	m	struct:chunk_header	file:
+ticks	include/asound.h	/^ unsigned int ticks;$/;"	m	struct:snd_timer_params
+ticks	include/asound.h	/^ unsigned int ticks;$/;"	m	struct:snd_timer_read
+ticks	modules/include/asound.h	/^ unsigned int ticks;$/;"	m	struct:snd_timer_params
+ticks	modules/include/asound.h	/^ unsigned int ticks;$/;"	m	struct:snd_timer_read
+tid	include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_ginfo	typeref:struct:snd_timer_ginfo::snd_timer_id
+tid	include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_gparams	typeref:struct:snd_timer_gparams::snd_timer_id
+tid	include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_gstatus	typeref:struct:snd_timer_gstatus::snd_timer_id
+tid	include/win.h	/^	pthread_t tid;$/;"	m	struct:__anon33
+tid	modules/include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_ginfo	typeref:struct:snd_timer_ginfo::snd_timer_id
+tid	modules/include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_gparams	typeref:struct:snd_timer_gparams::snd_timer_id
+tid	modules/include/asound.h	/^ struct snd_timer_id tid;$/;"	m	struct:snd_timer_gstatus	typeref:struct:snd_timer_gstatus::snd_timer_id
+tid	modules/include/win.h	/^	pthread_t tid;$/;"	m	struct:__anon4
+tlv	include/asound.h	/^ unsigned int tlv[0];$/;"	m	struct:snd_ctl_tlv
+tlv	modules/include/asound.h	/^ unsigned int tlv[0];$/;"	m	struct:snd_ctl_tlv
+to_boxwin	include/win.h	84;"	d
+to_boxwin	modules/include/win.h	84;"	d
+to_id	include/win.h	86;"	d
+to_id	modules/include/win.h	86;"	d
+to_mainwin	include/win.h	85;"	d
+to_mainwin	modules/include/win.h	85;"	d
+to_subwin	include/win.h	83;"	d
+to_subwin	modules/include/win.h	83;"	d
+trigger_tstamp	include/asound.h	/^ struct timespec trigger_tstamp;$/;"	m	struct:snd_pcm_status	typeref:struct:snd_pcm_status::timespec
+trigger_tstamp	modules/include/asound.h	/^ struct timespec trigger_tstamp;$/;"	m	struct:snd_pcm_status	typeref:struct:snd_pcm_status::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_ctl_elem_value	typeref:struct:snd_ctl_elem_value::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_pcm_mmap_status	typeref:struct:snd_pcm_mmap_status::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_pcm_status	typeref:struct:snd_pcm_status::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_rawmidi_status	typeref:struct:snd_rawmidi_status::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_timer_status	typeref:struct:snd_timer_status::timespec
+tstamp	include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_timer_tread	typeref:struct:snd_timer_tread::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_ctl_elem_value	typeref:struct:snd_ctl_elem_value::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_pcm_mmap_status	typeref:struct:snd_pcm_mmap_status::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_pcm_status	typeref:struct:snd_pcm_status::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_rawmidi_status	typeref:struct:snd_rawmidi_status::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_timer_status	typeref:struct:snd_timer_status::timespec
+tstamp	modules/include/asound.h	/^ struct timespec tstamp;$/;"	m	struct:snd_timer_tread	typeref:struct:snd_timer_tread::timespec
+tstamp_mode	include/asound.h	/^ int tstamp_mode;$/;"	m	struct:snd_pcm_sw_params
+tstamp_mode	modules/include/asound.h	/^ int tstamp_mode;$/;"	m	struct:snd_pcm_sw_params
+type	include/asound.h	/^ int type;$/;"	m	struct:snd_ctl_event
+type	include/asound.h	/^ snd_ctl_elem_type_t type;$/;"	m	struct:snd_ctl_elem_info
+type	include/module.h	/^	int type;$/;"	m	struct:module
+type	modules/include/asound.h	/^ int type;$/;"	m	struct:snd_ctl_event
+type	modules/include/asound.h	/^ snd_ctl_elem_type_t type;$/;"	m	struct:snd_ctl_elem_info
+type	modules/include/module.h	/^	int type;$/;"	m	struct:module
+uevent	event.c	/^static int uevent = 0;$/;"	v	file:
+uevent_init	event.c	/^int uevent_init(void)$/;"	f
+uevent_monitor	event.c	/^void *uevent_monitor(void *arg)$/;"	f
+uevent_pending	include/win.h	/^	int uevent_pending;$/;"	m	struct:__anon33
+uevent_pending	modules/include/win.h	/^	int uevent_pending;$/;"	m	struct:__anon4
+unload_driver	modules/wifi.c	/^int unload_driver()$/;"	f
+used	include/asound.h	/^ unsigned int used;$/;"	m	struct:snd_ctl_elem_list
+used	modules/include/asound.h	/^ unsigned int used;$/;"	m	struct:snd_ctl_elem_list
+val	include/asound.h	/^ unsigned int val;$/;"	m	struct:snd_timer_tread
+val	modules/include/asound.h	/^ unsigned int val;$/;"	m	struct:snd_timer_tread
+value	include/asound.h	/^ long long value[64];$/;"	m	union:snd_ctl_elem_value::__anon52::__anon54
+value	include/asound.h	/^ long value[128];$/;"	m	union:snd_ctl_elem_value::__anon52::__anon53
+value	include/asound.h	/^ } value;$/;"	m	struct:snd_ctl_elem_info	typeref:union:snd_ctl_elem_info::__anon47
+value	include/asound.h	/^ } value;$/;"	m	struct:snd_ctl_elem_value	typeref:union:snd_ctl_elem_value::__anon52
+value	modules/include/asound.h	/^ long long value[64];$/;"	m	union:snd_ctl_elem_value::__anon23::__anon25
+value	modules/include/asound.h	/^ long value[128];$/;"	m	union:snd_ctl_elem_value::__anon23::__anon24
+value	modules/include/asound.h	/^ } value;$/;"	m	struct:snd_ctl_elem_info	typeref:union:snd_ctl_elem_info::__anon18
+value	modules/include/asound.h	/^ } value;$/;"	m	struct:snd_ctl_elem_value	typeref:union:snd_ctl_elem_value::__anon23
+value_ptr	include/asound.h	/^ long *value_ptr;$/;"	m	union:snd_ctl_elem_value::__anon52::__anon53
+value_ptr	include/asound.h	/^ long long *value_ptr;$/;"	m	union:snd_ctl_elem_value::__anon52::__anon54
+value_ptr	modules/include/asound.h	/^ long *value_ptr;$/;"	m	union:snd_ctl_elem_value::__anon23::__anon24
+value_ptr	modules/include/asound.h	/^ long long *value_ptr;$/;"	m	union:snd_ctl_elem_value::__anon23::__anon25
+version	include/asound.h	/^ unsigned int version;$/;"	m	struct:snd_hwdep_dsp_status
+version	modules/include/asound.h	/^ unsigned int version;$/;"	m	struct:snd_hwdep_dsp_status
+wait_all_event	event.c	/^int wait_all_event(modwin_t *modwin)$/;"	f
+wait_uevent	event.c	/^int wait_uevent(modwin_t *modwin)$/;"	f
+wav_header	modules/sound.c	/^struct wav_header {$/;"	s	file:
+wave_id	modules/sound.c	/^    uint32_t wave_id;$/;"	m	struct:riff_wave_header	file:
+wifi_handler	modules/wifi.c	/^void *wifi_handler(void *arg)$/;"	f
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon30
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon31
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon32
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon33
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:boxwin
+win	include/win.h	/^	WINDOW *win;$/;"	m	struct:mainwin
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon1
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon2
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon3
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:__anon4
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:boxwin
+win	modules/include/win.h	/^	WINDOW *win;$/;"	m	struct:mainwin
+window_lock	thread.c	/^int window_lock(void)$/;"	f
+window_lock_init	thread.c	/^int window_lock_init(void)$/;"	f
+window_self	thread.c	/^int window_self(void)$/;"	f
+window_trylock	thread.c	/^int window_trylock(void)$/;"	f
+window_unlock	thread.c	/^int window_unlock(void)$/;"	f
+xfer_align	include/asound.h	/^ snd_pcm_uframes_t xfer_align;$/;"	m	struct:snd_pcm_sw_params
+xfer_align	modules/include/asound.h	/^ snd_pcm_uframes_t xfer_align;$/;"	m	struct:snd_pcm_sw_params
+xruns	include/asound.h	/^ size_t xruns;$/;"	m	struct:snd_rawmidi_status
+xruns	modules/include/asound.h	/^ size_t xruns;$/;"	m	struct:snd_rawmidi_status

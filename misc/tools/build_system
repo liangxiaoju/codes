@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Generate rk2818 ext3 system.img
+
+#ROOTFS=$(pwd)/bin/rootfs
+ROOTFS=$(pwd)/vendor
+PROG=$(pwd)/bin/genext2fs
+IMAGE=$(pwd)/../images/system.img
+
+post() {
+	cp -v ${IMAGE} ~/document/gentoo_xp/rk_image/
+}
+
+set -e
+
+[[ -d ${IMAGE%/*} ]] || echo "${IMAGE%/*} NOT exist"
+
+size=$(du -sk ${ROOTFS} | awk '{print $1}')
+
+$PROG -b $((size+10240)) -d ${ROOTFS} ${IMAGE}
+tune2fs -j  -L system  -c -1 -i 0 ${IMAGE}	&>/dev/null
+e2fsck -fy ${IMAGE}	&>/dev/null || true
+
+size=$(resize2fs -P ${IMAGE} 2>/dev/null | awk -F: '{print $2}')
+rm ${IMAGE}
+
+$PROG -b ${size} -d ${ROOTFS} ${IMAGE}
+tune2fs -j  -L system  -c -1 -i 0 ${IMAGE} &>/dev/null
+e2fsck -fy ${IMAGE} &>/dev/null || true
+
+echo -e "${IMAGE} GENERATE successfully\n\n"
+
+# post
+

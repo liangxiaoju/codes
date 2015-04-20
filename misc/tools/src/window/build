@@ -1,0 +1,13 @@
+#!/bin/bash
+
+case $1 in
+	arm)
+		compiler=arm-boeye-linux-gnueabi-gcc
+		shift 1
+		;;
+	*)
+		compiler=gcc
+		;;
+esac
+
+make -B CC=${compiler} $@ && make -B -C modules CC=${compiler} $@

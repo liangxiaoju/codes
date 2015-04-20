@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#
+# Usage:
+# ./build_kernel menuconfig	# default E9
+# ./build_kernel 				# default E9
+# ./build_kernel M970 menuconfig
+# ./build_kernel M970
+#
+
+function die()
+{
+	echo $@
+	exit 1
+}
+
+out=$(pwd)/../images/
+
+( which ccache &>/dev/null ) && CCACHE=ccache
+
+case $1 in
+	C60)
+		target=$1
+		kernel=$(pwd)/../rk2818-kernel/
+		images=${kernel}../out/C60/kernel.img
+		shift 1
+		;;
+	E8)
+		target=$1
+		kernel=~/com/e8/rk2918-kernel/
+		images=${kernel}../out/E8/kernel.img
+		shift 1
+		;;
+
+	*)
+		target=C60
+		kernel=$(pwd)/../rk2818-kernel/
+		images=${kernel}../out/C60/kernel.img
+		;;
+esac
+
+[[ -d ${kernel} ]] || die "${kernel} NOT exist"
+[[ -d ${out} ]] || die "${out} NOT exist"
+
+dist=$(pwd)/../out/$target/
+# images+=" ${dist}./arch/arm/boot/zImage"
+
+[[ -d ${dist} ]] || die "${dist} NOT exist"
+
+make -C  ${kernel} ARCH=arm CROSS_COMPILE="$CCACHE arm-linux-" O=${dist} -j2 $@	|| die "make failed"
+
+echo 
+echo ----------
+for image in $images ; do
+	[[ -r $image ]] && cp -v $image ${out}./${image##*/}.${target} && echo $image.${target} GENERATED!!!
+done
+echo ----------

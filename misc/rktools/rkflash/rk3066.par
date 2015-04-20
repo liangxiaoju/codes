@@ -1,0 +1,8 @@
+# section offset file
+parameter	0x0			../../tenadg08.rk3066/Images/parameter
+misc		0x2000		../../tenadg08.rk3066/Images/misc.img
+kernel		0x4000		../../tenadg08.rk3066/Images/kernel.img
+boot		0x8000		../../tenadg08.rk3066/Images/boot.img
+recovery	0x10000		../../tenadg08.rk3066/Images/recovery.img
+system		0x31a000	../../tenadg08.rk3066/Images/system.img
+backup      0x00018000  ../../tenadg08.rk3066/Images/update.img

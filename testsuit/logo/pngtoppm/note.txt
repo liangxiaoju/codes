@@ -1,0 +1,1 @@
+ffmpeg -i image.png -f image2 -pix_fmt rgb565 image.raw

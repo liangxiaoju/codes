@@ -1,0 +1,90 @@
+#!/system/bin/sh
+
+set -e
+
+updateimg=$1
+update_ext=/mnt/update/update_ext
+
+cd "${updateimg%/*}"
+
+[ -e "${update_ext}" ] && source ${update_ext}
+
+unpack_img ()
+{
+    partition=$1
+    filename=$2
+    unpack -i ${updateimg} -p ${partition} -o ${filename}
+}
+
+find_mtd ()
+{
+    name=$(cat /proc/mtd | grep $1)
+    echo "/dev/mtd/${name%%:*}"
+}
+
+write_img ()
+{
+    flashcp $1 $2
+}
+
+show_process ()
+{
+    echo "$1"
+    setprop imt.update.status "$1"
+}
+
+remount_system ()
+{
+    ramdisk="/dev/block/ram0"
+
+    fstype=$(cat /proc/mounts | grep "system")
+    fstype=${fstype##*system }
+    fstype=${fstype%% *}
+
+    echo "system fstype is $fstype"
+
+    system_mtd=$(find_mtd "system")
+    dd if=${system_mtd} of=${ramdisk} &>/dev/null
+    mount -t ${fstype} ${ramdisk} /system
+}
+
+check_updateimg ()
+{
+    unpack -i ${updateimg} -c
+}
+
+prepare ()
+{
+    export PATH="$(pwd):$PATH"
+
+    check_updateimg
+
+    remount_system
+}
+
+targets="kernel boot userdata system"
+
+show_process "update start"
+
+prepare
+
+for target in ${targets}; do
+    show_process "unpacking ${target}"
+    unpack_img ${target} ${target}.img
+    show_process "unpacked ${target}"
+
+    mtd=$(find_mtd ${target})
+
+    show_process "writing ${target}"
+    write_img ${target}.img ${mtd}
+    show_process "writed ${target}"
+
+    rm ${target}.img
+done
+
+sync
+
+show_process "update end"
+
+exit 0
+

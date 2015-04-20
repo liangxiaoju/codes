@@ -1,0 +1,92 @@
+#!/bin/bash
+
+set -e
+
+cryptfs_create()
+{
+    device=$1
+    keyfile=$2
+    cryptsetup -c aes-cbc-essiv:sha256 -q luksFormat $device $keyfile
+}
+
+cryptfs_open()
+{
+    device=$1
+    name=$2
+    keyfile=$3
+    cryptsetup luksOpen $device $name --key-file=$keyfile
+}
+
+cryptfs_close()
+{
+    name=$1
+    cryptsetup luksClose $name
+}
+
+cryptfs_checkpw()
+{
+    device=$1
+    keyfile=$2
+    cryptsetup luksOpen $device --test-passphrase --key-file=$keyfile
+}
+
+cryptfs_checkcrypt()
+{
+    device=$1
+    cryptsetup isLuks $device
+}
+
+cryptfs_status()
+{
+    name=$1
+    cryptsetup status $name
+}
+
+make_cryptfs()
+{
+    input=$1
+    output=$2
+    keyfile=${3:-android/vendor/imt/cryptfs/keyfile}
+    name="cryptfs"
+    mapper="/dev/mapper"
+
+    if [ ! -f "$input" ]; then
+        echo "ERR: '$input' not a file."
+        exit 1
+    fi
+
+    if [ ! -e "$keyfile" ]; then
+        echo "ERR: No keyfile found."
+        exit 1
+    fi
+
+    printf "encrypt: keyfile='%s'\n" $keyfile
+
+    size=$(stat $input | awk '/Size/ { print $2 }')
+    size=$(($size + 4*1024*1024))
+
+    dd if=/dev/zero of=$output bs=$size count=1 &>/dev/null && sync
+
+    cryptfs_status $name &>/dev/null && cryptfs_close $name
+
+    cryptfs_create $output $keyfile
+
+    cryptfs_open $output $name $keyfile
+
+    dd if=$input of=$mapper/$name &>/dev/null && sync
+
+    cryptfs_close $name
+
+    printf "encrypt: '%s' --> '%s'\n" $input $output
+}
+
+usage()
+{
+    echo "usage: $0 input output [keyfile]"
+    exit 1
+}
+
+[ $# -lt 2 ] && usage
+
+make_cryptfs $@
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+pngtopnm ${1} > _logo.pnm
+pnmquant 224 _logo.pnm > _logo_224.pnm
+pnmtoplainpnm _logo_224.pnm > _logo_224.ppm
+mkdir out
+cp _logo_224.ppm out/linux_logo.ppm
+tools/pnmtologo -o out/linux_logo.c _logo_224.ppm
+rm _logo*

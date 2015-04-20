@@ -1,0 +1,8 @@
+#!/bin/bash
+
+count=$#
+
+for i in $(seq $(($count-1))); do
+	eval adb push '$'$i '$'$count
+	i=$(($i+1))
+done

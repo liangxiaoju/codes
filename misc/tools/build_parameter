@@ -1,0 +1,17 @@
+#!/bin/bash
+
+IMAGES_DIR=$(pwd)/../images
+src=$(pwd)/bin/rockdev/Image/parameter
+dst=${IMAGES_DIR}/parameter
+addcrc32=$(pwd)/bin/addcrc32
+
+size=$(ls -l ${src} | awk '{ print $5 }' | xargs printf "%04x")
+
+size_str=$(echo \\\x$(echo ${size} | cut -b 3-4)\\\x$(echo ${size} | cut -b 1-2)\\\x00\\\x00)
+
+cp -f ${src} ${IMAGES_DIR}/parameter.tmp
+${addcrc32} ${IMAGES_DIR}/parameter.tmp
+echo -e -n "PARM${size_str}" > ${IMAGES_DIR}/parameter.header
+cat ${IMAGES_DIR}/parameter.header ${IMAGES_DIR}/parameter.tmp > ${IMAGES_DIR}/parameter
+
+rm -f ${IMAGES_DIR}/parameter.*

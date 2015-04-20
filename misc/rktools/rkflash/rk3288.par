@@ -1,0 +1,7 @@
+# section offset file
+resource	0x6000		~/imt/rk3288_rbox_4.4/Images/resource.img
+kernel		0xe000		~/imt/rk3288_rbox_4.4/Images/kernel.img
+boot		0x16000		~/imt/rk3288_rbox_4.4/Images/boot.img
+recovery	0x26000		~/imt/rk3288_rbox_4.4/Images/recovery.img
+system		0x92000	    ~/imt/rk3288_rbox_4.4/Images/system.img
+ubuntu      0x50000	    ~/imt/rk3288_rbox_4.4/Images/system.img

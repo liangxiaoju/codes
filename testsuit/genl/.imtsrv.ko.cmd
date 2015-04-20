@@ -1,0 +1,1 @@
+cmd_/home/lxjsky/testsuit/genl/imtsrv.ko := ld -r -m elf_x86_64 -T /usr/src/linux-3.14.1-gentoo/scripts/module-common.lds --build-id  -o /home/lxjsky/testsuit/genl/imtsrv.ko /home/lxjsky/testsuit/genl/imtsrv.o /home/lxjsky/testsuit/genl/imtsrv.mod.o

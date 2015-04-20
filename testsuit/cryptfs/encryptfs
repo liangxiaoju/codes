@@ -1,0 +1,61 @@
+#!/system/bin/sh
+
+backup="/dev/block/mtd/by-name/backup"
+keyfile="/data/crypt-key"
+device="/dev/block/mmcblk0"
+syspath="/sys/block/dm-0/uevent"
+label="sdcard"
+tag="encryptsd"
+taglen=9
+
+gen_key()
+{
+    if [ ! -s "${keyfile}" ]; then
+        sign=$(dd if=${backup} bs=${taglen} count=1 2>/dev/null)
+        echo "crypt tag: ${sign}"
+        if [ "${sign}" != "${tag}" ]; then
+            echo "not match, generate one"
+            dd if=/dev/urandom of=${backup} bs=256 count=1 2>/dev/null
+            echo "${tag}" | dd of=${backup} 2>/dev/null
+        fi
+        dd if=${backup} of=${keyfile} bs=256 count=1 2>/dev/null
+    fi
+}
+
+cryto_format()
+{
+    cryptsetup --test-passphrase open ${device} --key-file=${keyfile} --keyfile-size=256
+    if [ $? -ne 0 ]; then
+        echo "cryto_format"
+        cryptsetup --cipher=aes-cbc-essiv:sha256 --key-size=256 -q \
+            luksFormat ${device} ${keyfile}
+    fi
+}
+
+cryto_add()
+{
+    if [ -e "${device}" ]; then
+        echo "cryto_add"
+        cryptsetup open ${device} ${label} --key-file=${keyfile} --keyfile-size=256
+    fi
+}
+
+cryto_remove()
+{
+    if [ -e "${syspath}" ]; then
+        echo "cryto_remove"
+        echo "remove" > ${syspath}
+        cryptsetup close ${label}
+    fi
+}
+
+
+if [ -e "${device}" ]; then
+    gen_key
+#    cryto_format
+    cryto_add
+else
+    cryto_remove
+fi
+
+exit 0

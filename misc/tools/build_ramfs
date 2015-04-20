@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Make boot image that conform to rk2818 loader spec
+
+mkkrnlimg=$(pwd)/./bin/mkkrnlimg
+IMAGES_DIR=$(pwd)/../images
+
+targets="boot recovery"
+files=(	\
+	 	 boot     	 $IMAGES_DIR/boot.img     	 "$(pwd)/bin/boot.ramfs/"     	\
+	 	 recovery 	 $IMAGES_DIR/recovery.img 	 "$(pwd)/bin/recovery.ramfs/"	\
+	)
+
+
+set -e 
+
+if [[ $# -gt 0 ]]; then
+	targets=$@
+fi
+
+for target in $targets; do
+	for i in $(seq 0 ${#files[*]}); do
+		if [[ $target == ${files[i]} ]]; then
+			IMAGE=${files[i+1]}
+			ROOTFS=${files[i+2]}
+
+			cd $ROOTFS
+
+			find . | cpio -o -H newc | gzip -9 > ${IMAGE}.gz
+			cd - &> /dev/null
+
+			prefix="$( ls -l ${IMAGE}.gz | awk '{printf "size:%-15s", $5}' )"
+			sed -i "1s/^/$prefix/" ${IMAGE}.gz
+
+			$mkkrnlimg ${IMAGE}.gz ${IMAGE} &>/dev/null
+
+			rm ${IMAGE}.gz
+
+			echo -e "${IMAGE} generated\n"
+		fi
+	done
+done

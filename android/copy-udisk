@@ -1,0 +1,82 @@
+#!/system/bin/busybox sh
+
+export UDISK="/mnt/udisk"
+MFILE=
+
+start_monitor () {
+    MFILE=$(busybox mktemp -p /tmp)
+
+    cat << 'EOF' > ${MFILE}
+#!/system/bin/busybox sh
+
+VSIZE=$(busybox du -s ${UDISK}/vendor/ | busybox awk '{ print $1}')
+FSIZE=$(busybox du -s ${UDISK}/flash/ | busybox awk '{ print $1 }')
+TSIZE=$((${VSIZE}+${FSIZE}))
+
+IVUSE=$(busybox df | busybox awk '{ if ($NF=="/vendor") print $(NF-3)}')
+IFUSE=$(busybox df | busybox awk '{ if ($NF=="/flash") print $(NF-3) }')
+ITUSE=$((${IVUSE}+${IFUSE}))
+
+FRACTION=0
+FRACTION_L=0
+
+while true; do
+    VUSE=$(busybox df | busybox awk '{ if ($NF=="/vendor") print $(NF-3)}')
+    FUSE=$(busybox df | busybox awk '{ if ($NF=="/flash") print $(NF-3) }')
+    TUSE=$((${VUSE}+${FUSE}-${ITUSE}))
+
+    FRACTION=$((${TUSE}*100/${TSIZE}))
+    if busybox test $((${FRACTION}-${FRACTION_L})) -gt 1; then
+        echo "progress $((${FRACTION}-${FRACTION_L})) 1"
+        FRACTION_L=${FRACTION}
+    fi
+
+    busybox sleep 5
+done
+
+EOF
+
+    busybox chmod 0777 ${MFILE}
+    ${MFILE} &
+    busybox sleep 1
+}
+
+stop_monitor () {
+    busybox pkill -9 ${MFILE##*/}
+    busybox rm -f ${MFILE}
+}
+
+echo "ui_print Start ..."
+
+start_monitor
+
+busybox cp -rf ${UDISK}/vendor/* /vendor/
+if busybox test $? -gt 0; then
+    stop_monitor
+    echo "ui_print Failed to copy vendor."
+    exit -1
+fi
+
+busybox cp -rf ${UDISK}/flash/* /flash/
+if busybox test $? -gt 0; then
+    stop_monitor
+    echo "ui_print Failed to copy flash."
+    exit -1
+fi
+
+busybox chown -R 1000:1000 /vendor/
+busybox chmod 0755 /vendor/
+
+if busybox test -d "/vendor/video"; then
+    busybox chmod -R 0770 /vendor/video
+fi
+if busybox test -d "/vendor/app"; then
+    busybox chmod -R 0755 /vendor/app
+fi
+
+busybox sync
+stop_monitor
+
+echo "ui_print Complete."
+
+exit 0

@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Usage:
+# 	./rkflash C60 kernel boot
+# 	./rkflash E8 kernel boot
+
+
+
+prog=$(pwd)/bin/rkflash
+
+files_C60=(	\
+	 	 parameter 	 0x0     	 "../images/parameter"	\
+	 	 misc      	 0x2000  	 "../images/misc.img"            	\
+	 	 kernel    	 0x4000  	 "../images/kernel.img.C60"                	\
+	 	 boot      	 0x8000  	 "../images/recovery.img"				\
+	 	 recovery  	 0xC000  	 "../images/recovery.img"                   \
+	 	 backup    	 0x10000  	 "../images/recovery.img"        	\
+	 	 system    	 0x12000 	 "../images/system.img"                    	\
+		 data        0xD2000     \
+	 	 user      	 0x130000 	 \
+	)
+
+files_E8=(	\
+	 	 parameter 	 0x0     	 "../images/parameter"	\
+	 	 misc      	 0x2000  	 "../images/misc.img"            	\
+	 	 kernel    	 0x4000  	 "../images/kernel.img.E8"                	\
+	 	 boot      	 0x8000  	 "/home/lxjsky/boeye/src/E8/rk2918-android-gb2.3.5/rockdev/Image/boot.img"				\
+	 	 recovery  	 0x10000  	 "/home/lxjsky/boeye/src/E8/rk2918-android-gb2.3.5/rockdev/Image/recovery.img"                   \
+	 	 backup    	 0x18000  	 "../images/backup.img"        	\
+		 cache		 0x10800  	 ""	\
+		 userdata	 0x188000 	 ""	\
+		 kpanic 	 0x588000 	 ""	\
+	 	 system    	 0x78a000 	 "/home/lxjsky/boeye/src/E8/rk2918-android-gb2.3.5/rockdev/Image/system.img"	\
+		 vendor      0x470000    "../images/vendor.img"	\
+	 	 user      	 0x670000 	 ""	\
+	)
+
+case $1 in
+	C60)
+		files=( ${files_C60[@]} )
+		shift 1
+		;;
+	E8)
+		files=( ${files_E8[@]} )
+		shift 1
+		;;
+
+	*)
+		files=( ${files_E8[@]} )
+esac
+
+case $1 in
+	-b)
+		$prog -b
+		exit
+		;;
+esac
+
+targets="kernel boot recovery system"
+
+flash_all() {
+	targets="parameter misc kernel boot recovery system backup"
+}
+
+if [[ $# -gt 0 ]]; then
+	targets=$@
+fi
+
+# flash images 
+for target in $targets; do
+	for i in $(seq 0 ${#files[*]} ); do
+		if [[ $target == ${files[i]} ]]; then
+			echo -e "flashing $target: ${files[i+2]}"
+
+			size=$(ls -l ${files[i+2]} | awk '{print $5}')
+			$prog -w ${files[i+1]} $(($size/512 + 1)) ${files[i+2]}
+
+			echo
+		fi
+	done
+done

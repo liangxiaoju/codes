@@ -1,0 +1,21 @@
+#!/bin/sh
+
+eecho ()
+{
+	echo "$1"
+	echo "$1" > ${FIFO}
+}
+
+MACH=$(echo $(uname -m) | cut -c 1-3)
+test "$MACH" != "arm" && echo "not support machine." && exit 1
+
+if [ -e /usr/bin/update ]; then
+	eecho "Start update ..."
+	chmod +x /usr/bin/update
+	/usr/bin/update
+else
+	eecho "******* ERROR *******"
+fi
+
+rm -f parameter.img misc.img kernel.img boot.img recovery.img system.img version update-script oem
+sync

@@ -1,0 +1,49 @@
+#!/sbin/busybox sh
+
+cryptfs_open()
+{
+    device=$1
+    name=$2
+    keyfile=$3
+    cryptsetup luksOpen $device $name --key-file=$keyfile
+}
+
+is_cryptfs()
+{
+    device=$1
+    cryptsetup isLuks $device
+}
+
+cryptfs_status()
+{
+    name=$1
+    cryptsetup status $name
+}
+
+decrypt()
+{
+    input=$1
+    output=$2
+    keyfile=$3
+    name=${input##*/}
+    mapper="/dev/mapper"
+
+    if [ ! -e "$input" ]; then
+        echo "'$input' not exist."
+        exit 1
+    fi
+
+    is_cryptfs $input
+    if [ $? -eq 0 ]; then
+        cryptfs_open $input $name $keyfile && busybox ln -s -f $mapper/$name $output
+        cryptfs_status $name &>/dev/null && echo "decrypt: '$input' --> '$output'"
+    fi
+
+    [ -e "$keyfile" ] && busybox rm -f $keyfile
+}
+
+[ $# -ne 3 ] && exit 1
+
+[ ! -e /dev/kmsg ] && busybox mknod /dev/kmsg c 1 11
+
+decrypt $@ >/dev/kmsg 2>&1

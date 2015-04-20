@@ -1,0 +1,21 @@
+#!/bin/bash
+
+input=$1
+output=$2
+tmpfile=${input}.tmp
+
+cd "$(pwd)"
+
+if [ $# -ne 2 ] || [ ! -f "$input" ]; then
+    echo "Usage: $0 input output"
+    exit 0
+fi
+
+size=$(stat $input | awk '/Size/ { print $2 }')
+size=$(($size - 12))
+
+dd if=$input of=$tmpfile bs=8 skip=1
+
+dd if=$tmpfile of=$output bs=$size count=1
+
+rm -f $tmpfile

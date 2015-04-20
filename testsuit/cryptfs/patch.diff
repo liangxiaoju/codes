@@ -1,0 +1,369 @@
+diff --git a/frameworks/base/services/java/com/android/server/MountService.java b/frameworks/base/services/java/com/android/server/MountService.java
+index 4db9153..dea33f5 100644
+--- a/frameworks/base/services/java/com/android/server/MountService.java
++++ b/frameworks/base/services/java/com/android/server/MountService.java
+@@ -31,6 +31,11 @@ import android.content.res.ObbInfo;
+ import android.content.res.Resources;
+ import android.content.res.TypedArray;
+ import android.content.res.XmlResourceParser;
++import android.content.DialogInterface;
++import android.view.WindowManager;
++import android.view.IWindowManager;
++
++import android.app.AlertDialog;
+ import android.hardware.usb.UsbManager;
+ import android.net.Uri;
+ import android.os.Binder;
+@@ -109,7 +114,7 @@ class MountService extends IMountService.Stub
+ 
+     private static final boolean LOCAL_LOGD = false;
+     private static final boolean DEBUG_UNMOUNT = false;
+-    private static final boolean DEBUG_EVENTS = false;
++    private static final boolean DEBUG_EVENTS = true;
+     private static final boolean DEBUG_OBB = false;
+ 
+     // Disable this since it messes up long-running cryptfs operations.
+@@ -335,6 +340,7 @@ class MountService extends IMountService.Stub
+     private static final int H_UNMOUNT_PM_DONE = 2;
+     private static final int H_UNMOUNT_MS = 3;
+     private static final int H_SYSTEM_READY = 4;
++    private static final int H_ENCRYPT_SD_CONFIRM = 5;
+ 
+     private static final int RETRY_UNMOUNT_DELAY = 30; // in ms
+     private static final int MAX_UNMOUNT_RETRIES = 4;
+@@ -409,6 +415,38 @@ class MountService extends IMountService.Stub
+         @Override
+         public void handleMessage(Message msg) {
+             switch (msg.what) {
++                case H_ENCRYPT_SD_CONFIRM: {
++                    final int code = (int)msg.arg1;
++                    final String path = (String)msg.obj;
++                    AlertDialog sConfirmDialog;
++                    sConfirmDialog = new AlertDialog.Builder(mContext)
++                        .setTitle("Encrypt SD ?")
++                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
++                            public void onClick(DialogInterface dialog, int which) {
++                                Slog.w(TAG, "################## OK");
++                                new Thread() {
++                                    @Override
++                                    public void run() {
++                                        try {
++                                            Slog.w(TAG, "## vdc volume cryptsetup mmc");
++                                            mConnector.execute("volume", "cryptsetup", path);
++                                            Slog.w(TAG, String.format("####### code=%d", code));
++                                        } catch (NativeDaemonConnectorException e) {
++                                        }
++                                    }
++                                }.start();
++                            }
++                        })
++                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
++                        public void onClick(DialogInterface dialog, int which) {
++                                Slog.w(TAG, "################## NO");
++                            }
++                        })
++                    .create();
++                    sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
++                    sConfirmDialog.show();
++                    break;
++                }
+                 case H_UNMOUNT_PM_UPDATE: {
+                     if (DEBUG_UNMOUNT) Slog.i(TAG, "H_UNMOUNT_PM_UPDATE");
+                     UnmountCallBack ucb = (UnmountCallBack) msg.obj;
+@@ -833,6 +871,19 @@ class MountService extends IMountService.Stub
+                             int rc;
+                             if ((rc = doMountVolume(path)) != StorageResultCode.OperationSucceeded) {
+                                 Slog.w(TAG, String.format("Insertion mount failed (%d)", rc));
++                                if (label.equals("mmc")) {
++                                    try {
++                                        Slog.w(TAG, "## vdc volume cryptcheck mmc");
++                                        mConnector.execute("volume", "cryptcheck", path);
++                                    } catch (NativeDaemonConnectorException e) {
++                                        int code = e.getCode();
++
++                                        // display dialog for sd encrypt confirm
++                                        if (code == VoldResponseCode.OpFailedMediaCorrupt) {
++                                            mHandler.sendMessage(mHandler.obtainMessage(H_ENCRYPT_SD_CONFIRM, code, 0, path));
++                                        }
++                                    }
++                                }
+                             }
+                         } catch (Exception ex) {
+                             Slog.w(TAG, "Failed to mount media on insertion", ex);
+diff --git a/system/core/fs_mgr/fs_mgr.c b/system/core/fs_mgr/fs_mgr.c
+index 99adb81..474ae5c 100644
+--- a/system/core/fs_mgr/fs_mgr.c
++++ b/system/core/fs_mgr/fs_mgr.c
+@@ -42,7 +42,7 @@
+ #define KEY_LOC_PROP   "ro.crypto.keyfile.userdata"
+ #define KEY_IN_FOOTER  "footer"
+ 
+-#define E2FSCK_BIN      "/system/bin/e2fsck"
++#define E2FSCK_BIN      "/sbin/e2fsck"
+ 
+ struct flag_list {
+     const char *name;
+@@ -451,6 +451,7 @@ int fs_mgr_mount_all(char *fstab_file)
+     int mret;
+     struct fstab_rec *fstab = 0;
+ 
++    INFO("############## %s\n", __func__);
+     if (!(fstab = read_fstab(fstab_file))) {
+         return ret;
+     }
+@@ -466,6 +467,7 @@ int fs_mgr_mount_all(char *fstab_file)
+ 
+         mret = mount(fstab[i].blk_dev, fstab[i].mnt_point, fstab[i].type,
+                      fstab[i].flags, fstab[i].fs_options);
++        INFO("######## mounting %s at %s mret=%d\n", fstab[i].blk_dev, fstab[i].mnt_point, mret);
+         if (!mret) {
+             /* Success!  Go get the next one */
+             continue;
+@@ -482,6 +484,7 @@ int fs_mgr_mount_all(char *fstab_file)
+                         fstab[i].mnt_point);
+                 goto out;
+             }
++            INFO("## mounting tmpfs for %s at %s\n", fstab[i].blk_dev, fstab[i].mnt_point);
+             encrypted = 1;
+         } else {
+             ERROR("Cannot mount filesystem on %s at %s\n",
+@@ -496,6 +499,8 @@ int fs_mgr_mount_all(char *fstab_file)
+         ret = 0;
+     }
+ 
++    INFO("############### encrypted=%d\n", encrypted);
++
+ out:
+     free_fstab(fstab);
+     return ret;
+diff --git a/system/core/rootdir/init.rc b/system/core/rootdir/init.rc
+index 0face12..3c229d9 100644
+--- a/system/core/rootdir/init.rc
++++ b/system/core/rootdir/init.rc
+@@ -238,7 +238,7 @@ on post-fs-data
+     # must uncomment this line, otherwise encrypted filesystems
+     # won't work.
+     # Set indication (checked by vold) that we have finished this action
+-    #setprop vold.post_fs_data_done 1
++    setprop vold.post_fs_data_done 1
+ 
+ on boot
+ # basic network init
+diff --git a/system/vold/CommandListener.cpp b/system/vold/CommandListener.cpp
+index 3b5d2bf..b59e14d 100644
+--- a/system/vold/CommandListener.cpp
++++ b/system/vold/CommandListener.cpp
+@@ -195,6 +195,32 @@ int CommandListener::VolumeCmd::runCommand(SocketClient *cli,
+                     (enabled ? "Share enabled" : "Share disabled"), false);
+         }
+         return 0;
++    } else if (!strcmp(argv[1], "cryptcheck")) {
++        int ret;
++        char cmd[255];
++        sprintf(cmd, "cryptsetup --test-passphrase --key-file=/data/crypt-key open %s", argv[2]);
++        ret = system(cmd);
++        if (ret != 0) {
++            cli->sendMsg(ResponseCode::OpFailedMediaCorrupt,
++                    "cryptcheck failed", false);
++            SLOGD("### cryptcheck error");
++        } else {
++            cli->sendMsg(ResponseCode::CommandOkay,
++                    "cryptcheck success", false);
++            SLOGD("### cryptcheck ok");
++        }
++        return 0;
++    } else if (!strcmp(argv[1], "cryptsetup")) {
++        int ret;
++        char cmd[255];
++        SLOGD("### cryptsetup");
++        sprintf(cmd, "cryptsetup --cipher=aes-cbc-essiv:sha256 --key-size=256 --key-file=/data/crypt-key -q luksFormat %s", argv[2]);
++        ret = system(cmd);
++        SLOGD("### echo change > /sys/block/mmcblk0/uevent");
++        sprintf(cmd, "echo change > /sys/block/mmcblk0/uevent");
++        system(cmd);
++        cli->sendMsg(ResponseCode::CommandOkay, "cryptsetup", false);
++        return 0;
+     } else {
+         cli->sendMsg(ResponseCode::CommandSyntaxError, "Unknown volume cmd", false);
+     }
+diff --git a/system/vold/Volume.cpp b/system/vold/Volume.cpp
+index aa43b0a..5a3aa0a 100644
+--- a/system/vold/Volume.cpp
++++ b/system/vold/Volume.cpp
+@@ -266,7 +266,7 @@ int Volume::formatVol() {
+     char label[PROPERTY_VALUE_MAX];
+     property_get("UserVolumeLabel", label, "");
+ 
+-    if (!strcmp(getLabel(),"flash")) {
++    if (!strcmp(getLabel(),"flash") || !strcmp(getLabel(), "sdcard")) {
+         char cmd[255];
+         sprintf(cmd,"mkdosfs -L '%s' /dev/block/vold/%d:%d", label,
+             MAJOR(diskNode), MINOR(diskNode));
+diff --git a/system/vold/VolumeManager.cpp b/system/vold/VolumeManager.cpp
+index 8d3d5e7..38e2c07 100644
+--- a/system/vold/VolumeManager.cpp
++++ b/system/vold/VolumeManager.cpp
+@@ -129,7 +129,7 @@ int VolumeManager::addVolume(Volume *v) {
+     mVolumes->push_back(v);
+     return 0;
+ }
+-
++#define NETLINK_DEBUG
+ void VolumeManager::handleBlockEvent(NetlinkEvent *evt) {
+     const char *devpath = evt->findParam("DEVPATH");
+ 
+@@ -150,6 +150,24 @@ void VolumeManager::handleBlockEvent(NetlinkEvent *evt) {
+ #ifdef NETLINK_DEBUG
+         SLOGW("No volumes handled block event for '%s'", devpath);
+ #endif
++        int action = evt->getAction();
++        const char *devtype = evt->findParam("DEVTYPE");
++
++        if (action == NetlinkEvent::NlActionAdd && !strcmp(devtype, "disk")) {
++            int major = atoi(evt->findParam("MAJOR"));
++            int minor = atoi(evt->findParam("MINOR"));
++            if (strstr(devpath, "mmcblk0")) {
++                char msg[255];
++
++                snprintf(msg, sizeof(msg),
++                        "Volume %s %s disk inserted (%d:%d)", "mmc",
++                        "/dev/block/mmcblk0", major, minor);
++                getBroadcaster()->sendBroadcast(ResponseCode::VolumeDiskInserted,
++                        msg, false);
++
++                SLOGW("######################## mmc insert");
++            }
++        }
+     }
+ }
+ 
+diff --git a/system/vold/cryptfs.c b/system/vold/cryptfs.c
+index bcacc39..1827169 100644
+--- a/system/vold/cryptfs.c
++++ b/system/vold/cryptfs.c
+@@ -158,7 +158,7 @@ static int put_crypt_ftr_and_key(char *real_blk_name, struct crypt_mnt_ftr *cryp
+   if (!strcmp(key_loc, KEY_IN_FOOTER)) {
+     fname = real_blk_name;
+     if ( (fd = open(fname, O_RDWR)) < 0) {
+-      SLOGE("Cannot open real block device %s\n", fname);
++      SLOGE("%s: Cannot open real block device %s\n", __func__, fname);
+       return -1;
+     }
+ 
+@@ -257,7 +257,7 @@ static int get_crypt_ftr_and_key(char *real_blk_name, struct crypt_mnt_ftr *cryp
+   if (!strcmp(key_loc, KEY_IN_FOOTER)) {
+     fname = real_blk_name;
+     if ( (fd = open(fname, O_RDONLY)) < 0) {
+-      SLOGE("Cannot open real block device %s\n", fname);
++      SLOGE("%s: Cannot open real block device %s\n", __func__, fname);
+       return -1;
+     }
+ 
+@@ -747,6 +747,7 @@ static int do_crypto_complete(char *mount_point)
+ 
+   fs_mgr_get_crypt_info(get_fstab_filename(), 0, real_blkdev, sizeof(real_blkdev));
+ 
++    SLOGE("### %s\n", __func__);
+   if (get_crypt_ftr_and_key(real_blkdev, &crypt_ftr, encrypted_master_key, salt)) {
+     fs_mgr_get_crypt_info(get_fstab_filename(), key_loc, 0, sizeof(key_loc));
+ 
+@@ -797,6 +798,7 @@ static int test_mount_encrypted_fs(char *passwd, char *mount_point, char *label)
+ 
+   fs_mgr_get_crypt_info(get_fstab_filename(), 0, real_blkdev, sizeof(real_blkdev));
+ 
++    SLOGE("### %s\n", __func__);
+   if (get_crypt_ftr_and_key(real_blkdev, &crypt_ftr, encrypted_master_key, salt)) {
+     SLOGE("Error getting crypt footer and key\n");
+     return -1;
+@@ -811,7 +813,7 @@ static int test_mount_encrypted_fs(char *passwd, char *mount_point, char *label)
+ 
+   if (create_crypto_blk_dev(&crypt_ftr, decrypted_master_key,
+                                real_blkdev, crypto_blkdev, label)) {
+-    SLOGE("Error creating decrypted block device\n");
++    SLOGE("Error creating decrypted block device: %s\n", real_blkdev);
+     return -1;
+   }
+ 
+@@ -889,6 +891,7 @@ int cryptfs_setup_volume(const char *label, int major, int minor,
+ 
+     sprintf(real_blkdev, "/dev/block/vold/%d:%d", major, minor);
+ 
++    SLOGE("### %s\n", __func__);
+     /* Just want the footer, but gotta get it all */
+     get_crypt_ftr_and_key(saved_data_blkdev, &sd_crypt_ftr, key, salt);
+ 
+@@ -909,6 +912,8 @@ int cryptfs_setup_volume(const char *label, int major, int minor,
+     *new_major = MAJOR(statbuf.st_rdev);
+     *new_minor = MINOR(statbuf.st_rdev);
+ 
++    SLOGE("### %s: real_blkdev=%s crypto_sys_path=%s label=%s crypto_blkdev=%s new_major=%d new_minor=%d\n",
++            __func__, real_blkdev, crypto_sys_path, label, crypto_blkdev, *new_major, *new_minor);
+     /* Create path to sys entry for this block device */
+     snprintf(crypto_sys_path, max_path, "/devices/virtual/block/%s", strrchr(crypto_blkdev, '/')+1);
+ 
+@@ -1169,6 +1174,7 @@ int cryptfs_enable(char *howarg, char *passwd)
+     }
+ 
+     fs_mgr_get_crypt_info(get_fstab_filename(), 0, real_blkdev, sizeof(real_blkdev));
++    SLOGE("##### %s: real_blkdev=%s", __func__, real_blkdev);
+ 
+     /* Get the size of the real block device */
+     fd = open(real_blkdev, O_RDONLY);
+@@ -1210,8 +1216,10 @@ int cryptfs_enable(char *howarg, char *passwd)
+     num_vols=vold_getNumDirectVolumes();
+     vol_list = malloc(sizeof(struct volume_info) * num_vols);
+     vold_getDirectVolumeList(vol_list);
++    SLOGE("###xxxxxxxxxxxxxx num_vols=%d\n", num_vols);
+ 
+     for (i=0; i<num_vols; i++) {
++        SLOGE("### %s should_encrypt=%d\n", vol_list[i].blk_dev, should_encrypt(&vol_list[i]));
+         if (should_encrypt(&vol_list[i])) {
+             fd = open(vol_list[i].blk_dev, O_RDONLY);
+             if ( (vol_list[i].size = get_blkdev_size(fd)) == 0) {
+@@ -1326,6 +1334,7 @@ int cryptfs_enable(char *howarg, char *passwd)
+ 
+     /* setup crypto mapping for all encryptable volumes handled by vold */
+     for (i=0; i<num_vols; i++) {
++        SLOGE("### %s should_encrypt=%d\n", vol_list[i].blk_dev, should_encrypt(&vol_list[i]));
+         if (should_encrypt(&vol_list[i])) {
+             vol_list[i].crypt_ftr = crypt_ftr; /* gotta love struct assign */
+             vol_list[i].crypt_ftr.fs_size = vol_list[i].size;
+diff --git a/system/vold/main.cpp b/system/vold/main.cpp
+index 037a3a3..071c328 100644
+--- a/system/vold/main.cpp
++++ b/system/vold/main.cpp
+@@ -334,21 +334,21 @@ static int process_config(VolumeManager *vm) {
+                     /* If the first character is not a '/', it must be flags */
+                     break;
+                 }
+-		if(!strcmp(label,"flash"))//flash uevent path is /dev/block/mtd/by-name/user,we need to parse it
+-		{
+-			char sysfs_path_back[100];
+-			memset(mtd_syspath,0,sizeof(mtd_syspath));
+-			strcpy(sysfs_path_back,sysfs_path);//bakc the origin sysfs_path,because strtok will change the source
+-			// parse mtd partition to sysfs_path
+-			mtd_scan_partitions(sysfs_path_back,mtd_syspath);
+-			if(mtd_syspath[0])// we got the right syspath
+-			{
+-				sysfs_path=mtd_syspath;
+-			}	
+-		}
++                if(!strcmp(label,"flash"))//flash uevent path is /dev/block/mtd/by-name/user,we need to parse it
++                {
++                    char sysfs_path_back[100];
++                    memset(mtd_syspath,0,sizeof(mtd_syspath));
++                    strcpy(sysfs_path_back,sysfs_path);//bakc the origin sysfs_path,because strtok will change the source
++                    // parse mtd partition to sysfs_path
++                    mtd_scan_partitions(sysfs_path_back,mtd_syspath);
++                    if(mtd_syspath[0])// we got the right syspath
++                    {
++                        sysfs_path=mtd_syspath;
++                    }	
++                }
+                 if (dv->addPath(sysfs_path)) {
+                     SLOGE("Failed to add devpath %s to volume %s", sysfs_path,
+-                         label);
++                            label);
+                     goto out_fail;
+                 }
+             }
