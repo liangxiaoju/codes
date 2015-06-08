@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# kermit wrapper for ttyUSB
+
+KERMRC=$HOME/.kermrc
+
+LOG=/tmp/kermit.log
+
+SPEED=${1:-115200}
+
+DEV=${2:-/dev/ttyUSB0}
+
+cat <<EOF >$KERMRC
+set line $DEV
+set speed $SPEED
+set carrier-watch off
+set flow-control none
+set handshake none
+log session $LOG append
+connect
+EOF
+
+if [ $# -le 1 ]; then
+	MAXNUM=$(ls /dev/ttyUSB* | sed "s/\/dev\/ttyUSB//g" | sort -n | tail -1)
+	sed -i "s/ttyUSB.*/ttyUSB${MAXNUM}/" $KERMRC
+fi
+
+echo "### start kermit at $(date '+%F %T') ###" >>$LOG
+
+/usr/bin/kermit
