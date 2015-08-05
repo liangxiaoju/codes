@@ -22,13 +22,13 @@ for sub in re.finditer(r".*\t.*", strings):
     dlists.append(sub.group().split("\t"))
 
 for i,d in enumerate(dlists):
-    print "#%d: %s" % (i, d[0])
+    print "#%d: %s" % (i+1, d[0])
 
 serialno = None
 if len(dlists) > 1:
     try:
-        prompt = "Choice:(0-%d) " % (len(dlists)-1)
-        choice = input(prompt)
+        prompt = "Choice:(1-%d) " % (len(dlists))
+        choice = input(prompt) - 1
     except:
         sys.exit(1)
     serialno = dlists[choice][0]
