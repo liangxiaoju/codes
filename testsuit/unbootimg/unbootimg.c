@@ -16,22 +16,24 @@ void dump_hdr(boot_img_hdr *hdr)
     magic[BOOT_MAGIC_SIZE] = '\0';
 
     printf("===== HEADER =====\n");
-    printf("magic: %s\n", magic);
-    printf("kernel size: %d\n", hdr->kernel_size);
-    printf("kernel addr: %d\n", hdr->kernel_addr);
-    printf("ramdisk size: %d\n", hdr->ramdisk_size);
-    printf("ramdisk addr: %d\n", hdr->ramdisk_addr);
-    printf("second size: %d\n", hdr->second_size);
-    printf("second addr: %d\n", hdr->second_addr);
-    printf("kernel tags addr: %d\n", hdr->tags_addr);
-    printf("page size: %d\n", hdr->page_size);
-    printf("product name: %s\n", hdr->name);
+    printf("magic:\t\t\t%s\n", magic);
+    printf("kernel size:\t\t%u\n", hdr->kernel_size);
+    printf("kernel addr:\t\t0x%x\n", hdr->kernel_addr);
+    printf("ramdisk size:\t\t%u\n", hdr->ramdisk_size);
+    printf("ramdisk addr:\t\t0x%x\n", hdr->ramdisk_addr);
+    printf("second size:\t\t%u\n", hdr->second_size);
+    printf("second addr:\t\t0x%x\n", hdr->second_addr);
+    printf("tags addr:\t\t0x%x\n", hdr->tags_addr);
+    printf("page size:\t\t%u\n", hdr->page_size);
+    printf("dt size:\t\t%u\n", hdr->dt_size);
+    printf("product name:\t\t%s\n", hdr->name);
     printf("cmdline: %s\n", hdr->cmdline);
     printf("id:");
     for (i = 0; i < sizeof(hdr->id)/sizeof(hdr->id[0]); i++) {
         printf(" 0x%x", hdr->id[i]);
     }
     printf("\n");
+    printf("==================\n");
 }
 
 unsigned padding_offset(unsigned offset, unsigned pagesize)
@@ -72,7 +74,17 @@ int extract(int in_fd, boot_img_hdr *hdr, const char *path, const char *label)
             padding_offset(hdr->ramdisk_size, hdr->page_size);
 
         size = hdr->second_size;
-    }
+
+    } else if (strcmp(label, "dt") == 0) {
+
+        offset = padding_offset(sizeof(boot_img_hdr), hdr->page_size) +
+            padding_offset(hdr->kernel_size, hdr->page_size) +
+            padding_offset(hdr->ramdisk_size, hdr->page_size) +
+			padding_offset(hdr->second_size, hdr->page_size);
+
+        size = hdr->dt_size;
+
+	}
 
     if (size == 0)
         return 0;
@@ -105,6 +117,7 @@ void usage(void)
     printf("\t-k <output kernel filename>\n");
     printf("\t-r <output ramdisk filename>\n");
     printf("\t-s <output second filename>\n");
+    printf("\t-t <output dt filename>\n");
     printf("\t-d dump header\n");
     printf("\t-h help\n");
 }
@@ -112,15 +125,21 @@ void usage(void)
 int main(int argc, char *argv[])
 {
     boot_img_hdr hdr;
-    char *bootimg, *kernel = NULL, *ramdisk = NULL, *second = NULL;
+    char *bootimg, *kernel = NULL, *ramdisk = NULL, *second = NULL, *dt = NULL;
     int bootfd;
     int pagesize;
     int opt;
     int dump = 0;
 
+    if (argc < 2) {
+        usage();
+        return 0;
+    }
+
     memset(&hdr, 0, sizeof(hdr));
 
-    while ((opt = getopt(argc, argv, "i:k:r:s:dh")) != -1) {
+
+    while ((opt = getopt(argc, argv, "i:k:r:s:t:dh")) != -1) {
         switch (opt) {
             case 'i':
                 bootimg = strdup(optarg);
@@ -133,6 +152,9 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 second = strdup(optarg);
+                break;
+            case 't':
+                dt = strdup(optarg);
                 break;
             case 'd':
                 dump = 1;
@@ -172,10 +194,15 @@ int main(int argc, char *argv[])
        if (extract(bootfd, &hdr, second, "second") < 0)
            goto out;
 
-    if (!(kernel || ramdisk || second)) {
-       extract(bootfd, &hdr, "Image", "kernel");
+    if (dt)
+       if (extract(bootfd, &hdr, dt, "dt") < 0)
+           goto out;
+
+    if (!(kernel || ramdisk || second || dt)) {
+       extract(bootfd, &hdr, "kernel.img", "kernel");
        extract(bootfd, &hdr, "ramdisk.img", "ramdisk");
        extract(bootfd, &hdr, "second.img", "second");
+       extract(bootfd, &hdr, "dt.img", "dt");
     }
 
 out:
