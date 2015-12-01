@@ -1,0 +1,18 @@
+## API
+
+	#include "mlog.h"
+	extern int mlog(const char *fmt, ...);
+
+
+### Example
+	const char *foo = "Hello World!";
+	mlog("%s\n", foo);
+
+### Usage
+	init in RC group0 task
+	can used before init, but all the early buffer limit to 1K
+
+### Output
+	output in linux kernel kmsg
+	"[MODEM] Hello World!"
+

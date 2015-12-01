@@ -1,0 +1,14 @@
+type klogd, domain;
+
+type klogd_exec, exec_type, file_type;
+init_daemon_domain(klogd)
+
+allow klogd self:capability dac_override;
+
+allow klogd self:netlink_socket create_socket_perms;
+
+allow klogd mobile_info_file:file create_file_perms;
+allow klogd mobile_info_file:dir create_dir_perms;
+
+allow klogd kernel_record_file:file create_file_perms;
+allow klogd kernel_record_file:dir create_dir_perms;
