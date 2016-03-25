@@ -1,6 +1,7 @@
 #include "GameOverScene.h"
 #include "GameScene.h"
 #include "JavaHelper.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

@@ -1,0 +1,6 @@
+# view AndroidManifest.xml #generated:36
+-keep class com.google.android.gms.ads.AdActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:25
+-keep class org.cocos2dx.cpp.AppActivity { <init>(...); }
+

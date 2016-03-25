@@ -1,4 +1,5 @@
 #include "BackgroundLayer.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

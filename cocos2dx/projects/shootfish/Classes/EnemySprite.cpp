@@ -1,4 +1,5 @@
 #include "EnemySprite.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

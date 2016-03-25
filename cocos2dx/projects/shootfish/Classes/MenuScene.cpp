@@ -1,5 +1,6 @@
 #include "MenuScene.h"
 #include "JavaHelper.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

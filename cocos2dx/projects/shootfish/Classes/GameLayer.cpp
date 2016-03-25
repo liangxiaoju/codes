@@ -1,6 +1,7 @@
 #include "GameLayer.h"
 #include "UFOSprite.h"
 #include "MenuScene.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

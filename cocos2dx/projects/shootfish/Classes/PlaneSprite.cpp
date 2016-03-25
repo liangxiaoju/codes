@@ -1,4 +1,5 @@
 #include "PlaneSprite.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 

@@ -77,7 +77,7 @@ public class AppActivity extends Cocos2dxActivity {
         });
 
         AdRequest adReq = new AdRequest.Builder()
-//            .addTestDevice("F9CC34C4B0F028BACBB4CAF80A8548BB")
+            .addTestDevice("516EC8FCECE63E603FF79F7AAEACFDF9")
             .build();
         mAdView.loadAd(adReq);
     }
@@ -296,7 +296,7 @@ public class AppActivity extends Cocos2dxActivity {
     }
 
     public static void storeLeaderboards(int score) {
-        Log.d(TAG, "storeLeaderboards");
+        Log.d(TAG, "store leaderboards");
         final int curScore = score;
         appActivity.runOnUiThread(new Runnable() {
             @Override

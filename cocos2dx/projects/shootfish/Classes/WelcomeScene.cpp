@@ -1,4 +1,5 @@
 #include "WelcomeScene.h"
+#include "SimpleAudioEngine.h"
 
 using namespace CocosDenshion;
 
