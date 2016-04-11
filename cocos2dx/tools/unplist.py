@@ -1,103 +1,109 @@
 #!/usr/bin/env python
 import os,sys
 from xml.etree import ElementTree
+from optparse import OptionParser
 from PIL import Image
 
-def endWith(s,*endstring):
-        array = map(s.endswith,endstring)
-        if True in array:
-                return True
-        else:
-                return False 
-                
-# Get the all files & directories in the specified directory (path).
-def get_recursive_file_list(path):
-    current_files = os.listdir(path)
-    all_files = []
-    for file_name in current_files:
-        full_file_name = os.path.join(path, file_name)
-        if endWith(full_file_name,'.plist'):
-                full_file_name = full_file_name.replace('.plist','')
-                all_files.append(full_file_name)
- 
-        if os.path.isdir(full_file_name):
-            next_level_files = get_recursive_file_list(full_file_name)
-            all_files.extend(next_level_files)
- 
-    return all_files
-
-
-def tree_to_dict(tree):
+def elementTreeToDict(root):
     d = {}
-    for index, item in enumerate(tree):
-        if item.tag == 'key':
-            if tree[index+1].tag == 'string':
-                d[item.text] = tree[index + 1].text
-            elif tree[index + 1].tag == 'true':
-                d[item.text] = True
-            elif tree[index + 1].tag == 'false':
-                d[item.text] = False
-            elif tree[index+1].tag == 'dict':
-                d[item.text] = tree_to_dict(tree[index+1])
+    for index, element in enumerate(root):
+        if element.tag == "key":
+            key = element.text
+            nextElement = root[index + 1]
+            if nextElement.tag == "dict":
+                d[key] = elementTreeToDict(nextElement)
+            elif nextElement.tag == "string":
+                if nextElement.text.find("{") >= 0:
+                    to_list = lambda x: x.replace('{','').replace('}','').split(',')
+                    d[key] = [ int(float(i)) for i in to_list(nextElement.text)]
+                else:
+                    d[key] = nextElement.text
+            elif nextElement.tag in ("integer", "real"):
+                d[key] = int(float(nextElement.text))
+            elif nextElement.tag in ("true", "false"):
+                d[key] = nextElement.tag == "true"
     return d
 
-def gen_png_from_plist(plist_filename, png_filename):
-    file_path = plist_filename.replace('.plist', '')
-    big_image = Image.open(png_filename)
-    root = ElementTree.fromstring(open(plist_filename, 'r').read())
-    plist_dict = tree_to_dict(root[0])
-    to_list = lambda x: x.replace('{','').replace('}','').split(',')
-    for k,v in plist_dict['frames'].items():
-        rectlist = to_list(v['frame'])
-        width = int( rectlist[3] if v['rotated'] else rectlist[2] )
-        height = int( rectlist[2] if v['rotated'] else rectlist[3] )
-        box=( 
-            int(rectlist[0]),
-            int(rectlist[1]),
-            int(rectlist[0]) + width,
-            int(rectlist[1]) + height,
-            )
-        sizelist = [ int(x) for x in to_list(v['sourceSize'])]
-        rect_on_big = big_image.crop(box)
+def extractPlist(plist, outputDir):
+    with open(plist, "r") as f:
+        elementRoot = ElementTree.fromstring(f.read())
 
-        if v['rotated']:
-            rect_on_big = rect_on_big.rotate(90)
+    elementDict = elementTreeToDict(elementRoot[0])
 
-        result_image = Image.new('RGBA', sizelist, (0,0,0,0))
-        if v['rotated']:
-            result_box=(
-                ( sizelist[0] - height )/2,
-                ( sizelist[1] - width )/2,
-                ( sizelist[0] + height )/2,
-                ( sizelist[1] + width )/2
-                )
+    metadata = elementDict["metadata"]
+    png = metadata["realTextureFileName"]
+    png = os.path.join(os.path.dirname(plist), png)
+    format = metadata["format"]
+    size = metadata["size"]
+
+    frames = elementDict["frames"]
+    rotated = False
+
+    for name, frame in frames.items():
+        rect = [0, 0, 0, 0]
+        if format == 2:
+            rect = frame["frame"]
+            offset = frame["offset"]
+            rect[0] += offset[0]
+            rect[1] += offset[1]
+            rotated = frame["rotated"]
+        elif format == 0:
+            rect = [frame["x"], frame["y"], frame["width"], frame["height"]]
+            offset = [frame["offsetX"], frame["offsetY"]]
+            rect[0] += offset[0]
+            rect[1] += offset[1]
+
+        size = rect[2:4]
+        pasteBox = [0, 0] + size
+
+        if rotated:
+            w,h = rect[3],rect[2]
         else:
-            result_box=(
-                ( sizelist[0] - width )/2,
-                ( sizelist[1] - height )/2,
-                ( sizelist[0] + width )/2,
-                ( sizelist[1] + height )/2
-                )
-        result_image.paste(rect_on_big, result_box, mask=0)
+            w,h = rect[2],rect[3]
 
-        if not os.path.isdir(file_path):
-            os.mkdir(file_path)
-        outfile = (file_path+'/' + k).replace('gift_', '')
-        print outfile, "generated"
-        result_image.save(outfile)
+        cropBox = [rect[0], rect[1], rect[0]+w, rect[1]+h]
+
+        bigImage = Image.open(png)
+        rectImage = bigImage.crop(cropBox)
+
+        if rotated:
+            rectImage = rectImage.transpose(Image.ROTATE_90)
+
+        pasteImage = Image.new("RGBA", size, (0,0,0,0))
+
+        try:
+            pasteImage.paste(rectImage, pasteBox, mask=0)
+        except:
+            print name, "Failed to paste:", rectImage.getbbox(), "==>", pasteBox
+            continue
+
+        dirname = os.path.join(outputDir, plist.split(".")[0])
+        filename = os.path.join(dirname, name)
+        subdirname = os.path.dirname(filename)
+        if not os.path.isdir(subdirname):
+            os.makedirs(subdirname)
+
+        print "Generate: " + filename
+        pasteImage.save(filename)
+
 
 if __name__ == '__main__':
-    
-    
-    currtenPath = os.getcwd()
-    allPlistArray = get_recursive_file_list(currtenPath)
-    
-    for plist in allPlistArray:
-         filename = plist
-         print filename
-         plist_filename = filename + '.plist'
-         png_filename = filename + '.png'
-         if (os.path.exists(plist_filename) and os.path.exists(png_filename)):
-             gen_png_from_plist( plist_filename, png_filename )
-         else:
-             print "make sure you have both plist and png files in the same directory"
+    parser = OptionParser()
+    parser.add_option("-d", "--dir", dest="dir",
+        help="output directory", default=None)
+    parser.add_option("-p", "--plist", dest="plist",
+        help=".plist file path")
+
+    (options, args) = parser.parse_args()
+
+    plist = options.plist
+    outputDir = options.dir
+
+    if not plist or not os.path.isfile(plist):
+        raise Exception("No plist")
+
+    if not outputDir:
+        outputDir = os.path.dirname(plist)
+
+    extractPlist(plist, outputDir)
+
