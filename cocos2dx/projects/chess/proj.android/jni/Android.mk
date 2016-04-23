@@ -17,9 +17,17 @@ $(patsubst ./%,%, \
  )
 endef
 
+define all-c-files-under
+$(patsubst ./%,%, \
+  $(shell cd $(LOCAL_PATH) ; \
+          find -L $(1) -name "*.c" -and -not -name ".*") \
+ )
+endef
+
 LOCAL_SRC_FILES := hellocpp/main.cpp
 
 LOCAL_SRC_FILES += $(call all-cpp-files-under, ../../Classes)
+LOCAL_SRC_FILES += $(call all-c-files-under, ../../Classes)
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

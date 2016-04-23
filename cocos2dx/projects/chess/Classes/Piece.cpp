@@ -77,9 +77,9 @@ bool Piece::initWithType(Side side, Role role)
 	_role = role;
 
 	filename = _bitMap.at(std::make_pair(side, role));
-	setTexture("WOOD/" + filename);
+	setTexture("piece/WOOD/" + filename);
 
-	log("Piece: %s\n", filename.c_str());
+	//log("Piece: %s\n", filename.c_str());
 
 	return true;
 }

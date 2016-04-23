@@ -1,5 +1,6 @@
 #include <assert.h>
-#include <sys/timeb.h>
+//#include <sys/timeb.h>
+#include <sys/time.h>
 
 #ifndef BASE_H
 #define BASE_H
@@ -31,10 +32,16 @@ inline bool XOR(bool bArg1, bool bArg2) {
   return bArg1 ? !bArg2 : bArg2;
 }
 
+#ifdef MIN
+#undef MIN
+#endif
 template <typename T> inline T MIN(T Arg1, T Arg2) {
   return Arg1 < Arg2 ? Arg1 : Arg2;
 }
 
+#ifdef MAX
+#undef MAX
+#endif
 template <typename T> inline T MAX(T Arg1, T Arg2) {
   return Arg1 > Arg2 ? Arg1 : Arg2;
 }
@@ -79,9 +86,12 @@ inline int PopCnt32(uint32_t dw) {
 }
 
 inline int64_t GetTime() {
-  timeb tb;
-  ftime(&tb);
-  return (int64_t) tb.time * 1000 + tb.millitm;
+//  timeb tb;
+//  ftime(&tb);
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+//  return (int64_t) tb.time * 1000 + tb.millitm;
+  return (int64_t)tv.tv_sec * 1000 + tv.tv_usec/1000;
 }
 
 #endif

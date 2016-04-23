@@ -22,8 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifndef CCHESS_A3800
   #include <stdio.h>
+  #include <stdarg.h>
 #endif
 #include "../base/base2.h"
+#include "../base/pipe.h"
 #include "pregen.h"
 #include "position.h"
 #include "hash.h"
@@ -56,6 +58,27 @@ static struct {
   uint16_t wmvKiller[LIMIT_DEPTH][2]; // 杀手着法表
   MoveSortStruct MoveSort;            // 根结点的着法序列
 } Search2;
+
+extern PipeStruct pipeStd;
+static char outline[1024];
+int printf(const char *fmt, ...)
+{
+	va_list ap;
+	char p[1024] = {0};
+	int size = 1024;
+
+	va_start(ap, fmt);
+	size = vsnprintf(p, size, fmt, ap);
+	va_end(ap);
+
+	strncat(outline, p, sizeof(outline)-1-strlen(outline));
+	if (strchr(outline, '\n')) {
+		pipeStd.LineOutput(outline);
+		outline[0] = '\0';
+	}
+
+	return size;
+}
 
 #ifndef CCHESS_A3800
 

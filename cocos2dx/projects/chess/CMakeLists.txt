@@ -122,10 +122,15 @@ if ( WIN32 )
 )
 endif( WIN32 )
 
+file(GLOB MYGAME_SRC Classes/*.cpp)
+file(GLOB ENGINE_SRC Classes/engine/*/*.cpp)
+file(GLOB SQLITE_SRC Classes/sqlite/*.c)
+
 set(GAME_SRC
   Classes/AppDelegate.cpp
-  Classes/HelloWorldScene.cpp
   ${PLATFORM_SPECIFIC_SRC}
+  ${MYGAME_SRC}
+  ${ENGINE_SRC}
 )
 
 set(GAME_HEADERS

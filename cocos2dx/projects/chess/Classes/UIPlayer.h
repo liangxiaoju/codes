@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Board.h"
 #include "Piece.h"
+#include "HeaderSprite.h"
 
 USING_NS_CC;
 
@@ -16,15 +17,24 @@ public:
 
 	virtual void ponder() override;
 	virtual void go(float timeout) override;
+	virtual void stop();
+
+	virtual bool askForDraw();
+
+	void triggerLose();
+	void triggerPeace();
 
 	virtual bool onTouchBegan(Touch *touch, Event *unused);
 	virtual void onTouchMoved(Touch *touch, Event *unused);
 	virtual void onTouchEnded(Touch *touch, Event *event);
 	virtual void onTouchCancelled(Touch *touch, Event *event);
 
+	void setName(std::string first, std::string second);
+
 private:
 	Piece *_selectedPiece;
 	EventListenerTouchOneByOne * _touchListener;
+	HeaderSprite *_head;
 };
 
 #endif

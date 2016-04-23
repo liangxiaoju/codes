@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include "../base/base2.h"
 #include "../base/parse.h"
+#include "../base/pipe.h"
 #include "ucci.h"
 #include "pregen.h"
 #include "position.h"
@@ -31,12 +32,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 const int INTERRUPT_COUNT = 4096; // 搜索若干结点后调用中断
 
+extern PipeStruct pipeStd;
 inline void PrintLn(const char *sz) {
-  printf("%s\n", sz);
-  fflush(stdout);
+  //printf("%s\n", sz);
+  //fflush(stdout);
+  pipeStd.LineOutput(sz);
 }
 
-int main(void) {
+int emain(void) {
   int i;
   bool bPonderTime;
   UcciCommStruct UcciComm;
@@ -72,7 +75,7 @@ int main(void) {
   PrintLn("option usehash type check default true");
   PrintLn("option usebook type check default true");
   printf("option bookfiles type string default %s\n", Search.szBookFile);
-  fflush(stdout);
+  //fflush(stdout);
   PrintLn("option hashsize type spin min 16 max 1024 default 16");
   PrintLn("option idle type combo var none var small var medium var large default none");
   PrintLn("option pruning type combo var none var small var medium var large default large");

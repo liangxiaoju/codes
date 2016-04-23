@@ -9,7 +9,15 @@ USING_NS_CC;
 class Player : public Node
 {
 public:
-	virtual bool init() { return true; }
+	virtual bool init()
+	{
+		if (!Node::init())
+			return false;
+
+		setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+
+		return true;
+	}
 	virtual void setBoard(Board *b) { _board = b; }
 	virtual Board *getBoard() { return _board; }
 	virtual void setSide(Piece::Side side) { _side = side; }
@@ -18,6 +26,10 @@ public:
 	virtual void ponder() = 0;
 
 	virtual void go(float timeout) = 0;
+
+	virtual void stop() = 0;
+
+	virtual bool askForDraw() = 0;
 
 	class Listener : public Ref
 	{

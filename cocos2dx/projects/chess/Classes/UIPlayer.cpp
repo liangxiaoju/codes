@@ -1,4 +1,5 @@
 #include "UIPlayer.h"
+#include "HeaderSprite.h"
 
 bool UIPlayer::init()
 {
@@ -6,6 +7,13 @@ bool UIPlayer::init()
 			return false;
 
 	_selectedPiece = nullptr;
+
+	_head = HeaderSprite::createWithType(HeaderSprite::Type::LEFT);
+	_head->setNameLine("Player");
+	auto s = _head->getContentSize();
+	_head->setPosition(s.width/2, s.height/2);
+	addChild(_head);
+	setContentSize(s);
 
 	_touchListener = EventListenerTouchOneByOne::create();
 	_touchListener->onTouchBegan = CC_CALLBACK_2(UIPlayer::onTouchBegan, this);
@@ -17,6 +25,17 @@ bool UIPlayer::init()
 	_touchListener->setEnabled(false);
 
 	return true;
+}
+
+void UIPlayer::setName(std::string first, std::string second)
+{
+	if (!first.empty()) {
+		_head->setNameLine(first);
+	}
+
+	if (!second.empty()) {
+		_head->setInfoLine(second);
+	}
 }
 
 bool UIPlayer::onTouchBegan(Touch *touch, Event *event) {
@@ -49,10 +68,11 @@ bool UIPlayer::onTouchBegan(Touch *touch, Event *event) {
 			_selectedPiece = nullptr;
 
 			if (status < 0) {
-				;
+				if (status == -3)
+					getListener()->onResignRequest();;
 			} else {
-				getListener()->onMoved("TODO");
 				_touchListener->setEnabled(false);
+				getListener()->onMoved("TODO");
 			}
 		}
 	} else {
@@ -88,5 +108,29 @@ void UIPlayer::ponder()
 
 void UIPlayer::go(float timeout)
 {
+	getEventDispatcher()->dispatchCustomEvent(EVENT_UIPLAYER_GO);
+	_head->setActive(true);
 	_touchListener->setEnabled(true);
 }
+
+void UIPlayer::stop()
+{
+	_touchListener->setEnabled(false);
+	_head->setActive(false);
+}
+
+bool UIPlayer::askForDraw()
+{
+	return false;
+}
+
+void UIPlayer::triggerLose()
+{
+	getListener()->onResignRequest();
+}
+
+void UIPlayer::triggerPeace()
+{
+	getListener()->onDrawRequest();
+}
+
