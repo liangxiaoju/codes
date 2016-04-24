@@ -8,6 +8,7 @@
 #define EVENT_AIPLAYER_GO "EV_AIPLAYER_GO"
 #define EVENT_WHITE_WIN "EV_WHITE_WIN"
 #define EVENT_BLACK_WIN "EV_BLACK_WIN"
+#define EVENT_DRAW "EV_DRAW"
 
 namespace std {
 	template <>

@@ -104,14 +104,7 @@ void GameLayer::onPlayerWhiteMoved(std::string mv)
 	_playerWhite->stop();
 	if (Rule::getInstance()->isMate(_board->getFen())) {
 		log("Red Win!");
-		auto visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
-		auto s = Sprite::create("board/watch_win_red_tag.png");
-		addChild(s);
-		s->setPosition(origin.x + visibleSize.width/2,
-				origin.y + visibleSize.height/2);
-
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:WHITE");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
 		return;
 	}
@@ -124,14 +117,7 @@ void GameLayer::onPlayerBlackMoved(std::string mv)
 	_playerBlack->stop();
 	if (Rule::getInstance()->isMate(_board->getFen())) {
 		log("Black Win!");
-		auto visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
-		auto s = Sprite::create("board/watch_win_black_tag.png");
-		addChild(s);
-		s->setPosition(origin.x + visibleSize.width/2,
-				origin.y + visibleSize.height/2);
-
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:BLACK");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
 		return;
 	}
@@ -144,14 +130,8 @@ void GameLayer::onPlayerWhiteResignRequest()
 	_playerWhite->stop();
 	_playerBlack->stop();
 
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	auto s = Sprite::create("board/watch_win_black_tag.png");
-	addChild(s);
-	s->setPosition(origin.x + visibleSize.width/2,
-			origin.y + visibleSize.height/2);
-
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:BLACK");
+	getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
 }
 
 void GameLayer::onPlayerBlackResignRequest()
@@ -159,14 +139,8 @@ void GameLayer::onPlayerBlackResignRequest()
 	_playerWhite->stop();
 	_playerBlack->stop();
 
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	auto s = Sprite::create("board/watch_win_red_tag.png");
-	addChild(s);
-	s->setPosition(origin.x + visibleSize.width/2,
-			origin.y + visibleSize.height/2);
-
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:WHITE");
+	getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
 }
 
 void GameLayer::onPlayerWhiteDrawRequest()
@@ -176,14 +150,8 @@ void GameLayer::onPlayerWhiteDrawRequest()
 		_playerWhite->stop();
 		_playerBlack->stop();
 
-		auto visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
-		auto s = Sprite::create("board/watch_win_draw_tag.png");
-		addChild(s);
-		s->setPosition(origin.x + visibleSize.width/2,
-				origin.y + visibleSize.height/2);
-
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"DRAW:");
+		getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
 	}
 }
 
@@ -194,14 +162,8 @@ void GameLayer::onPlayerBlackDrawRequest()
 		_playerWhite->stop();
 		_playerBlack->stop();
 
-		auto visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
-		auto s = Sprite::create("board/watch_win_draw_tag.png");
-		addChild(s);
-		s->setPosition(origin.x + visibleSize.width/2,
-				origin.y + visibleSize.height/2);
-
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"DRAW:");
+		getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
 	}
 }
 

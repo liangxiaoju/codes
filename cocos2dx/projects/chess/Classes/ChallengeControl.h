@@ -118,12 +118,70 @@ public:
 		listener->setSwallowTouches(true);
 		getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
 
-		auto over_callback = [this](EventCustom* ev){
+		auto over_callback = [&](EventCustom* ev){
 			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
 			auto btn_regret = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_regret"));
 			auto btn_lose = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_lose"));
 			btn_regret->setEnabled(false);
 			btn_lose->setEnabled(false);
+
+			auto white_win_callback = [&](){
+				std::vector<EndGameData::EndGameClass> endGameClass;
+				EndGameData::getInstance()->queryEndGameClass(endGameClass);
+				for (auto &cls : endGameClass) {
+					if (cls.tid == _endGameItem.tid) {
+						if (cls.progress == _endGameItem.sort) {
+							cls.progress = _endGameItem.sort+1;
+							EndGameData::getInstance()->updateEndGameClass(cls);
+						}
+						break;
+					}
+				}
+				auto next = Button::create("ChallengeScene/button_next.png");
+				next->setTitleText("Next");
+				next->setTitleFontSize(35);
+				next->setZoomScale(0.1);
+				next->addClickEventListener([&](Ref *ref){
+						_gameLayer->removeFromParent();
+						std::vector<EndGameData::EndGameItem> endGameItems;
+						EndGameData::getInstance()->queryEndGameItem(_endGameItem.tid, endGameItems);
+						if (_endGameItem.sort == (endGameItems.size()-1)) {
+						Director::getInstance()->popScene();
+						} else {
+						_endGameItem = endGameItems[_endGameItem.sort+1];
+						auto scene = ChallengeScene::create(_endGameItem);
+						Director::getInstance()->replaceScene(scene);
+						}
+						});
+				auto vsize = Director::getInstance()->getVisibleSize();
+				next->setPosition(Vec2(vsize.width/2, vsize.height/3));
+				addChild(next);
+			};
+
+			auto vsize = Director::getInstance()->getVisibleSize();
+			Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+			std::string event = (const char *)ev->getUserData();
+
+			if (event.find("WIN:WHITE") != std::string::npos) {
+				auto s = Sprite::create("ChallengeScene/text_yq.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+
+				white_win_callback();
+
+			} else if (event.find("WIN:BLACK") != std::string::npos) {
+				auto s = Sprite::create("ChallengeScene/text_sq.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+			} else if (event.find("DRAW:") != std::string::npos) {
+				auto s = Sprite::create("ChallengeScene/text_hq.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+			}
 		};
 		/* have to remove previous listener */
 		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
@@ -144,41 +202,6 @@ public:
 		};
 		getEventDispatcher()->removeCustomEventListeners(EVENT_AIPLAYER_GO);
 		getEventDispatcher()->addCustomEventListener(EVENT_AIPLAYER_GO, ai_go_callback);
-
-		auto white_win_callback = [&](EventCustom* ev){
-			std::vector<EndGameData::EndGameClass> endGameClass;
-			EndGameData::getInstance()->queryEndGameClass(endGameClass);
-			for (auto &cls : endGameClass) {
-				if (cls.tid == _endGameItem.tid) {
-					if (cls.progress == _endGameItem.sort) {
-						cls.progress = _endGameItem.sort+1;
-						EndGameData::getInstance()->updateEndGameClass(cls);
-					}
-					break;
-				}
-			}
-			auto close = Button::create("ChallengeScene/button_next.png");
-			close->setTitleText("Next");
-			close->setTitleFontSize(35);
-			close->setZoomScale(0.1);
-			close->addClickEventListener([&](Ref *ref){
-				_gameLayer->removeFromParent();
-				std::vector<EndGameData::EndGameItem> endGameItems;
-				EndGameData::getInstance()->queryEndGameItem(_endGameItem.tid, endGameItems);
-				if (_endGameItem.sort == (endGameItems.size()-1)) {
-					Director::getInstance()->popScene();
-				} else {
-					_endGameItem = endGameItems[_endGameItem.sort+1];
-					auto scene = ChallengeScene::create(_endGameItem);
-					Director::getInstance()->replaceScene(scene);
-				}
-			});
-			auto vsize = Director::getInstance()->getVisibleSize();
-			close->setPosition(Vec2(vsize.width/2, vsize.height/3));
-			addChild(close);
-		};
-		getEventDispatcher()->removeCustomEventListeners(EVENT_WHITE_WIN);
-		getEventDispatcher()->addCustomEventListener(EVENT_WHITE_WIN, white_win_callback);
 
 		return true;
 	}

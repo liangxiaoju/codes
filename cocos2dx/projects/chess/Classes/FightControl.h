@@ -176,6 +176,28 @@ public:
 			btn_regret->setEnabled(false);
 			btn_lose->setEnabled(false);
 			btn_peace->setEnabled(false);
+
+			auto vsize = Director::getInstance()->getVisibleSize();
+			Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+			std::string event = (const char *)ev->getUserData();
+
+			if (event.find("WIN:WHITE") != std::string::npos) {
+				auto s = Sprite::create("board/watch_win_red_tag.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+			} else if (event.find("WIN:BLACK") != std::string::npos) {
+				auto s = Sprite::create("board/watch_win_black_tag.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+			} else if (event.find("DRAW:") != std::string::npos) {
+				auto s = Sprite::create("board/watch_win_draw_tag.png");
+				addChild(s);
+				s->setPosition(origin.x + vsize.width/2,
+						origin.y + vsize.height/2);
+			}
 		};
 		/* have to remove previous listener */
 		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
