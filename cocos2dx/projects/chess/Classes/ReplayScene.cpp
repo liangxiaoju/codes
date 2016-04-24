@@ -10,37 +10,29 @@ bool ReplayScene::init()
 
 	auto vsize = Director::getInstance()->getVisibleSize();
 
-	auto tab = TabControl::create();
-	tab->setContentSize(vsize);
-	tab->setHeaderHeight(50.f);
-	tab->setHeaderWidth(200.f);
-	tab->setHeaderSelectedZoom(.1f);
-	tab->setHeaderDockPlace(TabControl::Dock::TOP);
+	_tab = TabControl::create();
+	//_tab->setContentSize(Size(vsize.width, vsize.height-200-200));
+	_tab->setContentSize(vsize*2/3);
+	_tab->setHeaderHeight(50.f);
+	_tab->setHeaderWidth(200.f);
+	_tab->ignoreHeadersTextureSize(false);
+	_tab->setHeaderSelectedZoom(.1f);
+	_tab->setHeaderDockPlace(TabControl::Dock::TOP);
 
 	auto header1 = TabHeader::create();
-	header1->loadTextureBackGround("ReplayScene/mysave_title.png");
 	auto header2 = TabHeader::create();
+	header1->loadTextureBackGround("ReplayScene/mysave_title.png");
 	header2->loadTextureBackGround("ReplayScene/zuijin_title.png");
 
 	auto container1 = VBox::create();
-	container1->setOpacity(255);
-	container1->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-	container1->setBackGroundColor(Color3B::GRAY);
-	container1->setBackGroundColorOpacity(255);
 	auto container2 = VBox::create();
-	container2->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-	container2->setOpacity(255);
-	container2->setBackGroundColor(Color3B::BLUE);
-	container2->setBackGroundColorOpacity(255);
 
-	tab->insertTab(0, header1, container1);
-	tab->insertTab(1, header2, container2);
+	_tab->insertTab(0, header1, container1);
+	_tab->insertTab(1, header2, container2);
 
-	tab->setSelectTab(0);
-	addChild(tab);
-	tab->setPosition(vsize/2);
+	_tab->setSelectTab(0);
 
-	tab->setTabChangedEventListener(
+	_tab->setTabChangedEventListener(
 			[](int index, TabControl::EventType evtType)
 	{
 		log("tab %d selected", index);
@@ -57,6 +49,7 @@ bool ReplayScene::init()
 	_default_model->setTouchEnabled(true);
 	_default_model->setContentSize(default_button->getContentSize());
 	_default_model->addChild(default_button);
+	_default_model->setSwallowTouches(false);
 
 	_listview = ListView::create();
 	_listview->setDirection(ScrollView::Direction::VERTICAL);
@@ -65,8 +58,10 @@ bool ReplayScene::init()
 	_listview->setItemModel(_default_model);
 	_listview->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
 	_listview->setItemsMargin(30);
-
-	container1->addChild(_listview);
+	//XXX
+	_listview->setSwallowTouches(false);
+	//XXX
+	_listview->setContentSize(container1->getContentSize());
 
 	_listview->addEventListener([&](Ref *pSender, ListView::EventType type){
 	switch (type)
@@ -83,6 +78,16 @@ bool ReplayScene::init()
 			ListView* listView = static_cast<ListView*>(pSender);
 			auto item = listView->getItem(listView->getCurSelectedIndex());
 			CCLOG("select child end index = %d", item->getTag());
+
+			int index = item->getTag();
+			std::vector<UserData::SaveElement> saveElements;
+			UserData::getInstance()->querySaveTbl(saveElements);
+
+			auto e = saveElements[index];
+			GameLayer::Mode mode = (GameLayer::Mode)e.mode;
+			Piece::Side side = (Piece::Side)e.side;
+			auto scene = FightScene::create(mode, side, e.level, e.fen);
+			Director::getInstance()->replaceScene(scene);
 		}
 	default:
 		break;
@@ -95,7 +100,7 @@ bool ReplayScene::init()
 		std::vector<UserData::SaveElement> saveElements;
 		UserData::getInstance()->querySaveTbl(saveElements);
 
-		for(int i = 0; i < saveElements.size(); i++) {
+		for(size_t i = 0; i < saveElements.size(); i++) {
 			Widget* item = _default_model->clone();
 			item->setTag(i);
 			Button* btn = (Button*)item->getChildByName("Title Button");
@@ -104,6 +109,30 @@ bool ReplayScene::init()
 			_listview->pushBackCustomItem(item);
 		}
 	});
+
+	container1->addChild(_listview);
+
+	auto vbox = VBox::create();
+	vbox->setContentSize(vsize);
+	vbox->setBackGroundImage("MainMenuScene/common_bg_new2.png");
+
+	auto headview = Layout::create();
+	headview->setContentSize(Size(vsize.width, 200));
+	headview->setLayoutParameter(lp->clone());
+	vbox->addChild(headview);
+
+	_tab->setLayoutParameter(lp->clone());
+	vbox->addChild(_tab);
+
+	addChild(vbox);
+
+	auto back = Button::create("DifficultyScene/look_back.png");
+	back->addClickEventListener([](Ref *ref){
+			Director::getInstance()->popScene();
+			});
+	back->setZoomScale(0.1);
+	back->setPosition(Vec2(100, vsize.height-100));
+	addChild(back);
 
 	return true;
 }

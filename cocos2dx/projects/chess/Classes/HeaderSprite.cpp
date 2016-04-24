@@ -54,7 +54,7 @@ bool HeaderSprite::initWithType(Type type)
 
 void HeaderSprite::setNameLine(std::string name)
 {
-	auto text = Text::create(name, "fonts/arial.ttf", 35);
+	auto text = Text::create(name, "", 35);
 	text->setTextColor(Color4B::YELLOW);
 
 	RelativeLayoutParameter* rp_top = RelativeLayoutParameter::create();
@@ -67,7 +67,7 @@ void HeaderSprite::setNameLine(std::string name)
 
 void HeaderSprite::setInfoLine(std::string info)
 {
-	auto text = Text::create(info, "fonts/arial.ttf", 25);
+	auto text = Text::create(info, "", 25);
 	text->setTextColor(Color4B::YELLOW);
 
 	RelativeLayoutParameter* rp_bottom = RelativeLayoutParameter::create();

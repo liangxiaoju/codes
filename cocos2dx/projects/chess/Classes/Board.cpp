@@ -67,6 +67,9 @@ std::string Board::getFenWithMove()
 	std::string fen = _initFen;
 	std::string moves = "";
 
+	if (fen.empty())
+		return getFen();
+
 	if (_historyMv.empty())
 		return fen;
 
@@ -109,17 +112,17 @@ void Board::initFromFen(std::string fen)
 
 	_currSide = Piece::charToSide(substr[1][0]);
 
-	int i, n;
-	if ((n = fen.find(" moves ")) != -1) {
+	_initFen = getFen();
+
+	size_t i, n;
+	if ((n = fen.find(" moves ")) != std::string::npos) {
 		std::string mvstr = fen.substr(n+7);
 		std::vector<std::string> mvs = Utils::splitString(mvstr, ' ');
 		for (i = 0; i < mvs.size(); ++i) {
 			std::vector<Vec2> mv = Utils::toVecMove(mvs[i]);
-			move(mv[0], mv[1]);
+			move(mv[0], mv[1], false);
 		}
 	}
-
-	_initFen = fen;
 }
 
 void Board::addPiece(Vec2 index, Piece *p)
@@ -183,7 +186,7 @@ int Board::checkMove(Vec2 src, Vec2 dst)
 {
 	std::string fen = getFenWithMove();
 
-	if (fen.find(" moves ") != -1) {
+	if (fen.find(" moves ") != std::string::npos) {
 		fen = fen + " " + Utils::toUcciMove(src, dst);
 	} else {
 		fen = fen + " moves " + Utils::toUcciMove(src, dst);
@@ -192,7 +195,7 @@ int Board::checkMove(Vec2 src, Vec2 dst)
 	return Rule::getInstance()->check(fen);
 }
 
-int Board::move(Vec2 src, Vec2 dst)
+int Board::move(Vec2 src, Vec2 dst, bool check)
 {
 	auto it = _mapPieces.find(src);
 	if (it == _mapPieces.end())
@@ -200,10 +203,12 @@ int Board::move(Vec2 src, Vec2 dst)
 
 	unselectAll();
 
-	int ret = checkMove(src, dst);
-	if (ret != 0) {
-		log("%s: %d", __func__, ret);
-		return ret;
+	if (check) {
+		int ret = checkMove(src, dst);
+		if (ret != 0) {
+			log("%s: %d", __func__, ret);
+			return ret;
+		}
 	}
 
 	Piece *p = (*it).second;
@@ -268,7 +273,7 @@ void Board::undo()
 	if (!_historyMv.empty()) {
 		auto last = _historyMv.back();
 		Move mv = last.first;
-		Piece *p = last.second;
+		//Piece *p = last.second;
 		Vec2 src = mv.first;
 		Vec2 dst = mv.second;
 		markMove(src, dst);

@@ -4698,7 +4698,7 @@ static char *cmdline_option_value(int argc, char **argv, int i){
   return argv[i];
 }
 
-int SQLITE_CDECL main(int argc, char **argv){
+int SQLITE_CDECL sqlite_main(int argc, char **argv){
   char *zErrMsg = 0;
   ShellState data;
   const char *zInitFile = 0;

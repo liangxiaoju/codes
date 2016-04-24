@@ -103,7 +103,7 @@ void EndGameData::queryEndGameItem(int tid, std::vector<EndGameItem> &vector)
 
 		auto handleMoveList = [](EndGameItem::MoveList &movelist,
 				rapidjson::Value &array) {
-			for (int i=0; i < array.Size(); i++) {
+			for (unsigned i=0; i < array.Size(); i++) {
 				EndGameItem::MoveItem item;
 				if (array[i].HasMember("src") && array[i].HasMember("dst")) {
 					item.src = atoi(array[i]["src"].GetString());
@@ -112,7 +112,7 @@ void EndGameData::queryEndGameItem(int tid, std::vector<EndGameItem> &vector)
 				if (array[i].HasMember("comment"))
 					item.comment = array[i]["comment"].GetString();
 				if (array[i].HasMember("sub")) {
-					for (int j=0; j < array[i]["sub"].Size(); j++) {
+					for (unsigned j=0; j < array[i]["sub"].Size(); j++) {
 						int n = atoi(array[i]["sub"][j].GetString());
 						item.sub.push_back(n);
 					}

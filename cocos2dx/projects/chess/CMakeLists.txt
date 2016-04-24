@@ -58,6 +58,7 @@ elseif(MACOSX OR APPLE)
 elseif(LINUX)
   ADD_DEFINITIONS(-DLINUX)
   set(PLATFORM_FOLDER linux)
+  set(CMAKE_EXE_LINKER_FLAGS "-ldl")
 elseif(ANDROID)
   ADD_DEFINITIONS (-DUSE_FILE32API)
   set(PLATFORM_FOLDER android)
@@ -113,6 +114,7 @@ include_directories(
   ${COCOS2D_ROOT}/cocos
   ${COCOS2D_ROOT}/cocos/platform
   ${COCOS2D_ROOT}/cocos/audio/include/
+  ${COCOS2D_ROOT}/external
   Classes
 )
 if ( WIN32 )
@@ -131,6 +133,7 @@ set(GAME_SRC
   ${PLATFORM_SPECIFIC_SRC}
   ${MYGAME_SRC}
   ${ENGINE_SRC}
+  ${SQLITE_SRC}
 )
 
 set(GAME_HEADERS

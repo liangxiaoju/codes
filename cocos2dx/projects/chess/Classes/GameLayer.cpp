@@ -11,7 +11,6 @@ bool GameLayer::init(GameLayer::Mode mode, Piece::Side uiSide,
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	auto winSize = Director::getInstance()->getWinSize();
 
 	_board = Board::createWithFen(fen);
 	auto boardSize = _board->getContentSize();

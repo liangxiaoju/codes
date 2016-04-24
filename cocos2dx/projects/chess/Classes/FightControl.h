@@ -22,7 +22,7 @@ public:
 		backBtn->addClickEventListener([](Ref *ref){
 			Director::getInstance()->popScene();
 		});
-		backBtn->setPosition(Vec2(origin.x+50, origin.y+visibleSize.height-120));
+		backBtn->setPosition(Vec2(100, visibleSize.height-100));
 		addChild(backBtn);
 
 		_menuNode = Node::create();

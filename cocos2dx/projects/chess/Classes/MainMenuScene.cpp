@@ -34,19 +34,19 @@ public:
 
 		b1->addClickEventListener([](Ref *ref){
 			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 0);
-			Director::getInstance()->replaceScene(scene);
+			Director::getInstance()->pushScene(scene);
 		});
 		b2->addClickEventListener([](Ref *ref){
 			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 1);
-			Director::getInstance()->replaceScene(scene);
+			Director::getInstance()->pushScene(scene);
 		});
 		b3->addClickEventListener([](Ref *ref){
 			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 2);
-			Director::getInstance()->replaceScene(scene);
+			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
 			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 3);
-			Director::getInstance()->replaceScene(scene);
+			Director::getInstance()->pushScene(scene);
 		});
 
 		auto vbox = VBox::create();
@@ -65,7 +65,7 @@ public:
 			Director::getInstance()->popScene();
 		});
 		back->setZoomScale(0.1);
-		back->setPosition(Vec2(50, 50));
+		back->setPosition(Vec2(100, visibleSize.height-100));
 		addChild(back);
 
 		return true;
@@ -154,7 +154,7 @@ bool MainMenuLayer::init()
 
 	//auto setting = Button::create("MainMenuScene/main_button_setting.png", "MainMenuScene/main_button_settingP.png");
 	auto setting = Button::create("MainMenuScene/main_button_setting.png");
-	setting->setScale(1.2);
+	//setting->setScale(1.2);
 	setting->addClickEventListener([](Ref *ref){ log("setting click"); });
 	setting->setZoomScale(0.1);
 
@@ -164,7 +164,7 @@ bool MainMenuLayer::init()
 	setting->setLayoutParameter(rp_r);
 
 	auto quit = Button::create("MainMenuScene/common_back.png");
-	quit->setScale(1.2);
+	//quit->setScale(1.2);
 	quit->addClickEventListener([](Ref *ref){
 		log("quit click");
 		Director::getInstance()->end();
@@ -181,17 +181,22 @@ bool MainMenuLayer::init()
 	layout2->addChild(b3);
 	layout2->addChild(b4);
 
-	layout3->addChild(setting);
-	layout3->addChild(quit);
+	//layout3->addChild(setting);
+	//layout3->addChild(quit);
 
 	auto vbox = VBox::create();
 	vbox->setBackGroundImage("MainMenuScene/common_bg_new2.png");
 	vbox->addChild(layout1);
 	vbox->addChild(layout2);
-	vbox->addChild(layout3);
+	//vbox->addChild(layout3);
 
 	vbox->setContentSize(visibleSize);
 	addChild(vbox);
+
+	setting->setPosition(Vec2(visibleSize.width-100, visibleSize.height-100));
+	addChild(setting);
+	quit->setPosition(Vec2(100, visibleSize.height-100));
+	addChild(quit);
 
 	return true;
 }

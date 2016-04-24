@@ -16,6 +16,7 @@ public:
 private:
 	ListView *_listview;
 	Layout *_default_model;
+	TabControl *_tab;
 };
 
 #endif

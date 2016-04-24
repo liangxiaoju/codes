@@ -36,7 +36,7 @@ public:
 
 	Piece* pick(Vec2 index);
 
-	int move(Vec2 src, Vec2 dst);
+	int move(Vec2 src, Vec2 dst, bool check=true);
 
 	void setStyle(Style s);
 

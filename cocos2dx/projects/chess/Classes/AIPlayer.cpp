@@ -255,11 +255,11 @@ void AIPlayer::go(float timeout)
 	cmd = "go time " + Utils::toString(int(_difficulty*1000+timeout));
 	sendWithCallBack(cmd, "bestmove", [&](std::string reply)
 		{
-			if (reply.find("nobestmove") != -1) {
+			if (reply.find("nobestmove") != std::string::npos) {
 				auto l = getListener();
 				if (l != nullptr)
 					l->onResignRequest();
-			} else if (reply.find("draw") != -1) {
+			} else if (reply.find("draw") != std::string::npos) {
 				auto l = getListener();
 				if (l != nullptr)
 					l->onDrawRequest();
@@ -271,7 +271,7 @@ void AIPlayer::go(float timeout)
 				auto b = getBoard();
 				int ret = 0;
 				if (b != nullptr)
-					ret = b->move(vecs[0], vecs[1]);
+					ret = b->move(vecs[0], vecs[1], false);
 
 				auto l = getListener();
 

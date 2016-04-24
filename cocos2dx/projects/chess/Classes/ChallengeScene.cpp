@@ -2,7 +2,7 @@
 #include "FightScene.h"
 #include "GameLayer.h"
 #include "BGLayer.h"
-#include "UIPlayer.h"
+#include "AIPlayer.h"
 #include "ChallengeControl.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
@@ -20,7 +20,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 	auto gameLayer = GameLayer::create(GameLayer::Mode::UI_TO_AI,
 			Piece::Side::WHITE, 2, fen);
 	addChild(gameLayer);
-	UIPlayer *ai = (UIPlayer*)gameLayer->getPlayer(Piece::Side::BLACK);
+	AIPlayer *ai = (AIPlayer*)gameLayer->getPlayer(Piece::Side::BLACK);
 	ai->setName(item.data.subtitle, "--");
 
 	auto control = ChallengeControl::create();
@@ -112,6 +112,7 @@ bool ChallengeMenuL2::init(EndGameData::EndGameClass cls)
 			item->setTag(i);
 			Button* btn = (Button*)item->getChildByName("Title Button");
 			btn->setTitleFontSize(40);
+			btn->setTitleFontName("");
 			btn->setTitleText(_endGameItems[i].data.subtitle);
 
 			if (i < (progress+1)) {
@@ -150,7 +151,7 @@ bool ChallengeMenuL2::init(EndGameData::EndGameClass cls)
 			Director::getInstance()->popScene();
 			});
 	back->setZoomScale(0.1);
-	back->setPosition(Vec2(50, 50));
+	back->setPosition(Vec2(100, vsize.height-100));
 	addChild(back);
 
 	return true;
@@ -226,6 +227,7 @@ bool ChallengeMenuL1::init()
 			item->setTag(i);
 			Button* btn = (Button*)item->getChildByName("Title Button");
 			btn->setTitleFontSize(40);
+			btn->setTitleFontName("");
 			btn->setTitleText(_endGameClass[i].data.title);
 
 			if ((i > 0) && (_endGameClass[i-1].progress < _endGameClass[i-1].subCount)) {
@@ -257,7 +259,7 @@ bool ChallengeMenuL1::init()
 			Director::getInstance()->popScene();
 			});
 	back->setZoomScale(0.1);
-	back->setPosition(Vec2(50, 50));
+	back->setPosition(Vec2(100, vsize.height-100));
 	addChild(back);
 
 	return true;

@@ -9,9 +9,6 @@ bool FightScene::init(GameLayer::Mode mode, Piece::Side side, int level, std::st
 	if (!Scene::init())
 		return false;
 
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
 	auto bgLayer = BGLayer::create();
 	addChild(bgLayer);
 
