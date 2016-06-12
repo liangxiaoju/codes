@@ -221,23 +221,29 @@ std::string AIPlayer::sendWithReply(std::string msg, std::string match)
 
 int AIPlayer::sendWithCallBack(std::string msg, std::string match, const std::function<void (std::string)> &cb)
 {
-	std::string *reply = new std::string();
-
-	std::function<void(void*)> callback = [&, cb, reply](void *param)
-	{
+	auto callback = [cb](EventCustom* ev){
+		std::string *reply = (std::string *)ev->getUserData();
 		log("callback %s", (*reply).c_str());
 		cb(*reply);
-		delete reply;
+	};
+
+	auto task = [this, msg, match, callback](){
+		retain();
+		std::string *reply = new std::string();
+		*reply = this->sendWithReply(msg, match);
+
+		Director::getInstance()->getEventDispatcher()->removeCustomEventListeners("sendWithCallBack");
+		Director::getInstance()->getEventDispatcher()->addCustomEventListener("sendWithCallBack", callback);
+
+		Director::getInstance()->getScheduler()->performFunctionInCocosThread([this, reply](){
+			Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("sendWithCallBack", (void *)reply);
+			delete reply;
+		});
 		release();
 	};
 
-	std::function<void()> task = [&, reply, msg, match]()
-	{
-		retain();
-		*reply = this->sendWithReply(msg, match);
-	};
-
-	AsyncTaskPool::getInstance()->enqueue(AsyncTaskPool::TaskType::TASK_OTHER, callback, (void*)NULL, task);
+	std::thread sendThread(task);
+	sendThread.detach();
 
 	return 0;
 }
@@ -292,6 +298,7 @@ void AIPlayer::stop()
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
 	_head->setActive(false);
+	getEventDispatcher()->removeCustomEventListeners("sendWithCallBack");
 }
 
 bool AIPlayer::askForDraw()

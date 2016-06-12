@@ -96,6 +96,9 @@ GameLayer::~GameLayer()
 	_playerWhite->setBoard(nullptr);
 	_playerBlack->setBoard(nullptr);
 
+	_playerWhite->stop();
+	_playerBlack->stop();
+
 	log("### Delete GameLayer");
 }
 
