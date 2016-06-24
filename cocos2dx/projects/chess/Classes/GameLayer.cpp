@@ -1,6 +1,8 @@
 #include "GameLayer.h"
 #include "UIPlayer.h"
 #include "AIPlayer.h"
+#include "AIPlayer2.h"
+#include "NetPlayer.h"
 #include "UserData.h"
 
 bool GameLayer::init(GameLayer::Mode mode, Piece::Side uiSide,
@@ -24,18 +26,30 @@ bool GameLayer::init(GameLayer::Mode mode, Piece::Side uiSide,
 	_side = uiSide;
 	_initFen = fen;
 
+	_server = NULL;
+
 	if (mode == Mode::UI_TO_AI) {
 		player1 = UIPlayer::create();
-		player2 = AIPlayer::create();
+		player2 = AIPlayer2::create();
 	} else if (mode == Mode::UI_TO_UI) {
 		player1 = UIPlayer::create();
 		player2 = UIPlayer::create();
 	} else if (mode == Mode::UI_TO_NET) {
+		RoomManager *manager = RoomManager::getInstance();
+		std::vector<RoomManager::RoomInfo> v;
+		v = manager->scanRoom(1, 2);
+		if (v.size() == 0) {
+			_server = manager->createRoom();
+			_side = Piece::Side::WHITE;
+		} else {
+			_side = Piece::Side::BLACK;
+		}
+
 		player1 = UIPlayer::create();
-		player2 = AIPlayer::create();
+		player2 = NetPlayer::create();
 	}
 
-	if (uiSide == Piece::Side::WHITE) {
+	if (_side == Piece::Side::WHITE) {
 		_uiPlayer = _playerWhite = player1;
 		_playerBlack = player2;
 		auto s = _playerWhite->getContentSize();
@@ -99,17 +113,21 @@ GameLayer::~GameLayer()
 	_playerWhite->stop();
 	_playerBlack->stop();
 
+	if (_server)
+		RoomManager::getInstance()->destroyRoom(_server);
+
 	log("### Delete GameLayer");
 }
 
 void GameLayer::onPlayerWhiteMoved(std::string mv)
 {
+	log("RED: %s", _board->getFenWithMove().c_str());
 	_playerWhite->stop();
 	if (Rule::getInstance()->isMate(_board->getFen())) {
 		log("Red Win!");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:WHITE");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
-		return;
+		//return;
 	}
 	getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_GO);
 	_playerBlack->go(0);
@@ -117,12 +135,13 @@ void GameLayer::onPlayerWhiteMoved(std::string mv)
 
 void GameLayer::onPlayerBlackMoved(std::string mv)
 {
+	log("BLACK: %s", _board->getFenWithMove().c_str());
 	_playerBlack->stop();
 	if (Rule::getInstance()->isMate(_board->getFen())) {
 		log("Black Win!");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:BLACK");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
-		return;
+		//return;
 	}
 	getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_GO);
 	_playerWhite->go(0);
@@ -197,9 +216,9 @@ void GameLayer::setDifficulty(int level)
 	_difficulty = level;
 	if (_mode == Mode::UI_TO_AI) {
 		if (_side == Piece::Side::WHITE) {
-			((AIPlayer*)_playerBlack)->setDifficulty(level);
+			((AIPlayer2*)_playerBlack)->setDifficulty(level);
 		} else {
-			((AIPlayer*)_playerWhite)->setDifficulty(level);
+			((AIPlayer2*)_playerWhite)->setDifficulty(level);
 		}
 	}
 }

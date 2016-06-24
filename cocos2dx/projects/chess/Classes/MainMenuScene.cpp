@@ -45,7 +45,7 @@ public:
 			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 3);
+			auto scene = FightScene::create(GameLayer::Mode::UI_TO_NET, Piece::Side::WHITE, 3);
 			Director::getInstance()->pushScene(scene);
 		});
 

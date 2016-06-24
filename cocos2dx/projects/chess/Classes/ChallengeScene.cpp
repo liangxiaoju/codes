@@ -2,7 +2,7 @@
 #include "FightScene.h"
 #include "GameLayer.h"
 #include "BGLayer.h"
-#include "AIPlayer.h"
+#include "AIPlayer2.h"
 #include "ChallengeControl.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
@@ -20,7 +20,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 	auto gameLayer = GameLayer::create(GameLayer::Mode::UI_TO_AI,
 			Piece::Side::WHITE, 2, fen);
 	addChild(gameLayer);
-	AIPlayer *ai = (AIPlayer*)gameLayer->getPlayer(Piece::Side::BLACK);
+	AIPlayer2 *ai = (AIPlayer2*)gameLayer->getPlayer(Piece::Side::BLACK);
 	ai->setName(item.data.subtitle, "--");
 
 	auto control = ChallengeControl::create();

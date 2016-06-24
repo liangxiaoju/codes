@@ -25,7 +25,7 @@ int Rule::check(std::string fen)
 	std::string f = fen.substr(0, i);
 	std::vector<std::string> mvs = Utils::splitString(fen.substr(i+7), ' ');
 
-	log("%s", fen.c_str());
+	//log("%s", fen.c_str());
 
     _pos.FromFen(f.c_str());
 

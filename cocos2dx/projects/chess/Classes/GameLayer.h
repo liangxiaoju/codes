@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Player.h"
 #include "Board.h"
+#include "room/RoomManager.h"
 
 USING_NS_CC;
 
@@ -72,6 +73,8 @@ private:
 	Mode _mode;
 	int _difficulty;
 	std::string _initFen;
+
+	RoomServer *_server;
 };
 
 #endif

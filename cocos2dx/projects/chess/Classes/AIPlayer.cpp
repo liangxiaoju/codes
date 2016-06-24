@@ -10,31 +10,27 @@ int socket_client_init()
 {
 	int sockfd, portno, i=0;
 	struct sockaddr_in serv_addr;
-	struct hostent *server;
 
 	portno = 6669;
 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0) 
-		log("ERROR opening socket");
-
-	server = gethostbyname("127.0.0.1");
-	if (server == NULL) {
-		log("ERROR, no such host\n");
-	}
-
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	bcopy((char *)server->h_addr, 
-			(char *)&serv_addr.sin_addr.s_addr,
-			server->h_length);
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(portno);
 
 	while (i++ < 10) {
-		if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+		sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		if (sockfd < 0) {
+			log("ERROR opening socket");
+			continue;
+		}
+
+		if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
 			log("ERROR connecting, retry %d", i);
-		else {
+			close(sockfd);
+			sockfd = -1;
 			usleep(200*1000);
+		} else {
 			break;
 		}
 	}
@@ -78,7 +74,7 @@ int socket_server_init()
 }
 
 extern void emain();
-int server_socketfd;
+extern int server_socketfd;
 void AIPlayer::eleeye_thread()
 {
 	server_socketfd = socket_server_init();
@@ -99,9 +95,8 @@ bool AIPlayer::init()
 	setContentSize(s);
 
 	/* have to be inited before onEnter */
-	std::thread eleeye(std::bind(
+	_thread = std::thread(std::bind(
 				&AIPlayer::eleeye_thread, this));
-	eleeye.detach();
 
 	client_socketfd = socket_client_init();
 
@@ -146,6 +141,7 @@ AIPlayer::~AIPlayer()
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
 	sendWithReply("quit", "bye");
+	_thread.join();
 	log("~AIPlayer");
 }
 

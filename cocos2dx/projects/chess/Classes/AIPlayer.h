@@ -35,6 +35,7 @@ private:
 
 	HeaderSprite *_head;
 	std::mutex mutex;
+	std::thread _thread;
 };
 
 #endif
