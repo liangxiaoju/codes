@@ -44,21 +44,20 @@ RoomServer *RoomManager::createRoom()
 		server = NULL;
 	}
 
-	RecvBroadcast::NotifyCallBack notify = [this]
-		(RecvBroadcast *receiver, const RoomPacket &packet) {
+	Broadcast::NotifyCallBack notify = [this]
+		(Broadcast *broadcast, const RoomPacket &packet) {
 			RoomPacket reply;
 			if (packet["FROM"] == "scanner") {
 				reply["TYPE"] = "scan";
 				reply["FROM"] = "manager";
-				reply["TO"] = packet["ADDR"];
 				reply["CONTENT"] = "I am here.";
-				receiver->reply(reply);
+				broadcast->send(reply);
 			}
 		};
 
-	RecvBroadcast *receiver = new (std::nothrow) RecvBroadcast(notify);
-	receiver->start();
-	_roomPrivateMap[server] = receiver;
+	Broadcast *broadcast = new (std::nothrow) Broadcast(notify);
+	broadcast->start();
+	_roomPrivateMap[server] = broadcast;
 
 	return server;
 }
@@ -66,9 +65,9 @@ RoomServer *RoomManager::createRoom()
 void RoomManager::destroyRoom(RoomServer *server)
 {
 	if (server) {
-		RecvBroadcast *receiver = _roomPrivateMap[server];
-		receiver->stop();
-		delete receiver;
+		Broadcast *broadcast = _roomPrivateMap[server];
+		broadcast->stop();
+		delete broadcast;
 
 		server->stop();
 		delete server;

@@ -19,6 +19,10 @@
 #include <mutex>
 #include <condition_variable>
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 class SocketServer
 {
 public:
@@ -67,6 +71,15 @@ public:
 		const int on = 1;
 		setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR,
 				(const char*)&on, sizeof(on));
+#ifdef SO_REUSEPORT
+		setsockopt(_listenfd, SOL_SOCKET, SO_REUSEPORT,
+				(const char*)&on, sizeof(on));
+#endif
+
+#ifdef SO_NOSIGPIPE
+		setsockopt(_listenfd, SOL_SOCKET, SO_NOSIGPIPE,
+				(const void *)&on, sizeof(on));
+#endif
 
 		struct sockaddr_in addr;
 		memset(&addr, 0, sizeof(struct sockaddr_in));
@@ -90,9 +103,12 @@ public:
 			return -1;
 		}
 
+		pipe(_pipe);
+
 		FD_ZERO(&_read_set);
 		FD_SET(_listenfd, &_read_set);
-		_maxfd = _listenfd;
+		FD_SET(_pipe[0], &_read_set);
+		_maxfd = std::max(_listenfd, _pipe[0]);
 
 		_eventThread = std::thread([this]{ eventLoop(); });
 		_messageThread = std::thread([this]{ messageLoop(); });
@@ -108,12 +124,14 @@ public:
 				_stop = true;
 				while(_queue.size())
 					_queue.pop();
-				shutdown(_listenfd, SHUT_RDWR);
+				write(_pipe[1], "W", 1);
 				_condition.notify_all();
 			}
 			_eventThread.join();
 			_messageThread.join();
 			close(_listenfd);
+			close(_pipe[0]);
+			close(_pipe[1]);
 		}
 	}
 
@@ -193,7 +211,7 @@ private:
 				for (auto &fd : to_remove) {
 					FD_CLR(fd, &_read_set);
 					_fds.erase(std::remove(_fds.begin(), _fds.end(), fd), _fds.end());
-					_maxfd = _listenfd;
+					_maxfd = std::max(_listenfd, _pipe[0]);
 					for (auto iter = _fds.begin(); iter != _fds.end(); iter++) {
 						_maxfd = std::max(_maxfd, *iter);
 					}
@@ -258,6 +276,7 @@ private:
 	bool _stop;
 	std::string _addr;
 	int _port;
+	int _pipe[2];
 };
 
 #endif

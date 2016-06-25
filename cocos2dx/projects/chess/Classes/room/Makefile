@@ -1,4 +1,5 @@
-CPP := arm-linux-gnueabi-g++
+#CPP := arm-linux-gnueabi-g++
+CPP := g++
 
 all: server client
 

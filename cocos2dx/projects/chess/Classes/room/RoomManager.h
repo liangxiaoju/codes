@@ -25,7 +25,7 @@ public:
 
 private:
 	static RoomManager *_manager;
-	std::unordered_map<RoomServer*, RecvBroadcast*> _roomPrivateMap;
+	std::unordered_map<RoomServer*, Broadcast*> _roomPrivateMap;
 };
 
 #endif

@@ -19,8 +19,183 @@
 
 #define SCAN_PORT 6001
 
-class SendBroadcast {
+class Broadcast
+{
+public:
+	typedef std::function<void(Broadcast*,const RoomPacket&)> NotifyCallBack;
+
+	Broadcast()
+	: _stop(false)
+	, _mode(0)
+	{}
+
+	Broadcast(NotifyCallBack &notify)
+	: _stop(false)
+	, _notify(notify)
+	, _mode(MODE_R)
+	{}
+
+	Broadcast(RoomPacket &packet)
+	: _stop(false)
+	, _packet(packet)
+	, _mode(MODE_W)
+	{}
+
+	Broadcast(NotifyCallBack &notify, RoomPacket &packet)
+	: _stop(false)
+	, _notify(notify)
+	, _packet(packet)
+	, _mode(MODE_R|MODE_W)
+	{}
+
+	void start()
+	{
+		setUp();
+
+		if (_mode & MODE_R) {
+			_readThread = std::thread([this]{readThread();});
+		}
+		if (_mode & MODE_W) {
+			_sendThread = std::thread([this]{sendThread();});
+		}
+	}
+
+	void stop()
+	{
+		tearDown();
+	}
+
+	int send(RoomPacket &packet)
+	{
+		std::string msg = packet.toString();
+
+		struct sockaddr_in addrto[5];
+		int num = getBroadcastAddr(addrto, 5);
+		if (num <= 0) {
+			printf("Failed to get broadcast address.\n");
+			return -1;
+		}
+
+		int nlen = sizeof(struct sockaddr_in);
+		int i, ret;
+
+		std::unique_lock<std::mutex> lock(_mutex_w);
+
+		for (i = 0; i < num; i++) {
+			addrto[i].sin_port = htons(SCAN_PORT);
+
+			ret = sendto(_sockfd,
+					msg.c_str(), msg.size(),
+					0, (struct sockaddr*)&addrto[i], nlen);  
+			if (ret < 0) {
+				perror("sendto");
+				return -1;
+			}
+		}
+
+		return 0;
+	}
+
+	int read(RoomPacket &packet)
+	{
+		int err;
+		int len = sizeof(struct sockaddr_in);  
+		char msg[4096];
+
+		struct sockaddr_in from;  
+		memset(&from, 0, sizeof(from));
+
+		fd_set fdset;
+		FD_ZERO(&fdset);
+		FD_SET(_sockfd, &fdset);
+		FD_SET(_pipe[0], &fdset);
+
+		select(std::max(_sockfd, _pipe[0])+1, &fdset, NULL, NULL, NULL);
+
+		if (FD_ISSET(_sockfd, &fdset)) {
+			std::unique_lock<std::mutex> lock(_mutex_r);
+
+			err = recvfrom(_sockfd, msg, sizeof(msg), 0,
+					(struct sockaddr*)&from, (socklen_t*)&len);  
+			if (err < 0) {
+				perror("recvfrom");
+				return -1;
+			}
+		}
+
+		//printf("add: %s\n", inet_ntoa(from.sin_addr));
+		packet = RoomPacket(msg);
+		packet["ADDR"] = inet_ntoa(from.sin_addr);
+
+		return 0;
+	}
+
 private:
+	enum {
+		MODE_R = 0x1,
+		MODE_W = 0x2,
+	};
+
+	int setUp()
+	{
+		int fd, err;
+
+		fd = socket(AF_INET, SOCK_DGRAM, 0);
+		if (fd < 0) {
+			perror("socket");
+			return -1;
+		}
+
+		const int on = 1;
+		setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+				(const char*)&on, sizeof(on));
+#ifdef SO_REUSEPORT
+		setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
+				(const char*)&on, sizeof(on));
+#endif
+
+		struct sockaddr_in addr;
+		memset(&addr, 0, sizeof(addr));
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		addr.sin_port = htons(SCAN_PORT);
+
+		err = bind(fd, (struct sockaddr*)&addr, sizeof(addr));
+		if (err < 0) {
+			perror("bind");
+			close(fd);
+			return -1;
+		}
+
+		const int opt = 1;  
+		err = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
+				(char *)&opt, sizeof(opt));  
+		if (err < 0) {
+			perror("setsockopt");
+			close(fd);
+			return -1;
+		}
+
+		pipe(_pipe);
+
+		_sockfd = fd;
+
+		return 0;
+	}
+
+	void tearDown()
+	{
+		_stop = true;
+		write(_pipe[1], "W", 1);
+		if (_mode & MODE_W)
+			_sendThread.join();
+		if (_mode & MODE_R)
+			_readThread.join();
+		close(_pipe[0]);
+		close(_pipe[1]);
+		close(_sockfd);
+	}
+
 	int getBroadcastAddr(struct sockaddr_in *addrs, int maxsize)
 	{
 		struct ifaddrs *ifaddr = NULL, *ifa;
@@ -60,218 +235,42 @@ private:
 		return size;
 	}
 
-	int send_broadcast()
+	void sendThread()
 	{
-		RoomPacket packet;
-		packet["TYPE"] = "scan";
-		packet["FROM"] = "scanner";
-		packet["CONTENT"] = "Where are you ?";
-		std::string msg = packet.toString();
-
+		std::cout << "sendThread start" << std::endl;
 		do {
-			struct sockaddr_in addrto[5];
-			int num = getBroadcastAddr(addrto, 5);
-			if (num <= 0) {
-				printf("Failed to get broadcast address.\n");
-				return -1;
-			}
-
-			int nlen = sizeof(struct sockaddr_in);
-			int i, ret;
-
-			for (i = 0; i < num; i++) {
-				addrto[i].sin_port = htons(SCAN_PORT);
-
-				ret = sendto(_sockfd,
-						msg.c_str(), msg.size(),
-						0, (struct sockaddr*)&addrto[i], nlen);  
-				if (_stop)
-					return 0;
-
-				if (ret < 0) {
-					perror("sendto");
-				}
-				sleep(1);
-			}
-		} while(1);
-
-		return 0;  
-	}
-
-public:
-	SendBroadcast() : _stop(false) {}
-
-	int start() {
-		if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)   
-		{     
-			perror("socket");
-			return -1;
-		}
-
-		const int opt = 1;  
-		int nb = 0;  
-		nb = setsockopt(_sockfd, SOL_SOCKET, SO_BROADCAST,
-				(char *)&opt, sizeof(opt));  
-		if(nb == -1)  
-		{  
-			perror("setsockopt");
-			return -1;  
-		}
-
-		_thread = std::thread([this]{send_broadcast();});
-
-		return 0;
-	}
-
-	void stop() {
-		_stop = true;
-		shutdown(_sockfd, SHUT_RDWR);
-		_thread.join();
-		close(_sockfd);
-	}
-
-private:
-	int _stop;
-	int _sockfd;
-	std::thread _thread;
-};
-
-class RecvBroadcast {
-private:
-	int isLocalAddr(struct sockaddr_in *addr)
-	{
-		struct ifaddrs *ifaddr, *ifa;
-		int status = 0;
-
-		if (getifaddrs(&ifaddr) == -1) {
-			perror("getifaddrs");
-			return -1;
-		}
-
-		for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-			if (ifa->ifa_addr == NULL)
-				continue;
-
-			if (!(ifa->ifa_flags & IFF_UP))
-				continue;
-
-			if (ifa->ifa_flags & IFF_LOOPBACK)
-				continue;
-
-			int family = ifa->ifa_addr->sa_family;
-			if (family != AF_INET)
-				continue;
-
-			if (addr->sin_addr.s_addr ==
-					((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr.s_addr) {
-				status = 1;
-				break;
-			}
-		}
-
-		freeifaddrs(ifaddr);
-
-		return status;
-	}
-
-	int recv_broadcast()
-	{
-		do {
-			int err;
-			int len = sizeof(struct sockaddr_in);  
-			char msg[4096];
-
-			struct sockaddr_in from;  
-			bzero(&from, sizeof(struct sockaddr_in));  
-
-			err = recvfrom(_sockfd, msg, sizeof(msg), 0,
-					(struct sockaddr*)&from, (socklen_t*)&len);  
+			send(_packet);
 			if (_stop)
 				break;
-
-			if (err < 0) {
-				perror("recvfrom");
-				break;
-			} else if (err == 0) {
-				continue;
-			}
-
-			//if (isLocalAddr(&from))
-			//	continue;
-
-			//printf("add: %s\n", inet_ntoa(from.sin_addr));
-			RoomPacket packet(msg);
-			packet["ADDR"] = inet_ntoa(from.sin_addr);
-			_notify(this, packet);
-
+			sleep(1);
 		} while (1);
-
-		return 0;
+		std::cout << "sendThread exit" << std::endl;
 	}
 
-public:
-	typedef std::function<void(RecvBroadcast *, const RoomPacket &packet)> NotifyCallBack;
-
-	RecvBroadcast(NotifyCallBack &notify)
-	: _stop(false)
+	void readThread()
 	{
-		_notify = notify;
+		RoomPacket packet;
+
+		std::cout << "readThread start" << std::endl;
+		do {
+			read(packet);
+			if (_stop)
+				break;
+			_notify(this, packet);
+		} while (1);
+		std::cout << "readThread exit" << std::endl;
 	}
 
-	int start() {
-		if ((_sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)   
-		{     
-			perror("socket");
-			return -1;  
-		}
-
-		const int on = 1;
-		setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR,
-				(const char*)&on, sizeof(on));
-
-		struct sockaddr_in addr;  
-		bzero(&addr, sizeof(struct sockaddr_in));  
-		addr.sin_family = AF_INET;  
-		addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		addr.sin_port = htons(SCAN_PORT);
-
-		if(bind(_sockfd,(struct sockaddr *)&(addr),
-					sizeof(struct sockaddr_in)) == -1) {
-			perror("bind");
-			return -1;
-		}
-
-		_thread = std::thread([this]{recv_broadcast();});
-
-		return 0;
-	}
-
-	void stop() {
-		_stop = true;
-		shutdown(_sockfd, SHUT_RDWR);
-		_thread.join();
-		close(_sockfd);
-	}
-
-	int reply(RoomPacket &packet)
-	{
-		struct sockaddr_in addrto;
-		std::string msg = packet.toString();
-
-		memset(&addrto, 0, sizeof(addrto));
-		addrto.sin_family = AF_INET;
-		inet_aton(packet["TO"].c_str(), &addrto.sin_addr);
-		addrto.sin_port = htons(SCAN_PORT);
-
-		return sendto(_sockfd, msg.c_str(), msg.size(), 0,
-				(struct sockaddr*)&addrto, sizeof(struct sockaddr_in));
-	}
-
-private:
-	int _stop;
+	bool _stop;
 	int _sockfd;
-	std::thread _thread;
+	std::thread _sendThread;
+	std::thread _readThread;
 	NotifyCallBack _notify;
+	RoomPacket _packet;
+	int _mode;
+	std::mutex _mutex_w;
+	std::mutex _mutex_r;
+	int _pipe[2];
 };
 
 class RoomScanner
@@ -288,8 +287,8 @@ public:
 	{
 		std::vector<RoomInfo> infos;
 
-		RecvBroadcast::NotifyCallBack notify = [this, &infos, max]
-			(RecvBroadcast *receiver, const RoomPacket &packet) {
+		Broadcast::NotifyCallBack notify = [this, &infos, max]
+			(Broadcast *broadcast, const RoomPacket &packet) {
 
 				if (packet["FROM"] == "scanner") {
 					return;
@@ -312,21 +311,19 @@ public:
 				}
 		};
 
-		RecvBroadcast receiver(notify);
-		receiver.start();
-		SendBroadcast sender;
-		sender.start();
+		RoomPacket packet;
+		packet["TYPE"] = "scan";
+		packet["FROM"] = "scanner";
+		packet["CONTENT"] = "Where are you ?";
+
+		Broadcast broadcast(notify, packet);
+		broadcast.start();
 
 		std::unique_lock<std::mutex> lock(_mutex);
-#if 0
-		_condition.wait(lock, [&infos, max]{ return infos.size() >= max; });
-#else
 		if (infos.size() < max)
 			_condition.wait_for(lock, std::chrono::seconds(timeout));
-#endif
 
-		sender.stop();
-		receiver.stop();
+		broadcast.stop();
 
 		return infos;
 	}

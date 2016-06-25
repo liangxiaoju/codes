@@ -16,6 +16,10 @@
 #include <sstream>
 #include <thread>
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 class SocketClient
 {
 public:
@@ -49,6 +53,19 @@ public:
 		if (_sock < 0)
 			return -1;
 
+		const int on = 1;
+		setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR,
+				(const void*)&on, sizeof(on));
+#ifdef SO_REUSEPORT
+		setsockopt(_sock, SOL_SOCKET, SO_REUSEPORT,
+				(const void*)&on, sizeof(on));
+#endif
+
+#ifdef SO_NOSIGPIPE
+		setsockopt(_sock, SOL_SOCKET, SO_NOSIGPIPE,
+				(const void *)&on, sizeof(on));
+#endif
+
 		struct sockaddr_in addr;
 		memset(&addr, 0, sizeof(struct sockaddr_in));
 		addr.sin_family = AF_INET;
@@ -68,6 +85,8 @@ public:
 
 		onConnect();
 
+		pipe(_pipe);
+
 		_thread = std::thread([this] { loop(); });
 
 		return 0;
@@ -76,9 +95,11 @@ public:
 	void disconnect()
 	{
 		_stop = true;
-		shutdown(_sock, SHUT_RDWR);
+		write(_pipe[1], "W", 1);
 		_thread.join();
 		close(_sock);
+		close(_pipe[0]);
+		close(_pipe[1]);
 	}
 
 	int send(std::string msg)
@@ -93,8 +114,9 @@ private:
 			fd_set read_set;
 			FD_ZERO(&read_set);
 			FD_SET(_sock, &read_set);
+			FD_SET(_pipe[0], &read_set);
 
-			int nready = select(_sock+1, &read_set, NULL, NULL, NULL);
+			int nready = select(std::max(_sock, _pipe[0])+1, &read_set, NULL, NULL, NULL);
 			if (_stop)
 				return;
 
@@ -125,6 +147,7 @@ private:
 	int _port;
 	int _sock;
 	bool _stop;
+	int _pipe[2];
 };
 
 #endif
