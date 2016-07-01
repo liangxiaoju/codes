@@ -24,6 +24,9 @@ public:
 			return nullptr;
 		}
 	}
+
+private:
+	EndGameData::EndGameItem _item;
 };
 
 class ChallengeMenuL1 : public Scene

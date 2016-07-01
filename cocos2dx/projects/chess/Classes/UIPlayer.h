@@ -5,36 +5,31 @@
 #include "Player.h"
 #include "Board.h"
 #include "Piece.h"
-#include "HeaderSprite.h"
 
 USING_NS_CC;
 
 class UIPlayer : public Player
 {
 public:
-	virtual bool init();
+	virtual bool init() override;
 	CREATE_FUNC(UIPlayer);
 
-	virtual void ponder() override;
-	virtual void go(float timeout) override;
-	virtual void stop();
+	virtual void start(std::string fen) override;
+	virtual void stop() override;
 
-	virtual bool askForDraw();
+	virtual bool onRequest(std::string req) override;
 
-	void triggerLose();
-	void triggerPeace();
+	bool onTouchBegan(Touch *touch, Event *unused);
+	void onTouchMoved(Touch *touch, Event *unused);
+	void onTouchEnded(Touch *touch, Event *event);
+	void onTouchCancelled(Touch *touch, Event *event);
 
-	virtual bool onTouchBegan(Touch *touch, Event *unused);
-	virtual void onTouchMoved(Touch *touch, Event *unused);
-	virtual void onTouchEnded(Touch *touch, Event *event);
-	virtual void onTouchCancelled(Touch *touch, Event *event);
-
-	void setName(std::string first, std::string second);
+	void setBoard(Board *board) { _board = board; };
 
 private:
 	Piece *_selectedPiece;
 	EventListenerTouchOneByOne * _touchListener;
-	HeaderSprite *_head;
+	Board *_board;
 };
 
 #endif

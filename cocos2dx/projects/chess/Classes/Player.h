@@ -2,54 +2,51 @@
 #define __PLAYER_H__
 
 #include "cocos2d.h"
-#include "Board.h"
 
 USING_NS_CC;
 
 class Player : public Node
 {
 public:
-	virtual bool init()
+	virtual bool init(const std::string name)
 	{
 		if (!Node::init())
 			return false;
 
 		setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 
+		_name = name;
+
 		return true;
 	}
-	virtual void setBoard(Board *b) { _board = b; }
-	virtual Board *getBoard() { return _board; }
-	virtual void setSide(Piece::Side side) { _side = side; }
-	virtual Piece::Side getSide() { return _side; }
 
-	virtual void ponder() = 0;
+	std::string getName() { return _name; }
 
-	virtual void go(float timeout) = 0;
+	virtual void start(std::string fen) = 0;
 
 	virtual void stop() = 0;
 
-	virtual bool askForDraw() = 0;
+	virtual bool onRequest(std::string req) = 0;
 
-	class Listener : public Ref
+	class Delegate
 	{
 	public:
-    	typedef std::function<void(std::string)> ccMovedCallback;
-    	typedef std::function<void()> ccResignRequestCallback;
-    	typedef std::function<void()> ccDrawRequestCallback;
+		typedef std::function<void(std::string)> ccMoveRequestCallback;
+		typedef std::function<void()> ccResignRequestCallback;
+		typedef std::function<void()> ccDrawRequestCallback;
+		typedef std::function<void()> ccRegretRequestCallback;
 
-		ccMovedCallback onMoved;
+		ccMoveRequestCallback onMoveRequest;
 		ccResignRequestCallback onResignRequest;
 		ccDrawRequestCallback onDrawRequest;
+		ccRegretRequestCallback onRegretRequest;
 	};
 
-	virtual void setListener(Listener *l) { _listener = l; }
-	virtual Listener *getListener() { return _listener; }
+	void setDelegate(Delegate *delegate) { _delegate = delegate; }
 
-private:
-	Listener *_listener;
-	Board *_board;
-	Piece::Side _side;
+protected:
+	std::string _name;
+	Delegate *_delegate;
 };
 
 #endif

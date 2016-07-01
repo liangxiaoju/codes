@@ -12,8 +12,8 @@ public:
 	struct SaveElement {
 		int id;
 		std::string date;
-		int mode;
-		int side;
+		int roleWhite;
+		int roleBlack;
 		int level;
 		std::string white;
 		std::string black;
@@ -23,8 +23,8 @@ public:
 	struct RecordElement {
 		int id;
 		std::string date;
-		int mode;
-		int side;
+		int roleWhite;
+		int roleBlack;
 		int level;
 		std::string white;
 		std::string black;

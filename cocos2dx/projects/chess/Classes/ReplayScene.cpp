@@ -84,9 +84,10 @@ bool ReplayScene::init()
 			UserData::getInstance()->querySaveTbl(saveElements);
 
 			auto e = saveElements[index];
-			GameLayer::Mode mode = (GameLayer::Mode)e.mode;
-			Piece::Side side = (Piece::Side)e.side;
-			auto scene = FightScene::create(mode, side, e.level, e.fen);
+
+			FightScene::Role roleWhite = (FightScene::Role)e.roleWhite;
+			FightScene::Role roleBlack = (FightScene::Role)e.roleBlack;
+			auto scene = FightScene::create(roleWhite, roleBlack, e.level, e.fen);
 			Director::getInstance()->replaceScene(scene);
 		}
 	default:

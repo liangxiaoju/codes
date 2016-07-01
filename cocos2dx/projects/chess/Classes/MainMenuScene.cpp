@@ -2,6 +2,7 @@
 #include "FightScene.h"
 #include "ReplayScene.h"
 #include "ChallengeScene.h"
+#include "LANFightScene.h"
 
 class DifficultyScene : public Scene
 {
@@ -33,19 +34,19 @@ public:
 		b1->setLayoutParameter(lp1);
 
 		b1->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 0);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 0);
 			Director::getInstance()->pushScene(scene);
 		});
 		b2->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 1);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 1);
 			Director::getInstance()->pushScene(scene);
 		});
 		b3->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(GameLayer::Mode::UI_TO_AI, Piece::Side::WHITE, 2);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 2);
 			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(GameLayer::Mode::UI_TO_NET, Piece::Side::WHITE, 3);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 3);
 			Director::getInstance()->pushScene(scene);
 		});
 
@@ -101,7 +102,9 @@ bool MainMenuLayer::init()
 	b3->addClickEventListener([](Ref *ref){
 		Director::getInstance()->pushScene(ReplayScene::create());
 	});
-	b4->addClickEventListener([](Ref *ref){ log("b4 click"); });
+	b4->addClickEventListener([](Ref *ref){
+		Director::getInstance()->pushScene(LANFightScene::create());
+	});
 
 	b1->setZoomScale(0.1);
 	b2->setZoomScale(0.1);

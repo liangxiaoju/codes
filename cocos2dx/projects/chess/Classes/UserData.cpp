@@ -12,8 +12,8 @@ void UserData::createTable()
 					   "saveTbl("
 							   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
 							   "date TEXT, "
-							   "mode INTEGER, "
-							   "side INTEGER, "
+							   "roleWhite INTEGER, "
+							   "roleBlack INTEGER, "
 							   "level INTEGER, "
 							   "white TEXT, "
 							   "black TEXT, "
@@ -30,8 +30,8 @@ void UserData::createTable()
 					   "recordTbl("
 							   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
 							   "date TEXT, "
-							   "mode INTEGER, "
-							   "side INTEGER, "
+							   "roleWhite INTEGER, "
+							   "roleBlack INTEGER, "
 							   "level INTEGER, "
 							   "white TEXT, "
 							   "black TEXT, "
@@ -60,8 +60,8 @@ void UserData::querySaveTbl(std::vector<SaveElement> &vector)
 		SaveElement e;
 		e.id = atoi(argv[0]);
 		e.date = argv[1];
-		e.mode = atoi(argv[2]);
-		e.side = atoi(argv[3]);
+		e.roleWhite = atoi(argv[2]);
+		e.roleBlack = atoi(argv[3]);
 		e.level = atoi(argv[4]);
 		e.white = argv[5];
 		e.black = argv[6];
@@ -92,8 +92,8 @@ void UserData::queryRecordTbl(std::vector<RecordElement> &vector)
 		RecordElement e;
 		e.id = atoi(argv[0]);
 		e.date = argv[1];
-		e.mode = atoi(argv[2]);
-		e.side = atoi(argv[3]);
+		e.roleWhite = atoi(argv[2]);
+		e.roleBlack = atoi(argv[3]);
 		e.level = atoi(argv[4]);
 		e.white = argv[5];
 		e.black = argv[6];
@@ -115,10 +115,10 @@ void UserData::insertRecordElement(RecordElement element)
 {
 	char *sql = sqlite3_mprintf(
 			"INSERT INTO "
-			"recordTbl (date,mode,side,level,white,black,win,fen) "
+			"recordTbl (date,roleWhite,roleBlack,level,white,black,win,fen) "
 			"VALUES (datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s','%s')",
-			element.mode,
-			element.side,
+			element.roleWhite,
+			element.roleBlack,
 			element.level,
 			element.white.c_str(),
 			element.black.c_str(),
@@ -135,10 +135,10 @@ void UserData::insertSaveElement(SaveElement element)
 {
 	char *sql = sqlite3_mprintf(
 			"INSERT INTO "
-			"saveTbl (date,mode,side,level,white,black,fen) "
+			"saveTbl (date,roleWhite,roleBlack,level,white,black,fen) "
 			"VALUES (datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s')",
-			element.mode,
-			element.side,
+			element.roleWhite,
+			element.roleBlack,
 			element.level,
 			element.white.c_str(),
 			element.black.c_str(),

@@ -2,31 +2,89 @@
 #include "FightScene.h"
 #include "GameLayer.h"
 #include "BGLayer.h"
-#include "AIPlayer2.h"
+#include "AIPlayer.h"
 #include "ChallengeControl.h"
+#include "HeaderSprite.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
 	if (!Scene::init())
 		return false;
 
+	_item = item;
 	std::string fen = item.data.fen;
 
 	auto vsize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	auto bgLayer = BGLayer::create();
 	addChild(bgLayer);
 
-	auto gameLayer = GameLayer::create(GameLayer::Mode::UI_TO_AI,
-			Piece::Side::WHITE, 2, fen);
+	auto board = Board::createWithFen(fen);
+	auto playerWhite = UIPlayer::create();
+	playerWhite->setBoard(board);
+	auto playerBlack = AIPlayer::create();
+
+	auto lheader = HeaderSprite::createWithType(HeaderSprite::Type::LEFT);
+	auto rheader = HeaderSprite::createWithType(HeaderSprite::Type::RIGHT);
+	auto lsize = lheader->getContentSize();
+	auto rsize = rheader->getContentSize();
+	lheader->setPosition(origin.x+vsize.width/2, origin.y+lsize.height/2+20);
+	rheader->setPosition(origin.x+vsize.width/2, origin.y+vsize.height-rsize.height/2-20);
+
+	auto gameLayer = GameLayer::create(playerWhite, playerBlack, board);
+	gameLayer->addChild(lheader);
+	gameLayer->addChild(rheader);
 	addChild(gameLayer);
-	AIPlayer2 *ai = (AIPlayer2*)gameLayer->getPlayer(Piece::Side::BLACK);
-	ai->setName(item.data.subtitle, "--");
+
+	/* active/deactive header */
+	auto white_start_cb = [this, lheader, rheader](EventCustom* ev){
+		lheader->setActive(true);
+		rheader->setActive(false);
+	};
+	auto black_start_cb = [this, lheader, rheader](EventCustom* ev){
+		rheader->setActive(true);
+		lheader->setActive(false);
+	};
 
 	auto control = ChallengeControl::create();
 	addChild(control);
-	control->setGameLayer(gameLayer);
 	control->setEndGameItem(item);
+
+	/* response for reset */
+	auto reset_cb = [this](EventCustom* ev) {
+		removeAllChildren();
+		auto scene = ChallengeScene::create(_item);
+		Director::getInstance()->replaceScene(scene);
+	};
+	/* response for next */
+	auto next_cb = [this](EventCustom* ev) {
+		removeAllChildren();
+
+		std::vector<EndGameData::EndGameItem> endGameItems;
+		EndGameData::getInstance()->queryEndGameItem(_item.tid, endGameItems);
+		if (_item.sort == (endGameItems.size()-1)) {
+			Director::getInstance()->popScene();
+		} else {
+			_item = endGameItems[_item.sort+1];
+			auto scene = ChallengeScene::create(_item);
+			Director::getInstance()->replaceScene(scene);
+		}
+	};
+
+	setOnEnterCallback([this, reset_cb, next_cb, white_start_cb, black_start_cb](){
+		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_NEXT, next_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_WHITE_START, white_start_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_BLACK_START, black_start_cb);
+	});
+
+	setOnExitCallback([this](){
+		getEventDispatcher()->removeCustomEventListeners(EVENT_RESET);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_NEXT);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_WHITE_START);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_BLACK_START);
+	});
 
 	return true;
 }

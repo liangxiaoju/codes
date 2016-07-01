@@ -2,20 +2,28 @@
 #define __FIGHTSCENE_H__
 
 #include "cocos2d.h"
+#include "Board.h"
 #include "GameLayer.h"
+#include "UIPlayer.h"
+#include "AIPlayer.h"
+#include "NetPlayer.h"
 
 USING_NS_CC;
 
-class FightScene : public cocos2d::Scene
+class FightScene : public Scene
 {
 public:
-	virtual bool init(GameLayer::Mode mode, Piece::Side side,
-			int level, std::string fen);
-	static FightScene* create(GameLayer::Mode mode, Piece::Side side,
-			int level, std::string fen=Board::START_FEN)
+	enum Role {
+		UI,
+		AI,
+		NET,
+	};
+
+	virtual bool init(Role white, Role black, int level, std::string fen);
+	static FightScene* create(Role white, Role black, int level, std::string fen=Board::START_FEN)
 	{
 		FightScene *pRet = new(std::nothrow) FightScene();
-		if (pRet && pRet->init(mode, side, level, fen))
+		if (pRet && pRet->init(white, black, level, fen))
 		{
 			pRet->autorelease();
 			return pRet;
@@ -27,6 +35,16 @@ public:
 			return nullptr;
 		}
 	}
+
+private:
+	Role _roleWhite;
+	Role _roleBlack;
+	int _level;
+	std::string _fen;
+	Player *_playerWhite;
+	Player *_playerBlack;
+	GameLayer *_gameLayer;
+	Board *_board;
 };
 
 #endif

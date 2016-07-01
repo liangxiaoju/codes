@@ -1,95 +1,54 @@
 #include "GameLayer.h"
 #include "UIPlayer.h"
 #include "AIPlayer.h"
-#include "AIPlayer2.h"
 #include "NetPlayer.h"
 #include "UserData.h"
 
-bool GameLayer::init(GameLayer::Mode mode, Piece::Side uiSide,
-		int level, std::string fen)
+bool GameLayer::init(Player *white, Player *black, Board *board)
 {
 	if (!Layer::init())
 		return false;
 
-	auto visibleSize = Director::getInstance()->getVisibleSize();
+	auto vsize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	_board = Board::createWithFen(fen);
+	_playerWhite = white;
+	_playerBlack = black;
+	_board = board;
+
 	auto boardSize = _board->getContentSize();
-	addChild(_board);
-	_board->setPosition(origin.x + visibleSize.width/2, origin.y + visibleSize.height/2);
-	_board->setScale(visibleSize.width/boardSize.width);
+	_board->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
+	_board->setScale(vsize.width/boardSize.width);
 
-	Player *player1, *player2;
-
-	_mode = mode;
-	_side = uiSide;
-	_initFen = fen;
-
-	_server = NULL;
-
-	if (mode == Mode::UI_TO_AI) {
-		player1 = UIPlayer::create();
-		player2 = AIPlayer2::create();
-	} else if (mode == Mode::UI_TO_UI) {
-		player1 = UIPlayer::create();
-		player2 = UIPlayer::create();
-	} else if (mode == Mode::UI_TO_NET) {
-		RoomManager *manager = RoomManager::getInstance();
-		std::vector<RoomManager::RoomInfo> v;
-		v = manager->scanRoom(1, 2);
-		if (v.size() == 0) {
-			_server = manager->createRoom();
-			_side = Piece::Side::WHITE;
-		} else {
-			_side = Piece::Side::BLACK;
-		}
-
-		player1 = UIPlayer::create();
-		player2 = NetPlayer::create();
-	}
-
-	if (_side == Piece::Side::WHITE) {
-		_uiPlayer = _playerWhite = player1;
-		_playerBlack = player2;
-		auto s = _playerWhite->getContentSize();
-		_playerWhite->setPosition(origin.x+visibleSize.width/2, origin.y+s.height/2+20);
-		_playerBlack->setPosition(origin.x+visibleSize.width/2, origin.y+visibleSize.height-s.height/2-20);
-	} else {
-		_playerWhite = player2;
-		_uiPlayer = _playerBlack = player1;
-		auto s = _playerWhite->getContentSize();
-		_playerBlack->setPosition(origin.x+visibleSize.width/2, origin.y+s.height/2+20);
-		_playerWhite->setPosition(origin.x+visibleSize.width/2, origin.y+visibleSize.height-s.height/2-20);
-		_board->setRotation(180);
-	}
-
-	_playerWhite->setBoard(_board);
-	_playerBlack->setBoard(_board);
-	_playerWhite->setSide(Piece::Side::WHITE);
-	_playerBlack->setSide(Piece::Side::BLACK);
 	addChild(_playerWhite);
 	addChild(_playerBlack);
+	addChild(_board);
 
-	auto playerWhiteListener = new (std::nothrow) Player::Listener();
-	playerWhiteListener->onMoved = CC_CALLBACK_1(GameLayer::onPlayerWhiteMoved, this);
-	playerWhiteListener->onResignRequest = CC_CALLBACK_0(GameLayer::onPlayerWhiteResignRequest, this);
-	playerWhiteListener->onDrawRequest = CC_CALLBACK_0(GameLayer::onPlayerWhiteDrawRequest, this);
-	_playerWhite->setListener(playerWhiteListener);
+	Player::Delegate *delegate;
+	delegate = new (std::nothrow) Player::Delegate();
+	delegate->onMoveRequest = CC_CALLBACK_1(GameLayer::onPlayerWhiteMoveRequest, this);
+	delegate->onResignRequest = CC_CALLBACK_0(GameLayer::onPlayerWhiteResignRequest, this);
+	delegate->onDrawRequest = CC_CALLBACK_0(GameLayer::onPlayerWhiteDrawRequest, this);
+	delegate->onRegretRequest = CC_CALLBACK_0(GameLayer::onPlayerWhiteRegretRequest, this);
+	_playerWhite->setDelegate(delegate);
+	_playerWhiteDelegate = delegate;
 
-	auto playerBlackListener = new (std::nothrow) Player::Listener();
-	playerBlackListener->onMoved = CC_CALLBACK_1(GameLayer::onPlayerBlackMoved, this);
-	playerBlackListener->onResignRequest = CC_CALLBACK_0(GameLayer::onPlayerBlackResignRequest, this);
-	playerBlackListener->onDrawRequest = CC_CALLBACK_0(GameLayer::onPlayerBlackDrawRequest, this);
-	_playerBlack->setListener(playerBlackListener);
-
-	setDifficulty(level);
+	delegate = new (std::nothrow) Player::Delegate();
+	delegate->onMoveRequest = CC_CALLBACK_1(GameLayer::onPlayerBlackMoveRequest, this);
+	delegate->onResignRequest = CC_CALLBACK_0(GameLayer::onPlayerBlackResignRequest, this);
+	delegate->onDrawRequest = CC_CALLBACK_0(GameLayer::onPlayerBlackDrawRequest, this);
+	delegate->onRegretRequest = CC_CALLBACK_0(GameLayer::onPlayerBlackRegretRequest, this);
+	_playerBlack->setDelegate(delegate);
+	_playerBlackDelegate = delegate;
 
 	setOnEnterCallback([this](){
-		if (_board->getCurrentSide() == Piece::Side::WHITE)
-			_playerWhite->go(0);
-		else
-			_playerBlack->go(0);
+		if (_board->getCurrentSide() == Board::Side::WHITE) {
+			getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
+			_playerWhite->start(_board->getFenWithMove());
+		} else {
+			getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
+			_playerBlack->start(_board->getFenWithMove());
+		}
 	});
 
 	return true;
@@ -97,54 +56,66 @@ bool GameLayer::init(GameLayer::Mode mode, Piece::Side uiSide,
 
 GameLayer::~GameLayer()
 {
-	Player::Listener *l;
-	l = _playerBlack->getListener();
-	_playerBlack->setListener(nullptr);
-	if (l != nullptr)
-		delete l;
-	l = _playerWhite->getListener();
-	_playerWhite->setListener(nullptr);
-	if (l != nullptr)
-		delete l;
-
-	_playerWhite->setBoard(nullptr);
-	_playerBlack->setBoard(nullptr);
-
 	_playerWhite->stop();
 	_playerBlack->stop();
 
-	if (_server)
-		RoomManager::getInstance()->destroyRoom(_server);
+	delete _playerWhiteDelegate;
+	delete _playerBlackDelegate;
 
 	log("### Delete GameLayer");
 }
 
-void GameLayer::onPlayerWhiteMoved(std::string mv)
+void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 {
-	log("RED: %s", _board->getFenWithMove().c_str());
+	log("WHITE: %s", mv.c_str());
+
 	_playerWhite->stop();
+	int retval = _board->move(mv);
+
 	if (Rule::getInstance()->isMate(_board->getFen())) {
-		log("Red Win!");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:WHITE");
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)"WIN:WHITE");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
-		//return;
 	}
-	getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_GO);
-	_playerBlack->go(0);
+
+	switch (retval) {
+	case 0:
+		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
+		_playerBlack->start(_board->getFenWithMove());
+		break;
+	case -3:
+		onPlayerWhiteResignRequest();
+		break;
+	default:
+		_playerWhite->start(_board->getFenWithMove());
+	}
 }
 
-void GameLayer::onPlayerBlackMoved(std::string mv)
+void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 {
-	log("BLACK: %s", _board->getFenWithMove().c_str());
+	log("BLACK: %s", mv.c_str());
+
 	_playerBlack->stop();
+	int retval = _board->move(mv);
+
 	if (Rule::getInstance()->isMate(_board->getFen())) {
 		log("Black Win!");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:BLACK");
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)"WIN:BLACK");
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
-		//return;
 	}
-	getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_GO);
-	_playerWhite->go(0);
+
+	switch (retval) {
+	case 0:
+		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
+		_playerWhite->start(_board->getFenWithMove());
+		break;
+	case -3:
+		onPlayerBlackResignRequest();
+		break;
+	default:
+		_playerBlack->start(_board->getFenWithMove());
+	}
 }
 
 void GameLayer::onPlayerWhiteResignRequest()
@@ -152,7 +123,8 @@ void GameLayer::onPlayerWhiteResignRequest()
 	_playerWhite->stop();
 	_playerBlack->stop();
 
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:BLACK");
+	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+			(void *)"WIN:BLACK");
 	getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
 }
 
@@ -161,76 +133,61 @@ void GameLayer::onPlayerBlackResignRequest()
 	_playerWhite->stop();
 	_playerBlack->stop();
 
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"WIN:WHITE");
+	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+			(void *)"WIN:WHITE");
 	getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
 }
 
 void GameLayer::onPlayerWhiteDrawRequest()
 {
-	bool draw = _playerBlack->askForDraw();
+	bool draw = _playerBlack->onRequest("draw");
 	if (draw) {
 		_playerWhite->stop();
 		_playerBlack->stop();
 
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"DRAW:");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)"DRAW:");
 	}
 }
 
 void GameLayer::onPlayerBlackDrawRequest()
 {
-	bool draw = _playerWhite->askForDraw();
+	bool draw = _playerWhite->onRequest("draw");
 	if (draw) {
 		_playerWhite->stop();
 		_playerBlack->stop();
 
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER, (void *)"DRAW:");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)"DRAW:");
 	}
 }
 
-void GameLayer::requestRegret()
+void GameLayer::onPlayerWhiteRegretRequest()
 {
-	_playerWhite->stop();
-	_playerBlack->stop();
+	if (_board->getCurrentSide() != Board::Side::WHITE)
+		return;
+	if (! _playerBlack->onRequest("regret"))
+		return;
 	_board->undo();
 	_board->undo();
-	if (_board->getCurrentSide() == Piece::Side::WHITE)
-		_playerWhite->go(0);
-	else
-		_playerBlack->go(0);
 }
 
-void GameLayer::requestLose()
+void GameLayer::onPlayerBlackRegretRequest()
 {
-	((UIPlayer*)_uiPlayer)->triggerLose();
-}
-
-void GameLayer::requestPeace()
-{
-	((UIPlayer*)_uiPlayer)->triggerPeace();
-}
-
-void GameLayer::setDifficulty(int level)
-{
-	_difficulty = level;
-	if (_mode == Mode::UI_TO_AI) {
-		if (_side == Piece::Side::WHITE) {
-			((AIPlayer2*)_playerBlack)->setDifficulty(level);
-		} else {
-			((AIPlayer2*)_playerWhite)->setDifficulty(level);
-		}
+	if (_board->getCurrentSide() != Board::Side::BLACK)
+		return;
+	if (! _playerWhite->onRequest("regret"))
+		return;
+	_board->undo();
+	_board->undo();
+	if (_board->getCurrentSide() != Board::Side::BLACK) {
+		_playerBlack->stop();
+		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
+		_playerWhite->start(_board->getFenWithMove());
 	}
 }
 
-void GameLayer::requestSave()
+int GameLayer::onRequest(std::string req)
 {
-	UserData::SaveElement se;
-	se.mode = (int)_mode;
-	se.side = (int)_side;
-	se.level = _difficulty;
-	se.white = "white";
-	se.black = "black";
-	se.fen = _board->getFenWithMove();
-	UserData::getInstance()->insertSaveElement(se);
+	return 0;
 }

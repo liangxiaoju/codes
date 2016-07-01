@@ -11,6 +11,8 @@ USING_NS_CC;
 class Board : public Sprite
 {
 public:
+	typedef Piece::Side Side;
+
 	static const std::string START_FEN;
 
 	enum class Style
@@ -36,6 +38,11 @@ public:
 
 	Piece* pick(Vec2 index);
 
+	int move(std::string mv, bool check=true)
+	{
+		auto vecs = Utils::toVecMove(mv);
+		return move(vecs[0], vecs[1], check);
+	}
 	int move(Vec2 src, Vec2 dst, bool check=true);
 
 	void setStyle(Style s);
@@ -65,11 +72,11 @@ public:
 	void unmarkMoveAll();
 	int checkMove(Vec2 src, Vec2 dst);
 	void undo();
-    virtual void setRotation(float rotation);
-	Piece::Side getCurrentSide() { return _currSide; }
+    virtual void setRotation(float rotation) override;
+	Side getCurrentSide() { return _currSide; }
 	void changeSide() {
-		_currSide = (_currSide==Piece::Side::BLACK) ?
-			Piece::Side::WHITE : Piece::Side::BLACK;
+		_currSide = (_currSide==Side::BLACK) ?
+			Side::WHITE : Side::BLACK;
 	}
 
 private:
@@ -84,7 +91,7 @@ private:
 	std::map<Vec2, Sprite*> _selected;
 	std::map<Vec2, Piece*> _mapPieces;
 	Style _style;
-	Piece::Side _currSide;
+	Side _currSide;
 	Node *_pieceLayer;
 
 	void addPiece(Vec2 index, Piece *p);

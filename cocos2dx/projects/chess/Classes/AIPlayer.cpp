@@ -6,99 +6,44 @@
 #include <netdb.h>
 #include <unistd.h>
 
-int socket_client_init()
-{
-	int sockfd, portno, i=0;
-	struct sockaddr_in serv_addr;
-
-	portno = 6669;
-
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port = htons(portno);
-
-	while (i++ < 10) {
-		sockfd = socket(AF_INET, SOCK_STREAM, 0);
-		if (sockfd < 0) {
-			log("ERROR opening socket");
-			continue;
-		}
-
-		if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
-			log("ERROR connecting, retry %d", i);
-			close(sockfd);
-			sockfd = -1;
-			usleep(200*1000);
-		} else {
-			break;
-		}
-	}
-
-	return sockfd;
-}
-
-int socket_server_init()
-{
-	int sockfd, newsockfd, portno;
-	socklen_t clilen;
-	struct sockaddr_in serv_addr, cli_addr;
-	const int on = 1;
-
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0) 
-		log("ERROR opening socket");
-
-	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on));
-
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-	portno = 6669;
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	serv_addr.sin_port = htons(portno);
-	if (bind(sockfd, (struct sockaddr *) &serv_addr,
-				sizeof(serv_addr)) < 0) 
-		log("ERROR on binding");
-
-	listen(sockfd,1);
-	clilen = sizeof(cli_addr);
-	newsockfd = accept(sockfd, 
-			(struct sockaddr *) &cli_addr, 
-			&clilen);
-	if (newsockfd < 0) 
-		log("ERROR on accept");
-
-	close(sockfd);
-
-	return newsockfd;
-}
-
-extern void emain();
-extern int server_socketfd;
-void AIPlayer::eleeye_thread()
-{
-	server_socketfd = socket_server_init();
-
-	emain();
-}
-
 bool AIPlayer::init()
 {
-	if (!Player::init())
+	if (!Player::init("AI"))
 		return false;
 
-	_head = HeaderSprite::createWithType(HeaderSprite::Type::RIGHT);
-	_head->setNameLine("Computer");
-	auto s = _head->getContentSize();
-	_head->setPosition(s.width/2, s.height/2);
-	addChild(_head);
-	setContentSize(s);
+	_stop = false;
 
-	/* have to be inited before onEnter */
-	_thread = std::thread(std::bind(
-				&AIPlayer::eleeye_thread, this));
+	pipe(_pipe);
 
-	client_socketfd = socket_client_init();
+	_aiThread = std::thread(std::bind(&AIPlayer::AI_Thread, this));
+	_cmdThread = std::thread(std::bind(&AIPlayer::CMD_Thread, this));
+
+	int i = 0;
+	while (i++ < 10) {
+		struct sockaddr_in addr;
+		memset(&addr, 0, sizeof(addr));
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		addr.sin_port = htons(6669);
+
+		if ((_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+			log("Failed to create socket");
+			continue;
+		}
+		if (connect(_sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+			log("Failed to connect, retry %d", i);
+			close(_sockfd);
+			_sockfd = -1;
+			usleep(200*1000);
+		} else
+			break;
+	}
+
+	if (_sockfd < 0)
+		return false;
+
+	_sockfile = fdopen(_sockfd, "r+");
+	setbuf(_sockfile, NULL);
 
 	std::string reply;
 	reply = sendWithReply("ucci", "ucciok");
@@ -107,197 +52,316 @@ bool AIPlayer::init()
 	return true;
 }
 
-void AIPlayer::setName(std::string first, std::string second)
-{
-	if (!first.empty()) {
-		_head->setNameLine(first);
-	}
-
-	if (!second.empty()) {
-		_head->setInfoLine(second);
-	}
-}
-
-void AIPlayer::setDifficulty(int level)
-{
-	_difficulty = level;
-	switch (level) {
-	case 0:
-		_difficulty = 0; break;
-	case 1:
-		_difficulty = 2; break;
-	case 2:
-		_difficulty = 4; break;
-	case 3:
-		_difficulty = 8; break;
-	default:
-		_difficulty = level; break;
-	}
-	_head->setInfoLine("Level: " + Utils::toString(level));
-}
-
 AIPlayer::~AIPlayer()
 {
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
 	sendWithReply("quit", "bye");
-	_thread.join();
+	_aiThread.join();
+
+    stopAllActions();
+
+	_stop = true;
+
+	fclose(_sockfile);
+	_condition.notify_all();
+	_cmdThread.join();
+
+	close(_pipe[0]);
+	close(_pipe[1]);
+
 	log("~AIPlayer");
 }
 
-ssize_t readline(int fd, char* ptr, size_t maxlen)
+extern void emain();
+int server_socketfd;
+
+void AIPlayer::AI_Thread()
 {
-    size_t n, rc;
-    char c;
+	int sockfd, newsockfd;
+	socklen_t len;
+	struct sockaddr_in srvaddr, cliaddr;
+	const int on = 1;
 
-    for( n = 0; n < maxlen - 1; n++ ) {
-        if( (rc = recv(fd, &c, 1, 0)) ==1 ) {
-            *ptr++ = c;
-            if(c == '\n') {
-                break;
-            }
-        } else if( rc == 0 ) {
-            return 0;
-        } else if( errno == EINTR ) {
-            continue;
-        } else {
-            return -1;
-        }
-    }
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) 
+		log("ERROR opening socket");
 
-    *ptr = 0;
-    return n;
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
+			(const char*)&on, sizeof(on));
+
+	memset(&srvaddr , 0, sizeof(struct sockaddr_in));
+
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_addr.s_addr = INADDR_ANY;
+	srvaddr.sin_port = htons(6669);
+
+	if (bind(sockfd, (struct sockaddr *) &srvaddr,
+				sizeof(struct sockaddr_in)) < 0) 
+		log("ERROR on binding");
+
+	listen(sockfd, 1);
+	len = sizeof(cliaddr);
+
+	newsockfd = accept(sockfd, 
+			(struct sockaddr *) &cliaddr, 
+			&len);
+	if (newsockfd < 0) 
+		log("ERROR on accept");
+
+	close(sockfd);
+
+	server_socketfd = newsockfd;
+
+	log("Eleeye_Thread start.");
+
+	emain();
+
+	log("Eleeye_Thread exit.");
 }
 
-int AIPlayer::sendWithoutReply(std::string msg)
+void AIPlayer::CMD_Thread()
 {
-	msg += "\n";
-	log("sendWithoutReply: %s", msg.c_str());
-	return send(client_socketfd, msg.c_str(), msg.size(), 0);
-}
+	/*
+	 * android ndk<21 has no getline()
+	 * our getline() do not return '\n'
+	 */
+	auto getline = [](char **lineptr, size_t *len, FILE *fp)->size_t{
+		char *ptr = *lineptr;
+		int fd = fileno(fp);
+		size_t n, rc, maxlen = *len;
+		char c;
 
-std::string AIPlayer::sendWithReply(std::string msg, std::string match)
-{
-	char line[1024];
-	int n;
+		if (ptr == NULL) return -1;
 
-	msg += "\n";
-
-	log("sendWithReply: %s expect: %s", msg.c_str(), match.c_str());
-
-	mutex.lock();
-
-	struct timeval timeout = {0, 0};
-	fd_set readfds;
-
-	FD_ZERO(&readfds);
-	FD_SET(client_socketfd, &readfds);
-	int nready = select(client_socketfd+1, &readfds, nullptr, nullptr, &timeout);
-	if (nready > 0) {
-		if (FD_ISSET(client_socketfd, &readfds))
-			recv(client_socketfd, line, sizeof(line), 0);
-	}
-
-	if (send(client_socketfd, msg.c_str(), msg.size(), 0) < 0)
-		return nullptr;
-
-	while ((n = readline(client_socketfd, line, sizeof(line))) >= 0) {
-		//log("socket: %s", line);
-		if (strstr(line, match.c_str()) != nullptr) {
-			break;
-		}
-	}
-
-	mutex.unlock();
-
-	log("Got Reply: %s", line);
-
-	return std::string(line);
-}
-
-int AIPlayer::sendWithCallBack(std::string msg, std::string match, const std::function<void (std::string)> &cb)
-{
-	auto callback = [cb](EventCustom* ev){
-		std::string *reply = (std::string *)ev->getUserData();
-		log("callback %s", (*reply).c_str());
-		cb(*reply);
-	};
-
-	auto task = [this, msg, match, callback](){
-		retain();
-		std::string *reply = new std::string();
-		*reply = this->sendWithReply(msg, match);
-
-		Director::getInstance()->getEventDispatcher()->removeCustomEventListeners("sendWithCallBack");
-		Director::getInstance()->getEventDispatcher()->addCustomEventListener("sendWithCallBack", callback);
-
-		Director::getInstance()->getScheduler()->performFunctionInCocosThread([this, reply](){
-			Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("sendWithCallBack", (void *)reply);
-			delete reply;
-		});
-		release();
-	};
-
-	std::thread sendThread(task);
-	sendThread.detach();
-
-	return 0;
-}
-
-void AIPlayer::ponder()
-{
-}
-
-void AIPlayer::go(float timeout)
-{
-	getEventDispatcher()->dispatchCustomEvent(EVENT_AIPLAYER_GO);
-	_head->setActive(true);
-	std::string cmd = std::string("position fen ") + getBoard()->getFenWithMove();
-	sendWithoutReply(cmd);
-	cmd = "go time " + Utils::toString(int(_difficulty*1000+timeout));
-	sendWithCallBack(cmd, "bestmove", [&](std::string reply)
-		{
-			if (reply.find("nobestmove") != std::string::npos) {
-				auto l = getListener();
-				if (l != nullptr)
-					l->onResignRequest();
-			} else if (reply.find("draw") != std::string::npos) {
-				auto l = getListener();
-				if (l != nullptr)
-					l->onDrawRequest();
+		for( n = 0; n < maxlen - 1; n++ ) {
+			if((rc = recv(fd, &c, 1, 0)) == 1) {
+				*ptr = c;
+				if(c == '\n') {
+					break;
+				}
+				ptr++;
+			} else if( rc == 0 ) {
+				return 0;
+			} else if( errno == EINTR ) {
+				continue;
 			} else {
-				auto substr = Utils::splitString(reply, ' ');
-				auto mv = substr[1];
-				auto vecs = Utils::toVecMove(mv);
+				return -1;
+			}
+		}
 
-				auto b = getBoard();
-				int ret = 0;
-				if (b != nullptr)
-					ret = b->move(vecs[0], vecs[1], false);
+		*ptr = 0;
+		return n;
+	};
 
-				auto l = getListener();
+	do {
+		Request request;
+		{
+			std::unique_lock<std::mutex> lock(_mutex);
+			_condition.wait(lock, [this] {
+					return _stop || !_queue.empty();
+					});
+			if (_stop)
+				return;
 
-				if (l != nullptr) {
-					if (ret < 0) {
-						if (ret == -3)
-							l->onResignRequest();
-					} else {
-						l->onMoved(mv);
+			request = _queue.front();
+			_queue.pop();
+		}
+
+		fd_set fdset;
+		FD_ZERO(&fdset);
+		FD_SET(_sockfd, &fdset);
+		struct timeval timeout = {0, 0};
+
+		if (select(_sockfd+1, &fdset, NULL, NULL, &timeout) > 0) {
+			char tmp[1024];
+			recv(_sockfd, tmp, sizeof(tmp), 0);
+		}
+
+		FD_ZERO(&fdset);
+		FD_SET(_pipe[0], &fdset);
+		memset(&timeout, 0, sizeof(timeout));
+
+		if (select(_pipe[0]+1, &fdset, NULL, NULL, &timeout) > 0) {
+			char c[32];
+			read(_pipe[0], c, sizeof(c));
+		}
+
+		if (request.cmd.size() > 0) {
+			fprintf(_sockfile, "%s\n", request.cmd.c_str());
+			fflush(_sockfile);
+		}
+
+		memset(&timeout, 0, sizeof(timeout));
+		if (request.timeout > 0) {
+			timeout.tv_sec = request.timeout;
+		}
+
+		if (request.reply.size() > 0) {
+			size_t len = 1024;
+			char *line = (char*)malloc(len);
+			if (!line)
+				continue;
+			memset(line, 0, len);
+
+			do {
+				FD_ZERO(&fdset);
+				FD_SET(_sockfd, &fdset);
+				FD_SET(_pipe[0], &fdset);
+				int n = select(std::max(_sockfd, _pipe[0])+1,
+						&fdset, NULL, NULL, &timeout);
+				if (_stop)
+					return;
+				if (n == 0) {
+					log("select timeout");
+					break;
+				}
+				if (FD_ISSET(_pipe[0], &fdset)) {
+					char c[32];
+					read(_pipe[0], c, sizeof(c));
+					break;
+				}
+				if (FD_ISSET(_sockfd, &fdset)) {
+#if 1
+					if ((n = getline(&line, &len, _sockfile)) < 0)
+						continue;
+#else
+					if (fgets(line, len, _sockfile) == NULL)
+						continue;
+#endif
+					if (strstr(line, request.reply.c_str()) != nullptr) {
+						break;
 					}
 				}
-			}
-		});
+
+				memset(line, 0, len);
+
+			} while (1);
+
+			std::string reply(line);
+			free(line);
+			request.cb(reply);
+		}
+
+	} while(1);
+}
+
+void AIPlayer::enqueueRequest(Request req)
+{
+	std::unique_lock<std::mutex> lock(_mutex);
+	_queue.emplace(req);
+	_condition.notify_one();
+}
+
+void AIPlayer::sendWithoutReply(std::string msg)
+{
+	Request req;
+	req.cmd = msg;
+	req.timeout = 0;
+	enqueueRequest(req);
+	log("sendWithoutReply: %s", msg.c_str());
+}
+
+std::string AIPlayer::sendWithReply(std::string msg,
+		std::string match, int timeout)
+{
+	Request req;
+	std::string r;
+	std::mutex mutex;
+	std::condition_variable cond;
+	bool done = false;
+
+	auto cb = [&r, &cond, &done](std::string reply){
+		r = reply;
+		done = true;
+		cond.notify_one();
+	};
+
+	req.cmd = msg;
+	req.reply = match;
+	req.timeout = timeout;
+	req.cb = cb;
+
+	enqueueRequest(req);
+	log("sendWithReply(cmd:%s reply:%s timeout:%d)",
+			msg.c_str(), match.c_str(), timeout);
+
+	std::unique_lock<std::mutex> lock(mutex);
+	if (!done)
+		cond.wait_for(lock, std::chrono::seconds(timeout));
+
+	log("sendWithReply Got(%s)", r.c_str());
+
+	return r;
+}
+
+void AIPlayer::sendWithCallBack(std::string msg,
+		std::string match, int timeout,
+		RequestCallback &cb)
+{
+	Request req;
+
+	RequestCallback _cb = [this, cb](std::string reply){
+		log("sendWithCallBack Got(%s)", reply.c_str());
+
+		CallFunc *callback = CallFunc::create([cb, reply]() {
+				cb(reply);
+				});
+		runAction(callback);
+
+	};
+
+	req.cmd = msg;
+	req.reply = match;
+	req.timeout = timeout;
+	req.cb = _cb;
+
+	enqueueRequest(req);
+	log("sendWithCallBack(cmd:%s reply:%s timeout:%d)",
+			msg.c_str(), match.c_str(), timeout);
+}
+
+void AIPlayer::start(std::string fen)
+{
+	std::string cmd = std::string("position fen ") + fen;
+	sendWithoutReply(cmd);
+
+	RequestCallback cb = [&](std::string reply){
+		if (reply.size() == 0) {
+			return;
+		}
+
+		if (reply.find("nobestmove") != std::string::npos) {
+				_delegate->onResignRequest();
+		} else if (reply.find("draw") != std::string::npos) {
+				_delegate->onDrawRequest();
+		} else {
+			auto substr = Utils::splitString(reply, ' ');
+			auto mv = substr[1];
+			_delegate->onMoveRequest(mv);
+		}
+	};
+
+	int t = int(_level*1000);
+	cmd = "go time " + Utils::toString(t);
+	sendWithCallBack(cmd, "bestmove", t/1000 + 1, cb);
 }
 
 void AIPlayer::stop()
 {
+	write(_pipe[1], "W", 1);
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
-	_head->setActive(false);
-	getEventDispatcher()->removeCustomEventListeners("sendWithCallBack");
+    stopAllActions();
 }
 
-bool AIPlayer::askForDraw()
+bool AIPlayer::onRequest(std::string req)
 {
-	return true;
+	if (req == "draw") {
+		return true;
+	} else if (req == "regret") {
+		return true;
+	}
+
+	return false;
 }

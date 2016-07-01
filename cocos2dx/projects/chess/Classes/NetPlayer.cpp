@@ -1,41 +1,14 @@
 #include "NetPlayer.h"
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <unistd.h>
 
-bool NetPlayer::init()
+bool NetPlayer::init(RoomClient *client)
 {
-	if (!Player::init())
+	if (!Player::init("Net"))
 		return false;
-
-	_head = HeaderSprite::createWithType(HeaderSprite::Type::RIGHT);
-	_head->setNameLine("Net");
-	auto s = _head->getContentSize();
-	_head->setPosition(s.width/2, s.height/2);
-	addChild(_head);
-	setContentSize(s);
 
 	_active = false;
-
-	RoomManager *manager = RoomManager::getInstance();
-	std::vector<RoomManager::RoomInfo> v;
-	v = manager->scanRoom(1, 5);
-
-	if (v.size() == 0) {
-		log("Failed to scan Room.");
-		return false;
-	}
-
-	char name[16];
-	std::srand(std::time(0));
-	snprintf(name, sizeof(name), "%d", int(std::rand()*1000.0f/RAND_MAX));
-	_name = name;
-	log("%s", _name.c_str());
-
-	_client = manager->joinRoom(_name, v[0]);
+	_client = client;
 
 	auto onAction = [this](RoomClient *client, const RoomPacket &packet) {
 
@@ -55,19 +28,12 @@ bool NetPlayer::init()
 					auto substr = Utils::splitString(content, ' ');
 
 					auto mv = substr.back();
-					auto vecs = Utils::toVecMove(mv);
-
-					int ret = getBoard()->move(vecs[0], vecs[1], true);
-
-					if (ret == -3)
-						getListener()->onResignRequest();
-					else if (ret == 0)
-						getListener()->onMoved(mv);
+					_delegate->onMoveRequest(mv);
 				};
 
 				_client->emit("action", "ok");
 
-				if (content.find_first_of(getBoard()->getFenWithMove()) == std::string::npos) {
+				if (content.find_first_of(_fen) == std::string::npos) {
 					log("@@ position not match: %s", content.c_str());
 					return;
 				}
@@ -87,27 +53,61 @@ bool NetPlayer::init()
 		}
 	};
 
+	auto onControl = [this](RoomClient *client, const RoomPacket &packet) {
+
+		if (packet["TYPE"] == "control") {
+			auto content = packet["CONTENT"];
+
+			if (content.find("regret") != std::string::npos) {
+				auto cb = [this]() {
+					log("@@ request regret");
+					_delegate->onRegretRequest();
+				};
+				CallFunc *callback = CallFunc::create(cb);
+				runAction(callback);
+			} else if (content.find("draw") != std::string::npos) {
+				auto cb = [this]() {
+					log("@@ request draw");
+					_delegate->onDrawRequest();
+				};
+				CallFunc *callback = CallFunc::create(cb);
+				runAction(callback);
+			} else if (content.find("reset") != std::string::npos) {
+				auto cb = [this]() {
+					log("@@ request reset");
+					Director::getInstance()->getEventDispatcher()
+						->dispatchCustomEvent(EVENT_RESET, (void*)"Net");
+				};
+				CallFunc *callback = CallFunc::create(cb);
+				runAction(callback);
+			} else if (content.find("switch") != std::string::npos) {
+				auto cb = [this]() {
+					log("@@ request switch");
+					Director::getInstance()->getEventDispatcher()
+						->dispatchCustomEvent(EVENT_SWITCH, (void*)"Net");
+				};
+				CallFunc *callback = CallFunc::create(cb);
+				runAction(callback);
+			}
+		}
+	};
+
 	_client->on("action", onAction);
+	_client->on("control", onControl);
 
 	return true;
 }
 
 NetPlayer::~NetPlayer()
 {
-	RoomManager *manager = RoomManager::getInstance();
-	manager->leaveRoom(_client);
 	log("~NetPlayer");
 }
 
-void NetPlayer::go(float timeout)
+void NetPlayer::start(std::string fen)
 {
-	getEventDispatcher()->dispatchCustomEvent(EVENT_AIPLAYER_GO);
-	_head->setActive(true);
-
 	_sendcount = 0;
-	CallFunc *callback = CallFunc::create([this]() {
-			std::string cmd = std::string("position fen ") +
-			getBoard()->getFenWithMove();
+	CallFunc *callback = CallFunc::create([this, fen]() {
+			std::string cmd = std::string("position fen ") + fen;
 			_client->emit("action", cmd);
 
 			log("@@ Send: %d", ++_sendcount);
@@ -117,17 +117,32 @@ void NetPlayer::go(float timeout)
 	action->setTag(1000);
 	runAction(action);
 
+	_fen = fen;
 	_active = true;
 }
 
 void NetPlayer::stop()
 {
 	_active = false;
-	_head->setActive(false);
     stopAllActions();
 }
 
-bool NetPlayer::askForDraw()
+bool NetPlayer::onRequest(std::string req)
 {
-	return true;
+	if (req == "draw") {
+		_client->emit("control", "draw");
+		return true;
+	} else if (req == "regret") {
+		_client->emit("control", "regret");
+		/* TODO: return true/false according to the ack */
+		return true;
+	} else if (req == "reset") {
+		_client->emit("control", "reset");
+		return true;
+	} else if (req == "switch") {
+		_client->emit("control", "switch");
+		return true;
+	}
+
+	return false;
 }

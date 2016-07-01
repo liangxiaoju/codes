@@ -3,17 +3,10 @@
 
 bool UIPlayer::init()
 {
-	if (!Player::init())
+	if (!Player::init("UI"))
 			return false;
 
 	_selectedPiece = nullptr;
-
-	_head = HeaderSprite::createWithType(HeaderSprite::Type::LEFT);
-	_head->setNameLine("Player");
-	auto s = _head->getContentSize();
-	_head->setPosition(s.width/2, s.height/2);
-	addChild(_head);
-	setContentSize(s);
 
 	_touchListener = EventListenerTouchOneByOne::create();
 	_touchListener->onTouchBegan = CC_CALLBACK_2(UIPlayer::onTouchBegan, this);
@@ -24,62 +17,69 @@ bool UIPlayer::init()
 
 	_touchListener->setEnabled(false);
 
+	/* response for regret */
+	auto regret_cb = [this](EventCustom* ev) {
+		_delegate->onRegretRequest();
+	};
+	/* response for resign */
+	auto resign_cb = [this](EventCustom* ev) {
+		_delegate->onResignRequest();
+	};
+	/* response for draw*/
+	auto draw_cb = [this](EventCustom* ev) {
+		_delegate->onDrawRequest();
+	};
+
+	setOnEnterCallback([this, regret_cb, resign_cb, draw_cb](){
+		getEventDispatcher()->addCustomEventListener(EVENT_REGRET, regret_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_RESIGN, resign_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_DRAW, draw_cb);
+	});
+
+	setOnExitCallback([this](){
+		getEventDispatcher()->removeCustomEventListeners(EVENT_REGRET);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_RESIGN);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_DRAW);
+	});
+
 	return true;
-}
-
-void UIPlayer::setName(std::string first, std::string second)
-{
-	if (!first.empty()) {
-		_head->setNameLine(first);
-	}
-
-	if (!second.empty()) {
-		_head->setInfoLine(second);
-	}
 }
 
 bool UIPlayer::onTouchBegan(Touch *touch, Event *event) {
 	Vec2 touchPos = touch->getLocation();
 
-	Rect boardRect = getBoard()->getBoundingBox();
+	Rect boardRect = _board->getBoundingBox();
 
 	if (!boardRect.containsPoint(touchPos)) {
 		return false;
 	}
 
-	Vec2 index = getBoard()->convertWorldCoordToIndex(touchPos);
+	Vec2 index = _board->convertWorldCoordToIndex(touchPos);
 
-	Piece *p = getBoard()->pick(index);
+	Piece *p = _board->pick(index);
 	if (_selectedPiece != nullptr) {
 		/* move piece */
-		Vec2 src = getBoard()->convertLocalCoordToIndex(
+		Vec2 src = _board->convertLocalCoordToIndex(
 				_selectedPiece->getPosition());
 		Vec2 dst = index;
 		auto srcSide = _selectedPiece->getSide();
 
 		if (p != nullptr && srcSide == p->getSide()) {
 			/* select other piece */
-			getBoard()->unselect(src);
-			getBoard()->select(dst);
+			_board->unselect(src);
+			_board->select(dst);
 			_selectedPiece = p;
 		} else {
 			/* move piece */
-			int status = getBoard()->move(src, dst);
 			_selectedPiece = nullptr;
-
-			if (status < 0) {
-				if (status == -3)
-					getListener()->onResignRequest();;
-			} else {
-				_touchListener->setEnabled(false);
-				getListener()->onMoved("TODO");
-			}
+			std::string mv = Utils::toUcciMove(src, dst);
+			_delegate->onMoveRequest(mv);
 		}
 	} else {
 		/* select piece */
-		getBoard()->select(index);
+		_board->select(index);
 		_selectedPiece = p;
-		if (p != nullptr && getSide() != p->getSide()) {
+		if (p != nullptr && _board->getCurrentSide() != p->getSide()) {
 			/* cannot select other side's piece */
 			_selectedPiece = nullptr;
 		}
@@ -94,43 +94,32 @@ void UIPlayer::onTouchMoved(Touch *touch, Event *event) {
 void UIPlayer::onTouchEnded(Touch *touch, Event *event) {
 	if (_selectedPiece == nullptr) {
 		Vec2 touchPos = touch->getStartLocation();
-		Vec2 index = getBoard()->convertWorldCoordToIndex(touchPos);
-		getBoard()->unselect(index);
+		Vec2 index = _board->convertWorldCoordToIndex(touchPos);
+		_board->unselect(index);
 	}
 }
 
 void UIPlayer::onTouchCancelled(Touch *touch, Event *event) {
 }
 
-void UIPlayer::ponder()
+void UIPlayer::start(std::string fen)
 {
-}
-
-void UIPlayer::go(float timeout)
-{
-	getEventDispatcher()->dispatchCustomEvent(EVENT_UIPLAYER_GO);
-	_head->setActive(true);
 	_touchListener->setEnabled(true);
 }
 
 void UIPlayer::stop()
 {
 	_touchListener->setEnabled(false);
-	_head->setActive(false);
 }
 
-bool UIPlayer::askForDraw()
+bool UIPlayer::onRequest(std::string req)
 {
+	if (req == "draw") {
+		return true;
+	} else if (req == "regret") {
+		return true;
+	}
+
 	return false;
-}
-
-void UIPlayer::triggerLose()
-{
-	getListener()->onResignRequest();
-}
-
-void UIPlayer::triggerPeace()
-{
-	getListener()->onDrawRequest();
 }
 

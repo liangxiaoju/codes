@@ -55,7 +55,7 @@ public:
 				"FightSceneMenu/game_button_loseG_new.png",
 				[&](Ref *ref) {
 					log("onLose");
-					_gameLayer->requestLose();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_RESIGN);
 				}));
 		items.back()->setName("btn_lose");
 		items.pushBack(MenuItemImage::create(
@@ -64,9 +64,7 @@ public:
 				"FightSceneMenu/game_button_02dis.png",
 				[&](Ref *ref) {
 					log("onReset");
-					_gameLayer->removeFromParent();
-					auto scene = ChallengeScene::create(_endGameItem);
-					Director::getInstance()->replaceScene(scene);
+					getEventDispatcher()->dispatchCustomEvent(EVENT_RESET);
 				}));
 		items.back()->setName("btn_Reset");
 		items.pushBack(MenuItemImage::create(
@@ -75,7 +73,7 @@ public:
 				"FightSceneMenu/game_button_01G.png",
 				[&](Ref *ref) {
 					log("onRegret");
-					_gameLayer->requestRegret();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_REGRET);
 				}));
 		items.back()->setName("btn_regret");
 
@@ -116,7 +114,6 @@ public:
 		/* if onTouchBegan==true,
 		 * then do not pass the event into low layers */
 		listener->setSwallowTouches(true);
-		getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
 
 		auto over_callback = [&](EventCustom* ev){
 			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
@@ -142,16 +139,7 @@ public:
 				next->setTitleFontSize(35);
 				next->setZoomScale(0.1);
 				next->addClickEventListener([&](Ref *ref){
-						_gameLayer->removeFromParent();
-						std::vector<EndGameData::EndGameItem> endGameItems;
-						EndGameData::getInstance()->queryEndGameItem(_endGameItem.tid, endGameItems);
-						if (_endGameItem.sort == (endGameItems.size()-1)) {
-						Director::getInstance()->popScene();
-						} else {
-						_endGameItem = endGameItems[_endGameItem.sort+1];
-						auto scene = ChallengeScene::create(_endGameItem);
-						Director::getInstance()->replaceScene(scene);
-						}
+						getEventDispatcher()->dispatchCustomEvent(EVENT_NEXT);
 						});
 				auto vsize = Director::getInstance()->getVisibleSize();
 				next->setPosition(Vec2(vsize.width/2, vsize.height/3));
@@ -183,36 +171,24 @@ public:
 						origin.y + vsize.height/2);
 			}
 		};
-		/* have to remove previous listener */
-		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
-		getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_callback);
 
-		auto ui_go_callback = [this](EventCustom* ev){
-			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
-			auto btn_regret = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_regret"));
-			btn_regret->setEnabled(true);
-		};
-		getEventDispatcher()->removeCustomEventListeners(EVENT_UIPLAYER_GO);
-		getEventDispatcher()->addCustomEventListener(EVENT_UIPLAYER_GO, ui_go_callback);
+		setOnEnterCallback([this, listener, over_callback](){
+			getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+			getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_callback);
+		});
 
-		auto ai_go_callback = [this](EventCustom* ev){
-			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
-			auto btn_regret = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_regret"));
-			btn_regret->setEnabled(false);
-		};
-		getEventDispatcher()->removeCustomEventListeners(EVENT_AIPLAYER_GO);
-		getEventDispatcher()->addCustomEventListener(EVENT_AIPLAYER_GO, ai_go_callback);
-
+		setOnExitCallback([this](){
+			getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
+			getEventDispatcher()->removeEventListenersForTarget(this);
+		});
 		return true;
 	}
 
 	CREATE_FUNC(ChallengeControl);
 
-	void setGameLayer(GameLayer *layer) { _gameLayer = layer; }
 	void setEndGameItem(EndGameData::EndGameItem item) { _endGameItem = item; }
 
 private:
-	GameLayer *_gameLayer;
 	EndGameData::EndGameItem _endGameItem;
 	Node *_menuNode;
 };

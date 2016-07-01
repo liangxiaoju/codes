@@ -3,39 +3,55 @@
 
 #include "cocos2d.h"
 #include "Player.h"
-#include "HeaderSprite.h"
+#include "Utils.h"
 
 USING_NS_CC;
 
 class AIPlayer : public Player
 {
 public:
-	virtual bool init();
+	bool init() override;
 	CREATE_FUNC(AIPlayer);
+	void start(std::string fen) override;
+	void stop() override;
+	bool onRequest(std::string req) override;
 
-	virtual void ponder() override;
-	virtual void go(float timeout) override;
-	virtual void stop();
-
-	virtual bool askForDraw();
-
-	void setDifficulty(int level);
-	void setName(std::string first, std::string second);
-
+	void setLevel(int level) { _level = 1<<level; }
 	virtual ~AIPlayer();
 
 private:
-	void eleeye_thread();
-	int client_socketfd;
-	int sendWithoutReply(std::string msg);
-	std::string sendWithReply(std::string msg, std::string match);
-	int sendWithCallBack(std::string msg, std::string match, const std::function<void (std::string)> &cb);
+	typedef std::function<void(std::string)> RequestCallback;
+	struct Request
+	{
+		std::string cmd;
+		std::string reply;
+		int timeout;
+		RequestCallback cb;
+	};
 
-	int _difficulty;
+	void enqueueRequest(Request req);
+	void sendWithoutReply(std::string msg);
+	std::string sendWithReply(std::string msg, std::string match,
+			int timeout=2);
+	void sendWithCallBack(std::string msg, std::string match, int timeout,
+		RequestCallback &cb);
 
-	HeaderSprite *_head;
-	std::mutex mutex;
-	std::thread _thread;
+	void AI_Thread();
+	void CMD_Thread();
+
+	int _sockfd;
+	FILE *_sockfile;
+
+	bool _stop;
+	std::mutex _mutex;
+	std::condition_variable _condition;
+	std::queue<Request> _queue;
+
+	std::thread _cmdThread;
+	std::thread _aiThread;
+
+	int _level;
+	int _pipe[2];
 };
 
 #endif

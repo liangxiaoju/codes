@@ -2,7 +2,6 @@
 #define __FIGHTCONTROL_H__
 
 #include "cocos2d.h"
-#include "GameLayer.h"
 #include "ui/CocosGUI.h"
 
 USING_NS_CC;
@@ -19,6 +18,7 @@ public:
 		auto visibleSize = Director::getInstance()->getVisibleSize();
 		Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+		// +++++ back button
 		auto backBtn = Button::create("FightSceneMenu/look_back.png");
 		backBtn->setZoomScale(0.1);
 		backBtn->addClickEventListener([](Ref *ref){
@@ -26,7 +26,9 @@ public:
 		});
 		backBtn->setPosition(Vec2(100, visibleSize.height-100));
 		addChild(backBtn);
+		// -----
 
+		// +++++ menu
 		_menuNode = Node::create();
 
 		auto menuItemBtn = MenuItemImage::create(
@@ -57,7 +59,7 @@ public:
 				"FightSceneMenu/game_button_saveDIS.png",
 				[&](Ref *ref) {
 					log("onSave");
-					_gameLayer->requestSave();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_SAVE);
 					auto text = Text::create("Saved", "fonts/arial.ttf", 50);
 					text->setTextColor(Color4B::BLACK);
 					auto s = Director::getInstance()->getVisibleSize();
@@ -73,7 +75,7 @@ public:
 				"FightSceneMenu/game_button_loseG_new.png",
 				[&](Ref *ref) {
 					log("onLose");
-					_gameLayer->requestLose();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_RESIGN);
 				}));
 		items.back()->setName("btn_lose");
 		items.pushBack(MenuItemImage::create(
@@ -82,7 +84,7 @@ public:
 				"FightSceneMenu/game_button_peaceG_new.png",
 				[&](Ref *ref) {
 					log("onPeace");
-					_gameLayer->requestPeace();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
 				}));
 		items.back()->setName("btn_peace");
 		items.pushBack(MenuItemImage::create(
@@ -91,14 +93,7 @@ public:
 				"FightSceneMenu/game_button_02dis.png",
 				[&](Ref *ref) {
 					log("onReset");
-					GameLayer::Mode mode = _gameLayer->getMode();
-					Piece::Side side = _gameLayer->getSide();
-					int level = _gameLayer->getDifficulty();
-					std::string fen = _gameLayer->getInitFen();
-
-					_gameLayer->removeFromParent();
-					auto scene = FightScene::create(mode, side, level);
-					Director::getInstance()->replaceScene(scene);
+					getEventDispatcher()->dispatchCustomEvent(EVENT_RESET);
 				}));
 		items.back()->setName("btn_Reset");
 		items.pushBack(MenuItemImage::create(
@@ -107,7 +102,7 @@ public:
 				"FightSceneMenu/game_button_01G.png",
 				[&](Ref *ref) {
 					log("onRegret");
-					_gameLayer->requestRegret();
+					getEventDispatcher()->dispatchCustomEvent(EVENT_REGRET);
 				}));
 		items.back()->setName("btn_regret");
 		items.pushBack(MenuItemImage::create(
@@ -116,18 +111,7 @@ public:
 				"FightSceneMenu/look_switch_disable.png",
 				[&](Ref *ref) {
 					log("onChangeSide");
-					GameLayer::Mode mode = _gameLayer->getMode();
-					Piece::Side side = _gameLayer->getSide();
-					int level = _gameLayer->getDifficulty();
-					std::string fen = _gameLayer->getInitFen();
-
-					side = (side==Piece::Side::BLACK) ?
-					Piece::Side::WHITE : Piece::Side::BLACK;
-
-					_gameLayer->removeFromParent();
-
-					auto scene = FightScene::create(mode, side, level);
-					Director::getInstance()->replaceScene(scene);
+					getEventDispatcher()->dispatchCustomEvent(EVENT_SWITCH);
 				}));
 		items.back()->setName("btn_switch");
 
@@ -168,7 +152,7 @@ public:
 		/* if onTouchBegan==true,
 		 * then do not pass the event into low layers */
 		listener->setSwallowTouches(true);
-		getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,this);
+		// -----
 
 		auto over_callback = [this](EventCustom* ev){
 			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
@@ -201,35 +185,23 @@ public:
 						origin.y + vsize.height/2);
 			}
 		};
-		/* have to remove previous listener */
-		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
-		getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_callback);
 
-		auto ui_go_callback = [this](EventCustom* ev){
-			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
-			auto btn_regret = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_regret"));
-			btn_regret->setEnabled(true);
-		};
-		getEventDispatcher()->removeCustomEventListeners(EVENT_UIPLAYER_GO);
-		getEventDispatcher()->addCustomEventListener(EVENT_UIPLAYER_GO, ui_go_callback);
+		setOnEnterCallback([this, listener, over_callback](){
+			getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+			getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_callback);
+		});
 
-		auto ai_go_callback = [this](EventCustom* ev){
-			auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
-			auto btn_regret = dynamic_cast<MenuItemImage*>(subMenu->getChildByName("btn_regret"));
-			btn_regret->setEnabled(false);
-		};
-		getEventDispatcher()->removeCustomEventListeners(EVENT_AIPLAYER_GO);
-		getEventDispatcher()->addCustomEventListener(EVENT_AIPLAYER_GO, ai_go_callback);
+		setOnExitCallback([this](){
+			getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
+			getEventDispatcher()->removeEventListenersForTarget(this);
+		});
 
 		return true;
 	}
 
 	CREATE_FUNC(FightControl);
 
-	void setGameLayer(GameLayer *layer) { _gameLayer = layer; }
-
 private:
-	GameLayer *_gameLayer;
 	Node *_menuNode;
 };
 
