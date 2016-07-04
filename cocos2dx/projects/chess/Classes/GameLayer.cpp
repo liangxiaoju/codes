@@ -72,12 +72,6 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 	_playerWhite->stop();
 	int retval = _board->move(mv);
 
-	if (Rule::getInstance()->isMate(_board->getFen())) {
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)"WIN:WHITE");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
-	}
-
 	switch (retval) {
 	case 0:
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
@@ -89,6 +83,13 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 	default:
 		_playerWhite->start(_board->getFenWithMove());
 	}
+
+	if (Rule::getInstance()->isMate(_board->getFen())) {
+		std::string args = _board->getCurrentSide() == Board::Side::BLACK ?
+			"WIN:WHITE" : "WIN:BLACK";
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)args.c_str());
+	}
 }
 
 void GameLayer::onPlayerBlackMoveRequest(std::string mv)
@@ -97,13 +98,6 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 
 	_playerBlack->stop();
 	int retval = _board->move(mv);
-
-	if (Rule::getInstance()->isMate(_board->getFen())) {
-		log("Black Win!");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)"WIN:BLACK");
-		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
-	}
 
 	switch (retval) {
 	case 0:
@@ -116,6 +110,13 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 	default:
 		_playerBlack->start(_board->getFenWithMove());
 	}
+
+	if (Rule::getInstance()->isMate(_board->getFen())) {
+		std::string args = (_board->getCurrentSide() == Board::Side::BLACK) ?
+			"WIN:WHITE" : "WIN:BLACK";
+		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+				(void *)args.c_str());
+	}
 }
 
 void GameLayer::onPlayerWhiteResignRequest()
@@ -125,7 +126,6 @@ void GameLayer::onPlayerWhiteResignRequest()
 
 	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
 			(void *)"WIN:BLACK");
-	getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_WIN);
 }
 
 void GameLayer::onPlayerBlackResignRequest()
@@ -135,7 +135,6 @@ void GameLayer::onPlayerBlackResignRequest()
 
 	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
 			(void *)"WIN:WHITE");
-	getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_WIN);
 }
 
 void GameLayer::onPlayerWhiteDrawRequest()

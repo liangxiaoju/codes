@@ -16,7 +16,7 @@ public:
 	void stop() override;
 	bool onRequest(std::string req) override;
 
-	void setLevel(int level) { _level = 1<<level; }
+	void setLevel(int level) { _level = level; }
 	virtual ~AIPlayer();
 
 private:

@@ -60,11 +60,28 @@ inline void StartThread(void *ThreadEntry(void *), void *lpParameter) {
 
 #endif
 
+#if 1
+#include "cocos2d.h"
+USING_NS_CC;
+#endif
+
 inline void LocatePath(char *szDst, const char *szSrc) {
   char *lpSeparator;
   if (AbsolutePath(szSrc)) {
     strcpy(szDst, szSrc);
   } else {
+#if 1
+	std::string src = FileUtils::getInstance()
+		->fullPathForFilename(szSrc);
+	std::string dst = FileUtils::getInstance()
+		->getWritablePath().append(szSrc);
+	if (!FileUtils::getInstance()->isFileExist(dst)) {
+		Data data = FileUtils::getInstance()->getDataFromFile(src);
+		FileUtils::getInstance()->writeDataToFile(data, dst);
+	}
+	strcpy(szDst, dst.c_str());
+	log("path: %s", szDst);
+#else
     GetSelfExe(szDst);
     lpSeparator = strrchr(szDst, PATH_SEPARATOR);
     if (lpSeparator == NULL) {
@@ -72,6 +89,7 @@ inline void LocatePath(char *szDst, const char *szSrc) {
     } else {
       strcpy(lpSeparator + 1, szSrc);
     }
+#endif
   }
 }
 

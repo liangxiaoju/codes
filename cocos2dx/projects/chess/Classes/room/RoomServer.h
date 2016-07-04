@@ -69,9 +69,17 @@ public:
 				if (packet["TYPE"] == "ack") {
 					RoomPacket p;
 					p["TYPE"] = "connect";
-					p["FROM"] = "amin";
+					p["FROM"] = "admin";
 					p["CONTENT"] = from;
 					emitPacket(p);
+
+					for (auto &kv : _clientMap) {
+						RoomPacket p;
+						p["TYPE"] = "connect";
+						p["FROM"] = "admin";
+						p["CONTENT"] = kv.second;
+						emitPacketTo(fd, p);
+					}
 
 					_clientMap[fd] = from;
 					std::cout << "Add member: " << from << std::endl;

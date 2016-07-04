@@ -31,6 +31,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 	auto rsize = rheader->getContentSize();
 	lheader->setPosition(origin.x+vsize.width/2, origin.y+lsize.height/2+20);
 	rheader->setPosition(origin.x+vsize.width/2, origin.y+vsize.height-rsize.height/2-20);
+	rheader->setNameLine(item.data.subtitle);
 
 	auto gameLayer = GameLayer::create(playerWhite, playerBlack, board);
 	gameLayer->addChild(lheader);

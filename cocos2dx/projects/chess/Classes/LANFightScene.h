@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "Player.h"
+#include "UIPlayer.h"
+#include "NetPlayer.h"
 #include "Board.h"
 #include "GameLayer.h"
 #include "room/RoomManager.h"
@@ -18,7 +20,8 @@ public:
 private:
 	void scan();
 
-	Player *_playerNet;
+	UIPlayer *_playerUI;
+	NetPlayer *_playerNet;
 	Player *_playerWhite;
 	Player *_playerBlack;
 	GameLayer *_gameLayer;

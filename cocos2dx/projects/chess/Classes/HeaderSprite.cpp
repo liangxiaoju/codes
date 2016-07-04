@@ -61,7 +61,8 @@ void HeaderSprite::setNameLine(std::string name)
 	rp_top->setRelativeToWidgetName("line");
 	rp_top->setAlign(RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_CENTER);
 	text->setLayoutParameter(rp_top);
-	_layout->removeChildByName("nameLine");
+	if (_layout->getChildByName("nameLine"))
+		_layout->removeChildByName("nameLine");
 	_layout->addChild(text, 0, "nameLine");
 }
 
@@ -74,7 +75,8 @@ void HeaderSprite::setInfoLine(std::string info)
 	rp_bottom->setRelativeToWidgetName("line");
 	rp_bottom->setAlign(RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_CENTER);
 	text->setLayoutParameter(rp_bottom);
-	_layout->removeChildByName("infoLine");
+	if (_layout->getChildByName("infoLine"))
+		_layout->removeChildByName("infoLine");
 	_layout->addChild(text, 0, "infoLine");
 }
 
@@ -92,6 +94,7 @@ void HeaderSprite::setActive(bool active)
 		sprite->setPosition(size.width/2, size.height/2);
 		head->addChild(sprite, 0, "active");
 	} else {
-		head->removeChildByName("active");
+		if (head->getChildByName("active"))
+			head->removeChildByName("active");
 	}
 }

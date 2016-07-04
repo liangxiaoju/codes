@@ -36,7 +36,8 @@ struct RC4Struct {
 #if defined __arm__ || defined __mips__
     Seed.qw = 0;
 #else
-    Seed.qw = TimeStampCounter();
+    //Seed.qw = TimeStampCounter();
+    Seed.qw = 0;
 #endif
     Seed.dw[1] ^= (uint32_t) GetTime();
     Init(&Seed, 8);

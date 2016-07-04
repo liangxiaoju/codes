@@ -38,15 +38,15 @@ public:
 			Director::getInstance()->pushScene(scene);
 		});
 		b2->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 1);
-			Director::getInstance()->pushScene(scene);
-		});
-		b3->addClickEventListener([](Ref *ref){
 			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 2);
 			Director::getInstance()->pushScene(scene);
 		});
+		b3->addClickEventListener([](Ref *ref){
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 5);
+			Director::getInstance()->pushScene(scene);
+		});
 		b4->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 3);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 8);
 			Director::getInstance()->pushScene(scene);
 		});
 

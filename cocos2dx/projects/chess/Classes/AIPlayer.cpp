@@ -333,8 +333,10 @@ void AIPlayer::start(std::string fen)
 
 		if (reply.find("nobestmove") != std::string::npos) {
 				_delegate->onResignRequest();
+		/*
 		} else if (reply.find("draw") != std::string::npos) {
 				_delegate->onDrawRequest();
+		*/
 		} else {
 			auto substr = Utils::splitString(reply, ' ');
 			auto mv = substr[1];

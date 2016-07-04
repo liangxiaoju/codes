@@ -184,16 +184,22 @@ public:
 				s->setPosition(origin.x + vsize.width/2,
 						origin.y + vsize.height/2);
 			}
+
+			Device::vibrate(0.4);
 		};
 
 		setOnEnterCallback([this, listener, over_callback](){
 			getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 			getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_callback);
+
+			Device::setKeepScreenOn(true);
 		});
 
 		setOnExitCallback([this](){
 			getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
 			getEventDispatcher()->removeEventListenersForTarget(this);
+
+			Device::setKeepScreenOn(false);
 		});
 
 		return true;
