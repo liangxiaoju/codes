@@ -7,93 +7,92 @@ bool NetPlayer::init(RoomClient *client)
 	if (!Player::init("Net"))
 		return false;
 
+	_isDestroyed = std::make_shared<std::atomic<bool>>(false);
+
 	_active = false;
 	_client = client;
 
-	auto onAction = [this](RoomClient *client, const RoomPacket &packet) {
+	std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
 
-		if (packet["TYPE"] == "action") {
-			if (!_active) {
-				log("@@ inactive: ignore.");
+	auto onAction = [this, isDestroyed](RoomClient *client, const RoomPacket &packet) {
+
+		if (*isDestroyed) {
+			log("onAction: NetPlayer instance was destroyed!");
+			return;
+		}
+
+		if (!_active) {
+			log("@@ inactive: ignore.");
+			return;
+		}
+
+		auto content = packet["CONTENT"];
+
+		if (content.find("position") != std::string::npos) {
+
+			_client->emit("action", "ok");
+
+			if (content.find_first_of(_fen) == std::string::npos) {
+				log("@@ position not match: %s", content.c_str());
 				return;
 			}
 
-			auto content = packet["CONTENT"];
-
-			if (content.find("position") != std::string::npos) {
-
-				auto cb = [this, content]() {
-					log("@@ Got: %s", content.c_str());
-
-					auto substr = Utils::splitString(content, ' ');
-
-					auto mv = substr.back();
-					_delegate->onMoveRequest(mv);
-				};
-
-				_client->emit("action", "ok");
-
-				if (content.find_first_of(_fen) == std::string::npos) {
-					log("@@ position not match: %s", content.c_str());
-					return;
-				}
-
-				if (content.find_first_of("moves") == std::string::npos) {
-					log("@@ ignore: %s", content.c_str());
-					return;
-				}
-
-				CallFunc *callback = CallFunc::create(cb);
-				runAction(callback);
-
-			} else if (content.find("ok") != std::string::npos) {
-				log("@@ Got Reply");
-				stopAllActionsByTag(1000);
+			if (content.find_first_of("moves") == std::string::npos) {
+				log("@@ ignore: %s", content.c_str());
+				return;
 			}
+
+			log("@@ Got: %s", content.c_str());
+
+			auto substr = Utils::splitString(content, ' ');
+			auto mv = substr.back();
+
+			_delegate->onMoveRequest(mv);
+
+		} else if (content.find("ok") != std::string::npos) {
+			log("@@ Got Reply");
+			stopAllActionsByTag(1000);
 		}
 	};
 
-	auto onControl = [this](RoomClient *client, const RoomPacket &packet) {
+	auto onControl = [this, isDestroyed](RoomClient *client, const RoomPacket &packet) {
 
-		if (packet["TYPE"] == "control") {
-			auto content = packet["CONTENT"];
+		if (*isDestroyed) {
+			log("onControl: NetPlayer instance was destroyed!");
+			return;
+		}
 
-			if (content.find("regret") != std::string::npos) {
-				auto cb = [this]() {
-					log("@@ request regret");
-					_delegate->onRegretRequest();
-				};
-				CallFunc *callback = CallFunc::create(cb);
-				runAction(callback);
-			} else if (content.find("draw") != std::string::npos) {
-				auto cb = [this]() {
-					log("@@ request draw");
-					_delegate->onDrawRequest();
-				};
-				CallFunc *callback = CallFunc::create(cb);
-				runAction(callback);
-			} else if (content.find("reset") != std::string::npos) {
-				auto cb = [this]() {
-					log("@@ request reset");
-					Director::getInstance()->getEventDispatcher()
-						->dispatchCustomEvent(EVENT_RESET, (void*)"Net");
-				};
-				CallFunc *callback = CallFunc::create(cb);
-				runAction(callback);
-			} else if (content.find("switch") != std::string::npos) {
-				auto cb = [this]() {
-					log("@@ request switch");
-					Director::getInstance()->getEventDispatcher()
-						->dispatchCustomEvent(EVENT_SWITCH, (void*)"Net");
-				};
-				CallFunc *callback = CallFunc::create(cb);
-				runAction(callback);
-			}
+		auto content = packet["CONTENT"];
+
+		if (content.find("regret") != std::string::npos) {
+			log("@@ request regret");
+			_delegate->onRegretRequest();
+		} else if (content.find("draw") != std::string::npos) {
+			log("@@ request draw");
+			_delegate->onDrawRequest();
+		} else if (content.find("reset") != std::string::npos) {
+			log("@@ request reset");
+			Director::getInstance()->getEventDispatcher()
+				->dispatchCustomEvent(EVENT_RESET, (void*)"Net");
+		} else if (content.find("switch") != std::string::npos) {
+			log("@@ request switch");
+			Director::getInstance()->getEventDispatcher()
+				->dispatchCustomEvent(EVENT_SWITCH, (void*)"Net");
 		}
 	};
 
-	_client->on("action", onAction);
-	_client->on("control", onControl);
+	_client->on("action", [onAction](RoomClient *client, const RoomPacket &packet) {
+		Director::getInstance()->getScheduler()->performFunctionInCocosThread(
+			[onAction, client, packet]() {
+			onAction(client, packet);
+		});
+	});
+	_client->on("control", [onControl](RoomClient *client, const RoomPacket &packet) {
+		Director::getInstance()->getScheduler()->performFunctionInCocosThread(
+		[onControl, client, packet]() {
+			onControl(client, packet);
+		});
+	});
 
 	return true;
 }

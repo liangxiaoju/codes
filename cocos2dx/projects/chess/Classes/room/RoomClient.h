@@ -24,6 +24,16 @@ public:
 	{
 	}
 
+    void onError(std::string err)
+    {
+        RoomPacket packet;
+        packet["TYPE"] = "error";
+        packet["CONTENT"] = err;
+		packet["FROM"] = _name;
+		packet["TO"] = _name;
+        fireEvent(packet);
+    }
+
 	void onMessage(std::string msg)
 	{
 		auto packets = RoomPacket::parser(msg);

@@ -122,8 +122,9 @@ public:
 			{
 				std::unique_lock<std::mutex> lock(_queueMutex);
 				_stop = true;
-				while(_queue.size())
-					_queue.pop();
+                /* we should handle all the request before exit */
+				//while(_queue.size())
+				//	_queue.pop();
 				write(_pipe[1], "W", 1);
 				_condition.notify_all();
 			}

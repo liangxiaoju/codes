@@ -67,12 +67,14 @@ public:
 
 			if (to == "admin") {
 				if (packet["TYPE"] == "ack") {
+                    /* tell others about the newer */
 					RoomPacket p;
 					p["TYPE"] = "connect";
 					p["FROM"] = "admin";
 					p["CONTENT"] = from;
 					emitPacket(p);
 
+                    /* send member list to the newer */
 					for (auto &kv : _clientMap) {
 						RoomPacket p;
 						p["TYPE"] = "connect";

@@ -5,6 +5,8 @@
 #include "Player.h"
 #include "Utils.h"
 #include "room/RoomManager.h"
+#include <memory>  // for std::shared_ptr
+#include <atomic>
 
 USING_NS_CC;
 
@@ -41,6 +43,7 @@ private:
 	bool _active;
 	std::string _fen;
 	int _sendcount;
+    std::shared_ptr<std::atomic<bool>> _isDestroyed;
 };
 
 #endif

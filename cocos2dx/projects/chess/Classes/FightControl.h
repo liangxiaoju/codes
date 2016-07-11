@@ -52,8 +52,7 @@ public:
 		bg->setPositionY(menuItemBtn->getPositionY()+btnSize.height/2+bgSize.height/2+20);
 		_menuNode->addChild(bg, 0, "menuBG");
 
-		Vector <MenuItem*> items;
-		items.pushBack(MenuItemImage::create(
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/game_button_save.png",
 				"FightSceneMenu/game_button_saveP.png",
 				"FightSceneMenu/game_button_saveDIS.png",
@@ -68,8 +67,8 @@ public:
 					auto action = Sequence::create(DelayTime::create(3), RemoveSelf::create(), nullptr);
 					text->runAction(action);
 				}));
-		items.back()->setName("btn_save");
-		items.pushBack(MenuItemImage::create(
+		_items.back()->setName("btn_save");
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/game_button_lose_new.png",
 				"FightSceneMenu/game_button_loseP_new.png",
 				"FightSceneMenu/game_button_loseG_new.png",
@@ -77,8 +76,8 @@ public:
 					log("onLose");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_RESIGN);
 				}));
-		items.back()->setName("btn_lose");
-		items.pushBack(MenuItemImage::create(
+		_items.back()->setName("btn_lose");
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/game_button_peace_new.png",
 				"FightSceneMenu/game_button_peaceP_new.png",
 				"FightSceneMenu/game_button_peaceG_new.png",
@@ -86,8 +85,8 @@ public:
 					log("onPeace");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
 				}));
-		items.back()->setName("btn_peace");
-		items.pushBack(MenuItemImage::create(
+		_items.back()->setName("btn_peace");
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/game_button_02.png",
 				"FightSceneMenu/game_button_02P.png",
 				"FightSceneMenu/game_button_02dis.png",
@@ -95,8 +94,8 @@ public:
 					log("onReset");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_RESET);
 				}));
-		items.back()->setName("btn_Reset");
-		items.pushBack(MenuItemImage::create(
+		_items.back()->setName("btn_Reset");
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/game_button_01.png",
 				"FightSceneMenu/game_button_01P.png",
 				"FightSceneMenu/game_button_01G.png",
@@ -104,8 +103,8 @@ public:
 					log("onRegret");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_REGRET);
 				}));
-		items.back()->setName("btn_regret");
-		items.pushBack(MenuItemImage::create(
+		_items.back()->setName("btn_regret");
+		_items.pushBack(MenuItemImage::create(
 				"FightSceneMenu/look_switch.png",
 				"FightSceneMenu/look_switch_sel.png",
 				"FightSceneMenu/look_switch_disable.png",
@@ -113,11 +112,11 @@ public:
 					log("onChangeSide");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_SWITCH);
 				}));
-		items.back()->setName("btn_switch");
+		_items.back()->setName("btn_switch");
 
-		int n = items.size();
+		int n = _items.size();
 		int i = 0;
-		for (auto &item : items) {
+		for (auto &item : _items) {
 			auto bgPos = bg->getPosition();
 			auto contentSize = bg->getContentSize();
 			int offsetX = (contentSize.width/n) * (i + 0.5);
@@ -126,7 +125,7 @@ public:
 			i++;
 		}
 
-		auto subMenu = Menu::createWithArray(items);
+		auto subMenu = Menu::createWithArray(_items);
 		subMenu->setPosition(Vec2::ZERO);
 		_menuNode->addChild(subMenu, 0, "subMenu");
 
@@ -207,8 +206,18 @@ public:
 
 	CREATE_FUNC(FightControl);
 
+    void setEnabled(bool enable)
+    {
+        //auto subMenu = dynamic_cast<Menu*>(_menuNode->getChildByName("subMenu"));
+        //subMenu->setEnabled(enable);
+		for (auto &item : _items) {
+			item->setEnabled(enable);
+		}
+    }
+
 private:
 	Node *_menuNode;
+	Vector <MenuItem*> _items;
 };
 
 #endif

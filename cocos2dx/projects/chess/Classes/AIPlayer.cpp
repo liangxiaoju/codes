@@ -12,6 +12,7 @@ bool AIPlayer::init()
 		return false;
 
 	_stop = false;
+	_isDestroyed = std::make_shared<std::atomic<bool>>(false);
 
 	pipe(_pipe);
 
@@ -59,9 +60,8 @@ AIPlayer::~AIPlayer()
 	sendWithReply("quit", "bye");
 	_aiThread.join();
 
-    stopAllActions();
-
 	_stop = true;
+	*_isDestroyed = true;
 
 	fclose(_sockfile);
 	_condition.notify_all();
@@ -304,10 +304,14 @@ void AIPlayer::sendWithCallBack(std::string msg,
 	RequestCallback _cb = [this, cb](std::string reply){
 		log("sendWithCallBack Got(%s)", reply.c_str());
 
-		CallFunc *callback = CallFunc::create([cb, reply]() {
+        std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+		getScheduler()->performFunctionInCocosThread([cb, reply, isDestroyed]() {
+			if (*isDestroyed) {
+				log("AIPlayer instance was destroyed!");
+			} else {
 				cb(reply);
-				});
-		runAction(callback);
+			}
+		});
 
 	};
 
@@ -354,7 +358,6 @@ void AIPlayer::stop()
 	write(_pipe[1], "W", 1);
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
-    stopAllActions();
 }
 
 bool AIPlayer::onRequest(std::string req)

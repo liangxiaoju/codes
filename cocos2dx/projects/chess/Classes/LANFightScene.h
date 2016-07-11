@@ -7,6 +7,7 @@
 #include "NetPlayer.h"
 #include "Board.h"
 #include "GameLayer.h"
+#include "FightControl.h"
 #include "room/RoomManager.h"
 
 USING_NS_CC;
@@ -20,6 +21,7 @@ public:
 private:
 	void scan();
 
+    FightControl *_fightControl;
 	UIPlayer *_playerUI;
 	NetPlayer *_playerNet;
 	Player *_playerWhite;
@@ -29,7 +31,9 @@ private:
 	RoomClient *_client;
 	RoomServer *_server;
 	std::thread _thread;
-	bool _rotation;
+    std::string _side;
+    std::string _fen;
+    std::string _clientID;
 };
 
 #endif

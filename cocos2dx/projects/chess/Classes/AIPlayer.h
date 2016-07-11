@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "Player.h"
 #include "Utils.h"
+#include <memory>  // for std::shared_ptr
+#include <atomic>
 
 USING_NS_CC;
 
@@ -43,6 +45,7 @@ private:
 	FILE *_sockfile;
 
 	bool _stop;
+    std::shared_ptr<std::atomic<bool>> _isDestroyed;
 	std::mutex _mutex;
 	std::condition_variable _condition;
 	std::queue<Request> _queue;
