@@ -39,7 +39,7 @@ inline void PrintLn(const char *sz) {
   pipeStd.LineOutput(sz);
 }
 
-int emain(void) {
+int AIEngine(void) {
   int i;
   bool bPonderTime;
   UcciCommStruct UcciComm;

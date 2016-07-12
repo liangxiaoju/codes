@@ -16,6 +16,9 @@
 
 #define EVENT_NEXT "EV_NEXT"
 
+#define EVENT_SUSPEND "EV_SUSPEND"
+#define EVENT_RESUME "EV_RESUME"
+
 namespace std {
 	template <>
 	struct hash<cocos2d::Vec2>

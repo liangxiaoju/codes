@@ -6,20 +6,42 @@
 #include <netdb.h>
 #include <unistd.h>
 
+//#define USE_SOCKET
+
+extern void AIEngine();
+int serverReadFD;
+int serverWriteFD;
+
 bool AIPlayer::init()
 {
+    int pipefd[2];
+
 	if (!Player::init("AI"))
 		return false;
 
 	_stop = false;
 	_isDestroyed = std::make_shared<std::atomic<bool>>(false);
 
-	pipe(_pipe);
+    pipe(pipefd);
+    _wakeReadFD = pipefd[0];
+    _wakeWriteFD = pipefd[1];
+
+#ifndef USE_SOCKET
+    pipe(pipefd);
+    _AIReadFD = pipefd[0];
+    serverWriteFD = pipefd[1];
+
+    pipe(pipefd);
+    _AIWriteFD = pipefd[1];
+    serverReadFD = pipefd[0];
+#endif
 
 	_aiThread = std::thread(std::bind(&AIPlayer::AI_Thread, this));
 	_cmdThread = std::thread(std::bind(&AIPlayer::CMD_Thread, this));
 
+#ifdef USE_SOCKET
 	int i = 0;
+    int sockfd;
 	while (i++ < 10) {
 		struct sockaddr_in addr;
 		memset(&addr, 0, sizeof(addr));
@@ -27,24 +49,29 @@ bool AIPlayer::init()
 		addr.sin_addr.s_addr = htonl(INADDR_ANY);
 		addr.sin_port = htons(6669);
 
-		if ((_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 			log("Failed to create socket");
 			continue;
 		}
-		if (connect(_sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+		if (connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 			log("Failed to connect, retry %d", i);
-			close(_sockfd);
-			_sockfd = -1;
+			close(sockfd);
+			sockfd = -1;
 			usleep(200*1000);
 		} else
 			break;
 	}
 
-	if (_sockfd < 0)
+	if (sockfd < 0)
 		return false;
 
-	_sockfile = fdopen(_sockfd, "r+");
-	setbuf(_sockfile, NULL);
+    _AIReadFD = _AIWriteFD = sockfd;
+#endif
+
+    _AIReadFile = fdopen(_AIReadFD, "r");
+    _AIWriteFile = fdopen(_AIWriteFD, "w");
+	setbuf(_AIReadFile, NULL);
+	setbuf(_AIWriteFile, NULL);
 
 	std::string reply;
 	reply = sendWithReply("ucci", "ucciok");
@@ -63,28 +90,27 @@ AIPlayer::~AIPlayer()
 	_stop = true;
 	*_isDestroyed = true;
 
-	fclose(_sockfile);
+	fclose(_AIReadFile);
+    fclose(_AIWriteFile);
 	_condition.notify_all();
 	_cmdThread.join();
 
-	close(_pipe[0]);
-	close(_pipe[1]);
+	close(_wakeReadFD);
+	close(_wakeWriteFD);
 
 	log("~AIPlayer");
 }
 
-extern void emain();
-int server_socketfd;
-
 void AIPlayer::AI_Thread()
 {
+#ifdef USE_SOCKET
 	int sockfd, newsockfd;
 	socklen_t len;
 	struct sockaddr_in srvaddr, cliaddr;
 	const int on = 1;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0) 
+	if (sockfd < 0)
 		log("ERROR opening socket");
 
 	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
@@ -97,63 +123,32 @@ void AIPlayer::AI_Thread()
 	srvaddr.sin_port = htons(6669);
 
 	if (bind(sockfd, (struct sockaddr *) &srvaddr,
-				sizeof(struct sockaddr_in)) < 0) 
+				sizeof(struct sockaddr_in)) < 0)
 		log("ERROR on binding");
 
 	listen(sockfd, 1);
 	len = sizeof(cliaddr);
 
-	newsockfd = accept(sockfd, 
-			(struct sockaddr *) &cliaddr, 
+	newsockfd = accept(sockfd,
+			(struct sockaddr *) &cliaddr,
 			&len);
-	if (newsockfd < 0) 
+	if (newsockfd < 0)
 		log("ERROR on accept");
 
 	close(sockfd);
 
-	server_socketfd = newsockfd;
+	serverReadFD = serverWriteFD = newsockfd;
+#endif
 
 	log("Eleeye_Thread start.");
 
-	emain();
+	AIEngine();
 
 	log("Eleeye_Thread exit.");
 }
 
 void AIPlayer::CMD_Thread()
 {
-	/*
-	 * android ndk<21 has no getline()
-	 * our getline() do not return '\n'
-	 */
-	auto getline = [](char **lineptr, size_t *len, FILE *fp)->size_t{
-		char *ptr = *lineptr;
-		int fd = fileno(fp);
-		size_t n, rc, maxlen = *len;
-		char c;
-
-		if (ptr == NULL) return -1;
-
-		for( n = 0; n < maxlen - 1; n++ ) {
-			if((rc = recv(fd, &c, 1, 0)) == 1) {
-				*ptr = c;
-				if(c == '\n') {
-					break;
-				}
-				ptr++;
-			} else if( rc == 0 ) {
-				return 0;
-			} else if( errno == EINTR ) {
-				continue;
-			} else {
-				return -1;
-			}
-		}
-
-		*ptr = 0;
-		return n;
-	};
-
 	do {
 		Request request;
 		{
@@ -170,26 +165,26 @@ void AIPlayer::CMD_Thread()
 
 		fd_set fdset;
 		FD_ZERO(&fdset);
-		FD_SET(_sockfd, &fdset);
+		FD_SET(_AIReadFD, &fdset);
 		struct timeval timeout = {0, 0};
 
-		if (select(_sockfd+1, &fdset, NULL, NULL, &timeout) > 0) {
+		if (select(_AIReadFD+1, &fdset, NULL, NULL, &timeout) > 0) {
 			char tmp[1024];
-			recv(_sockfd, tmp, sizeof(tmp), 0);
+			read(_AIReadFD, tmp, sizeof(tmp));
 		}
 
 		FD_ZERO(&fdset);
-		FD_SET(_pipe[0], &fdset);
+		FD_SET(_wakeReadFD, &fdset);
 		memset(&timeout, 0, sizeof(timeout));
 
-		if (select(_pipe[0]+1, &fdset, NULL, NULL, &timeout) > 0) {
+		if (select(_wakeReadFD+1, &fdset, NULL, NULL, &timeout) > 0) {
 			char c[32];
-			read(_pipe[0], c, sizeof(c));
+			read(_wakeReadFD, c, sizeof(c));
 		}
 
 		if (request.cmd.size() > 0) {
-			fprintf(_sockfile, "%s\n", request.cmd.c_str());
-			fflush(_sockfile);
+			fprintf(_AIWriteFile, "%s\n", request.cmd.c_str());
+			fflush(_AIWriteFile);
 		}
 
 		memset(&timeout, 0, sizeof(timeout));
@@ -206,9 +201,9 @@ void AIPlayer::CMD_Thread()
 
 			do {
 				FD_ZERO(&fdset);
-				FD_SET(_sockfd, &fdset);
-				FD_SET(_pipe[0], &fdset);
-				int n = select(std::max(_sockfd, _pipe[0])+1,
+				FD_SET(_AIReadFD, &fdset);
+				FD_SET(_wakeReadFD, &fdset);
+				int n = select(std::max(_AIReadFD, _wakeReadFD)+1,
 						&fdset, NULL, NULL, &timeout);
 				if (_stop)
 					return;
@@ -216,19 +211,15 @@ void AIPlayer::CMD_Thread()
 					log("select timeout");
 					break;
 				}
-				if (FD_ISSET(_pipe[0], &fdset)) {
+				if (FD_ISSET(_wakeReadFD, &fdset)) {
 					char c[32];
-					read(_pipe[0], c, sizeof(c));
+					read(_wakeReadFD, c, sizeof(c));
 					break;
 				}
-				if (FD_ISSET(_sockfd, &fdset)) {
-#if 1
-					if ((n = getline(&line, &len, _sockfile)) < 0)
+				if (FD_ISSET(_AIReadFD, &fdset)) {
+					if (fgets(line, len, _AIReadFile) == NULL)
 						continue;
-#else
-					if (fgets(line, len, _sockfile) == NULL)
-						continue;
-#endif
+
 					if (strstr(line, request.reply.c_str()) != nullptr) {
 						break;
 					}
@@ -240,6 +231,8 @@ void AIPlayer::CMD_Thread()
 
 			std::string reply(line);
 			free(line);
+            if (reply.back() == '\n')
+                reply.pop_back();
 			request.cb(reply);
 		}
 
@@ -355,7 +348,7 @@ void AIPlayer::start(std::string fen)
 
 void AIPlayer::stop()
 {
-	write(_pipe[1], "W", 1);
+	write(_wakeWriteFD, "W", 1);
 	sendWithoutReply("stop");
 	sendWithReply("stop", "nobestmove");
 }

@@ -11,6 +11,9 @@ bool LANFightScene::init()
 
 	_client = nullptr;
 	_server = nullptr;
+    /* init for server */
+    _side = "white";
+    _fen = Board::START_FEN;
 
 	auto bgLayer = BGLayer::create();
 	addChild(bgLayer);
@@ -60,17 +63,49 @@ bool LANFightScene::init()
         _fightControl = FightControl::create();
         addChild(_fightControl, 1);
 	};
+    auto suspend_cb = [this](EventCustom *ev) {
+        log("suspend LANFightscene");
 
-	setOnEnterCallback([this, reset_cb, switch_cb](){
+        if (!_thread.joinable())
+            return;
+
+        _thread.join();
+        _playerWhite->stop();
+        _playerBlack->stop();
+        _fen = _board->getFenWithMove();
+
+        std::unique_lock<std::mutex> lock(_mutex);
+		if (_client) {
+			RoomManager::getInstance()->leaveRoom(_client);
+            _client = nullptr;
+        }
+		if (_server) {
+			RoomManager::getInstance()->destroyRoom(_server);
+            _server = nullptr;
+        }
+        log("suspend done");
+    };
+    auto resume_cb = [this](EventCustom *ev) {
+        log("resume LANFightscene");
+
+        if (!_thread.joinable())
+            _thread = std::thread(std::bind(&LANFightScene::scan, this));
+    };
+
+	setOnEnterCallback([this, reset_cb, switch_cb, suspend_cb, resume_cb](){
 		_thread = std::thread(std::bind(&LANFightScene::scan, this));
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SWITCH, switch_cb);
+        getEventDispatcher()->addCustomEventListener(EVENT_SUSPEND, suspend_cb);
+        getEventDispatcher()->addCustomEventListener(EVENT_RESUME, resume_cb);
 	});
 
 	setOnExitCallback([this](){
 		getEventDispatcher()->removeCustomEventListeners(EVENT_RESET);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SWITCH);
-		_thread.join();
+        getEventDispatcher()->removeCustomEventListeners(EVENT_SUSPEND);
+        getEventDispatcher()->removeCustomEventListeners(EVENT_RESUME);
+ 		_thread.join();
 		if (_client)
 			RoomManager::getInstance()->leaveRoom(_client);
 		if (_server)
@@ -85,6 +120,12 @@ void LANFightScene::scan()
 	auto showLoading = [this]() {
 		getScheduler()->performFunctionInCocosThread([this](){
 			log("showLoading");
+
+            if (getChildByName("outter"))
+                removeChildByName("outter");
+            if (getChildByName("inner"))
+                removeChildByName("inner");
+
             _fightControl->setEnabled(false);
 			auto vsize = Director::getInstance()->getVisibleSize();
 			RotateBy *rotateBy = RotateBy::create(0.1, -15);
@@ -121,13 +162,19 @@ void LANFightScene::scan()
 			_gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
 			addChild(_gameLayer, 0, "gamelayer");
 
-			removeChildByName("outter");
-			removeChildByName("inner");
+            if (getChildByName("outter"))
+                removeChildByName("outter");
+            if (getChildByName("inner"))
+                removeChildByName("inner");
 		});
 	};
 
     auto onServer = [=]() {
         log("onServer");
+        if (_client == nullptr) {
+            log("client is null");
+            return;
+        }
         /* we may not recv the connect event */
         _client->on("connect", [this](RoomClient *client, const RoomPacket &packet) {
                 log("server: client connect");
@@ -165,6 +212,10 @@ void LANFightScene::scan()
     };
 
     auto onClient = [=]() {
+        if (_client == nullptr) {
+            log("client is null");
+            return;
+        }
         _client->on("init", [this, startGame](RoomClient *client, const RoomPacket &packet) {
                 log("client: onInit (%s %s)", packet["SIDE"].c_str(), packet["FEN"].c_str());
 
@@ -180,6 +231,8 @@ void LANFightScene::scan()
 
                 log("client: server shutdown");
                 showLoading();
+
+                std::unique_lock<std::mutex> lock(_mutex);
                 /* switch to server */
                 RoomManager *manager = RoomManager::getInstance();
                 _server = manager->createRoom();
@@ -187,6 +240,7 @@ void LANFightScene::scan()
                 v = manager->scanRoom(1, 5);
                 if (v.size() == 0)
                     return;
+
                 auto clientOld = _client;
                 _client = manager->joinRoom(_clientID, v[0]);
                 getScheduler()->performFunctionInCocosThread([this, clientOld, onServer](){
@@ -225,8 +279,6 @@ void LANFightScene::scan()
     _clientID = name;
 
     if (_server) {
-        _side = "white";
-        _fen = Board::START_FEN;
         onServer();
     } else {
         onClient();

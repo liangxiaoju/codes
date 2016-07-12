@@ -157,7 +157,9 @@ void PipeStruct::LineOutput(const char *szLineStr) const {
 #include <time.h>
 #include <unistd.h>
 
-extern int server_socketfd;
+extern int serverReadFD;
+extern int serverWriteFD;
+
 void PipeStruct::Open(const char *szProcFile) {
   int nStdinPipe[2], nStdoutPipe[2];
   char szDir[PATH_MAX_CHAR];
@@ -166,7 +168,8 @@ void PipeStruct::Open(const char *szProcFile) {
   if (szProcFile == NULL) {
     nInput = STDIN_FILENO;
     nOutput = STDOUT_FILENO;
-	nInput = nOutput = server_socketfd;
+    nInput = serverReadFD;
+    nOutput = serverWriteFD;
   } else {
     pipe(nStdinPipe);
     pipe(nStdoutPipe);

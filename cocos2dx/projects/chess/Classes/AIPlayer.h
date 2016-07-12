@@ -41,9 +41,6 @@ private:
 	void AI_Thread();
 	void CMD_Thread();
 
-	int _sockfd;
-	FILE *_sockfile;
-
 	bool _stop;
     std::shared_ptr<std::atomic<bool>> _isDestroyed;
 	std::mutex _mutex;
@@ -54,7 +51,13 @@ private:
 	std::thread _aiThread;
 
 	int _level;
-	int _pipe[2];
+
+    int _wakeReadFD;
+    int _wakeWriteFD;
+    int _AIReadFD;
+    int _AIWriteFD;
+    FILE *_AIReadFile;
+    FILE *_AIWriteFile;
 };
 
 #endif

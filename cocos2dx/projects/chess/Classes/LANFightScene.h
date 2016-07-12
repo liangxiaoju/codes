@@ -34,6 +34,8 @@ private:
     std::string _side;
     std::string _fen;
     std::string _clientID;
+
+    std::mutex _mutex;
 };
 
 #endif
