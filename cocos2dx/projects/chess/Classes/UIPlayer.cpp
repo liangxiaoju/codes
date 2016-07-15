@@ -1,5 +1,6 @@
 #include "UIPlayer.h"
 #include "HeaderSprite.h"
+#include "Sound.h"
 
 bool UIPlayer::init()
 {
@@ -84,6 +85,9 @@ bool UIPlayer::onTouchBegan(Touch *touch, Event *event) {
 			_selectedPiece = nullptr;
 		}
 	}
+
+    if (_selectedPiece != nullptr)
+        Sound::getInstance()->playEffect("click");
 
 	return true;
 }

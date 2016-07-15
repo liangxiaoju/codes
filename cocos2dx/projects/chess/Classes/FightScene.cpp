@@ -4,6 +4,7 @@
 #include "BGLayer.h"
 #include "FightControl.h"
 #include "HeaderSprite.h"
+#include "Sound.h"
 
 bool FightScene::init(Role white, Role black, int level, std::string fen)
 {
@@ -95,14 +96,25 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 		se.fen = _board->getFenWithMove();
 		UserData::getInstance()->insertSaveElement(se);
 	};
+    auto over_cb = [this](EventCustom *ev) {
+        std::string event = (const char *)ev->getUserData();
+        if (event.find("DRAW:") != std::string::npos) {
+            Sound::getInstance()->playEffect("draw");
+        } else if (((event.find("WIN:WHITE") != std::string::npos) && (_roleWhite == Role::UI))
+                   || ((event.find("WIN:BLACK") != std::string::npos) && (_roleBlack == Role::UI))) {
+            Sound::getInstance()->playEffect("win");
+        } else {
+            Sound::getInstance()->playEffect("lose");
+        }
+    };
 
-	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, white_start_cb, black_start_cb](){
+	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, white_start_cb, black_start_cb, over_cb](){
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SWITCH, switch_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SAVE, save_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_WHITE_START, white_start_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_BLACK_START, black_start_cb);
-
+        getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_cb);
 	});
 
 	setOnExitCallback([this](){
@@ -111,6 +123,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SAVE);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_WHITE_START);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_BLACK_START);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
 	});
 
 	return true;

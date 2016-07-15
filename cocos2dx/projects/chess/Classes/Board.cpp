@@ -227,6 +227,23 @@ int Board::move(Vec2 src, Vec2 dst, bool check)
 		log("(%f %f)(%f %f) = %p", s.x, s.y, d.x, d.y, v.second);
 	}
 */
+#if 1
+    _mapPieces.erase(src);
+    _mapPieces[dst] = p;
+    changeSide();
+
+    unmarkMoveAll();
+    markMove(src, dst);
+
+    auto moveTo = MoveTo::create(0.15, convertIndexToLocalCoord(dst));
+    auto callback = CallFunc::create([this, p, dp, src, dst]() {
+            if (dp != nullptr)
+                _pieceLayer->removeChild(dp, true);
+            p->release();
+        });
+    auto seq = Sequence::create(moveTo, callback, nullptr);
+    p->runAction(seq);
+#else
 	removePiece(dst);
 	removePiece(src);
 	addPiece(dst, p);
@@ -236,6 +253,7 @@ int Board::move(Vec2 src, Vec2 dst, bool check)
 	markMove(src, dst);
 
 	changeSide();
+#endif
 
 	return 0;
 }

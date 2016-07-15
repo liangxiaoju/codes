@@ -5,7 +5,7 @@ Rule *Rule::s_rule = nullptr;
 
 Rule *Rule::getInstance() {
     if (!s_rule) {
-        s_rule= new Rule();
+        s_rule= new(std::nothrow) Rule();
         if (s_rule) {
             s_rule->init();
         }
@@ -62,4 +62,16 @@ bool Rule::isMate(std::string fen)
 {
     _pos.FromFen(fen.c_str());
 	return !!_pos.IsMate();
+}
+
+bool Rule::isChecked(std::string fen)
+{
+    _pos.FromFen(fen.c_str());
+    return !!_pos.InCheck();
+}
+
+bool Rule::isCaptured(std::string fen)
+{
+    _pos.FromFen(fen.c_str());
+    return !!_pos.Captured();
 }

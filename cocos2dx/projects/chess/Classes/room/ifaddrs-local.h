@@ -1,5 +1,5 @@
-#ifndef __IFADDRS_H__
-#define __IFADDRS_H__
+#ifndef __IFADDRS_LOCAL_H__
+#define __IFADDRS_LOCAL_H__
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -137,5 +137,4 @@ static void freeifaddrs(struct ifaddrs *ifa)
         free(ifp);
     }
 }
-
 #endif

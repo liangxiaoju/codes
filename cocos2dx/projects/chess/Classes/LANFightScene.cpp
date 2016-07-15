@@ -3,6 +3,7 @@
 #include "HeaderSprite.h"
 #include "UIPlayer.h"
 #include "NetPlayer.h"
+#include "Sound.h"
 
 bool LANFightScene::init()
 {
@@ -91,13 +92,25 @@ bool LANFightScene::init()
         if (!_thread.joinable())
             _thread = std::thread(std::bind(&LANFightScene::scan, this));
     };
+    auto over_cb = [this](EventCustom *ev) {
+        std::string event = (const char *)ev->getUserData();
+        if (event.find("DRAW:") != std::string::npos) {
+            Sound::getInstance()->playEffect("draw");
+        } else if (((event.find("WIN:WHITE") != std::string::npos) && (_playerWhite == _playerUI))
+                   || ((event.find("WIN:BLACK") != std::string::npos) && (_playerBlack == _playerUI))) {
+            Sound::getInstance()->playEffect("win");
+        } else {
+            Sound::getInstance()->playEffect("lose");
+        }
+    };
 
-	setOnEnterCallback([this, reset_cb, switch_cb, suspend_cb, resume_cb](){
+	setOnEnterCallback([this, reset_cb, switch_cb, suspend_cb, resume_cb, over_cb](){
 		_thread = std::thread(std::bind(&LANFightScene::scan, this));
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SWITCH, switch_cb);
         getEventDispatcher()->addCustomEventListener(EVENT_SUSPEND, suspend_cb);
         getEventDispatcher()->addCustomEventListener(EVENT_RESUME, resume_cb);
+        getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_cb);
 	});
 
 	setOnExitCallback([this](){
@@ -105,6 +118,7 @@ bool LANFightScene::init()
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SWITCH);
         getEventDispatcher()->removeCustomEventListeners(EVENT_SUSPEND);
         getEventDispatcher()->removeCustomEventListeners(EVENT_RESUME);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
  		_thread.join();
 		if (_client)
 			RoomManager::getInstance()->leaveRoom(_client);

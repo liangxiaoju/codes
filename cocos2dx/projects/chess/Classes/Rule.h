@@ -14,6 +14,8 @@ public:
 
 	int check(std::string fen);
 	bool isMate(std::string fen);
+    bool isChecked(std::string fen);
+    bool isCaptured(std::string fen);
 
 private:
 	static Rule *s_rule;

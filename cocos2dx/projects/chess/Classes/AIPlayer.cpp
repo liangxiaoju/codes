@@ -264,7 +264,8 @@ std::string AIPlayer::sendWithReply(std::string msg,
 	std::condition_variable cond;
 	bool done = false;
 
-	auto cb = [&r, &cond, &done](std::string reply){
+	auto cb = [&r, &cond, &done, &mutex](std::string reply){
+        std::unique_lock<std::mutex> lock(mutex);
 		r = reply;
 		done = true;
 		cond.notify_one();

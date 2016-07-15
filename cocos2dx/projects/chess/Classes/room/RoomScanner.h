@@ -14,7 +14,12 @@
 #include <string.h>
 #include <net/if.h>
 
-#include "ifaddrs.h"
+#ifdef __APPLE__
+#include <ifaddrs.h>
+#else
+#include "ifaddrs-local.h"
+#endif
+
 #include "RoomPacket.h"
 
 #define SCAN_PORT 6001

@@ -1,9 +1,9 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
-#include "FightScene.h"
-#include "MainMenuScene.h"
+#include "WelcomeScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
 
 static cocos2d::Size designResolutionSize = cocos2d::Size(720, 1280);
 static cocos2d::Size smallResolutionSize = cocos2d::Size(320, 480);
@@ -79,9 +79,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    //auto scene = HelloWorld::createScene();
-    //auto scene = FightScene::create();
-    auto scene = MainMenuScene::create();
+    auto scene = WelcomeScene::create();
 
     // run
     director->runWithScene(scene);
@@ -96,7 +94,7 @@ void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->getEventDispatcher()->dispatchCustomEvent(EVENT_SUSPEND);
 
     // if you use SimpleAudioEngine, it must be pause
-    // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
 }
 
 // this function will be called when the app is active again
@@ -106,5 +104,5 @@ void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->getEventDispatcher()->dispatchCustomEvent(EVENT_RESUME);
 
     // if you use SimpleAudioEngine, it must resume here
-    // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }

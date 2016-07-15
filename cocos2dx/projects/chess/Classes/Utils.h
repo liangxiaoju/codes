@@ -1,6 +1,10 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#include "cocos2d.h"
+
+USING_NS_CC;
+
 #define EVENT_GAMEOVER "EV_GAMEOVER"
 #define EVENT_WHITE_START "EV_WHITE_START"
 #define EVENT_BLACK_START "EV_BLACK_START"

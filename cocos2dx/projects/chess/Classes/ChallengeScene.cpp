@@ -5,6 +5,7 @@
 #include "AIPlayer.h"
 #include "ChallengeControl.h"
 #include "HeaderSprite.h"
+#include "Sound.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -72,12 +73,23 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 			Director::getInstance()->replaceScene(scene);
 		}
 	};
+    auto over_cb = [this](EventCustom *ev) {
+        std::string event = (const char *)ev->getUserData();
+        if (event.find("DRAW:") != std::string::npos) {
+            Sound::getInstance()->playEffect("draw");
+        } else if (event.find("WIN:WHITE") != std::string::npos) {
+            Sound::getInstance()->playEffect("win");
+        } else {
+            Sound::getInstance()->playEffect("lose");
+        }
+    };
 
-	setOnEnterCallback([this, reset_cb, next_cb, white_start_cb, black_start_cb](){
+	setOnEnterCallback([this, reset_cb, next_cb, white_start_cb, black_start_cb, over_cb](){
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_NEXT, next_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_WHITE_START, white_start_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_BLACK_START, black_start_cb);
+        getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_cb);
 	});
 
 	setOnExitCallback([this](){
@@ -85,6 +97,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 		getEventDispatcher()->removeCustomEventListeners(EVENT_NEXT);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_WHITE_START);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_BLACK_START);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);
 	});
 
 	return true;

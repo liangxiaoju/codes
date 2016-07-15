@@ -3,6 +3,7 @@
 #include "AIPlayer.h"
 #include "NetPlayer.h"
 #include "UserData.h"
+#include "Sound.h"
 
 bool GameLayer::init(Player *white, Player *black, Board *board)
 {
@@ -74,6 +75,13 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 
 	switch (retval) {
 	case 0:
+        if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
+            Sound::getInstance()->playEffect("check");
+        else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
+            Sound::getInstance()->playEffect("capture");
+        else
+            Sound::getInstance()->playEffect("move");
+
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
 		_playerBlack->start(_board->getFenWithMove());
 		break;
@@ -81,6 +89,7 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 		onPlayerWhiteResignRequest();
 		break;
 	default:
+        Sound::getInstance()->playEffect("illegal");
 		_playerWhite->start(_board->getFenWithMove());
 	}
 
@@ -101,6 +110,13 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 
 	switch (retval) {
 	case 0:
+        if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
+            Sound::getInstance()->playEffect("check");
+        else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
+            Sound::getInstance()->playEffect("capture");
+        else
+            Sound::getInstance()->playEffect("move");
+
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
 		_playerWhite->start(_board->getFenWithMove());
 		break;
@@ -108,6 +124,7 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 		onPlayerBlackResignRequest();
 		break;
 	default:
+        Sound::getInstance()->playEffect("illegal");
 		_playerBlack->start(_board->getFenWithMove());
 	}
 
@@ -169,6 +186,7 @@ void GameLayer::onPlayerWhiteRegretRequest()
 		return;
 	_board->undo();
 	_board->undo();
+    Sound::getInstance()->playEffect("undo");
 }
 
 void GameLayer::onPlayerBlackRegretRequest()
@@ -179,6 +197,8 @@ void GameLayer::onPlayerBlackRegretRequest()
 		return;
 	_board->undo();
 	_board->undo();
+    Sound::getInstance()->playEffect("undo");
+
 	if (_board->getCurrentSide() != Board::Side::BLACK) {
 		_playerBlack->stop();
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
