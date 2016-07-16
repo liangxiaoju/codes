@@ -9,6 +9,8 @@
 #include "GameLayer.h"
 #include "FightControl.h"
 #include "room/RoomManager.h"
+#include <memory>  // for std::shared_ptr
+#include <atomic>
 
 USING_NS_CC;
 
@@ -17,6 +19,7 @@ class LANFightScene : public Scene
 public:
 	bool init();
 	CREATE_FUNC(LANFightScene);
+	virtual ~LANFightScene();
 
 private:
 	void scan();
@@ -36,6 +39,8 @@ private:
     std::string _clientID;
 
     std::mutex _mutex;
+
+    std::shared_ptr<std::atomic<bool>> _isDestroyed;
 };
 
 #endif

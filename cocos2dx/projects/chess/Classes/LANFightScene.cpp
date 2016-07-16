@@ -10,6 +10,8 @@ bool LANFightScene::init()
 	if (!Scene::init())
 		return false;
 
+	_isDestroyed = std::make_shared<std::atomic<bool>>(false);
+
 	_client = nullptr;
 	_server = nullptr;
     /* init for server */
@@ -129,11 +131,23 @@ bool LANFightScene::init()
 	return true;
 }
 
+LANFightScene::~LANFightScene()
+{
+	*_isDestroyed = true;
+}
+
 void LANFightScene::scan()
 {
 	auto showLoading = [this]() {
-		getScheduler()->performFunctionInCocosThread([this](){
+        std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+
+		getScheduler()->performFunctionInCocosThread([this, isDestroyed](){
 			log("showLoading");
+
+			if (*isDestroyed) {
+				log("LANFightScene instance was destroyed!");
+				return;
+			}
 
             if (getChildByName("outter"))
                 removeChildByName("outter");
@@ -155,7 +169,14 @@ void LANFightScene::scan()
 	};
 
 	auto startGame = [this]() {
-		getScheduler()->performFunctionInCocosThread([this](){
+        std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+
+		getScheduler()->performFunctionInCocosThread([this, isDestroyed](){
+			if (*isDestroyed) {
+				log("LANFightScene instance was destroyed!");
+				return;
+			}
+
             log("startGame %s %s", _side.c_str(), _fen.c_str());
 
             if (getChildByName("gamelayer")) {
@@ -216,7 +237,13 @@ void LANFightScene::scan()
         /* server: client disconnect */
         _client->on("disconnect", [this, showLoading](RoomClient *client, const RoomPacket &packet) {
                 log("server: client disconnect");
-                getScheduler()->performFunctionInCocosThread([this](){
+        		std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+                getScheduler()->performFunctionInCocosThread([this, isDestroyed](){
+						if (*isDestroyed) {
+							log("LANFightScene instance was destroyed!");
+							return;
+						}
+
                         _playerWhite->stop();
                         _playerBlack->stop();
                         _fen = _board->getFenWithMove();
@@ -257,7 +284,12 @@ void LANFightScene::scan()
 
                 auto clientOld = _client;
                 _client = manager->joinRoom(_clientID, v[0]);
-                getScheduler()->performFunctionInCocosThread([this, clientOld, onServer](){
+        		std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+                getScheduler()->performFunctionInCocosThread([this, clientOld, onServer, isDestroyed](){
+						if (*isDestroyed) {
+							log("LANFightScene instance was destroyed!");
+							return;
+						}
                         _playerWhite->stop();
                         _playerBlack->stop();
                         /* ensure stop players before */
