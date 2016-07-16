@@ -38,12 +38,8 @@ public:
 
 	Piece* pick(Vec2 index);
 
-	int move(std::string mv, bool check=true)
-	{
-		auto vecs = Utils::toVecMove(mv);
-		return move(vecs[0], vecs[1], check);
-	}
-	int move(Vec2 src, Vec2 dst, bool check=true);
+	int move(Vec2 src, Vec2 dst);
+    void moveWithCallback(std::string mv, std::function<void()> cb);
 
 	void setStyle(Style s);
 
@@ -70,7 +66,7 @@ public:
 	void unselectAll();
 	void markMove(Vec2 src, Vec2 dst);
 	void unmarkMoveAll();
-	int checkMove(Vec2 src, Vec2 dst);
+	int checkMove(std::string mv);
 	void undo();
     virtual void setRotation(float rotation) override;
 	Side getCurrentSide() { return _currSide; }
@@ -89,6 +85,7 @@ private:
 	std::vector<std::pair<Move, Piece*>> _historyMv;
 	std::map<Vec2, Sprite*> _marked;
 	std::map<Vec2, Sprite*> _selected;
+	std::vector<Sprite*> _tips;
 	std::map<Vec2, Piece*> _mapPieces;
 	Style _style;
 	Side _currSide;

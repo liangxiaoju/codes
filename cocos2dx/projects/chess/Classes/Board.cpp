@@ -120,7 +120,7 @@ void Board::initFromFen(std::string fen)
 		std::vector<std::string> mvs = Utils::splitString(mvstr, ' ');
 		for (i = 0; i < mvs.size(); ++i) {
 			std::vector<Vec2> mv = Utils::toVecMove(mvs[i]);
-			move(mv[0], mv[1], false);
+			move(mv[0], mv[1]);
 		}
 	}
 }
@@ -182,8 +182,16 @@ Vec2 Board::convertLocalCoordToIndex(Vec2 coord)
 	return index;
 }
 
-int Board::checkMove(Vec2 src, Vec2 dst)
+int Board::checkMove(std::string mv)
 {
+    auto vecs = Utils::toVecMove(mv);
+    auto src = vecs[0];
+    auto dst = vecs[1];
+
+	auto it = _mapPieces.find(src);
+	if (it == _mapPieces.end())
+		return -1;
+
 	std::string fen = getFenWithMove();
 
 	if (fen.find(" moves ") != std::string::npos) {
@@ -195,21 +203,13 @@ int Board::checkMove(Vec2 src, Vec2 dst)
 	return Rule::getInstance()->check(fen);
 }
 
-int Board::move(Vec2 src, Vec2 dst, bool check)
+int Board::move(Vec2 src, Vec2 dst)
 {
 	auto it = _mapPieces.find(src);
 	if (it == _mapPieces.end())
 		return -1;
 
 	unselectAll();
-
-	if (check) {
-		int ret = checkMove(src, dst);
-		if (ret != 0) {
-			log("%s: %d", __func__, ret);
-			return ret;
-		}
-	}
 
 	Piece *p = (*it).second;
 	p->retain();
@@ -220,30 +220,7 @@ int Board::move(Vec2 src, Vec2 dst, bool check)
 	}
 	Move mv = std::make_pair(src, dst);
 	_historyMv.push_back(std::make_pair(mv, dp));
-/*
-	for (auto v : _historyMv) {
-		Vec2 s = v.first.first;
-		Vec2 d = v.first.second;
-		log("(%f %f)(%f %f) = %p", s.x, s.y, d.x, d.y, v.second);
-	}
-*/
-#if 1
-    _mapPieces.erase(src);
-    _mapPieces[dst] = p;
-    changeSide();
 
-    unmarkMoveAll();
-    markMove(src, dst);
-
-    auto moveTo = MoveTo::create(0.15, convertIndexToLocalCoord(dst));
-    auto callback = CallFunc::create([this, p, dp, src, dst]() {
-            if (dp != nullptr)
-                _pieceLayer->removeChild(dp, true);
-            p->release();
-        });
-    auto seq = Sequence::create(moveTo, callback, nullptr);
-    p->runAction(seq);
-#else
 	removePiece(dst);
 	removePiece(src);
 	addPiece(dst, p);
@@ -253,9 +230,48 @@ int Board::move(Vec2 src, Vec2 dst, bool check)
 	markMove(src, dst);
 
 	changeSide();
-#endif
 
 	return 0;
+}
+
+void Board::moveWithCallback(std::string mv, std::function<void()> cb)
+{
+    auto vecs = Utils::toVecMove(mv);
+    auto src = vecs[0];
+    auto dst = vecs[1];
+
+	auto it = _mapPieces.find(src);
+	if (it == _mapPieces.end())
+		return;
+
+	unselectAll();
+
+	Piece *p = (*it).second;
+	p->retain();
+
+	auto dp = _mapPieces[dst];
+	if (dp != nullptr) {
+		dp->retain();
+	}
+	Move last_mv = std::make_pair(src, dst);
+	_historyMv.push_back(std::make_pair(last_mv, dp));
+
+    _mapPieces.erase(src);
+    _mapPieces[dst] = p;
+    changeSide();
+
+    unmarkMoveAll();
+    markMove(src, dst);
+
+    auto moveTo = MoveTo::create(0.15, convertIndexToLocalCoord(dst));
+    auto callback = CallFunc::create([this, p, dp, cb]() {
+            if (dp != nullptr)
+                _pieceLayer->removeChild(dp, true);
+            p->release();
+            cb();
+        });
+    auto seq = Sequence::create(moveTo, callback, nullptr);
+    p->runAction(seq);
 }
 
 void Board::undo()
@@ -341,6 +357,17 @@ void Board::select(Vec2 index)
 	s->setPosition(convertIndexToLocalCoord(index));
 	_pieceLayer->addChild(s);
 	_selected[index] = s;
+
+	std::vector<std::string> mvs =
+		Rule::getInstance()->generateMoves(getFenWithMove(), index);
+
+	for (auto &mv : mvs) {
+    	auto dst = Utils::toVecMove(mv)[1];
+		auto s = Sprite::create("FightSceneMenu/red.png");
+		s->setPosition(convertIndexToLocalCoord(dst));
+		_pieceLayer->addChild(s);
+		_tips.push_back(s);
+	}
 }
 
 void Board::unselect(Vec2 index)
@@ -350,6 +377,11 @@ void Board::unselect(Vec2 index)
 		_pieceLayer->removeChild((*it).second, true);
 		_selected.erase(index);
 	}
+
+	for (auto &p : _tips) {
+		_pieceLayer->removeChild(p, true);
+	}
+	_tips.clear();
 }
 
 void Board::unselectAll()
@@ -358,6 +390,11 @@ void Board::unselectAll()
 		_pieceLayer->removeChild(kv.second, true);
 	}
 	_selected.clear();
+
+	for (auto &p : _tips) {
+		_pieceLayer->removeChild(p, true);
+	}
+	_tips.clear();
 }
 
 void Board::setRotation(float rotation)

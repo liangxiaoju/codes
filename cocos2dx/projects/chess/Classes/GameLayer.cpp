@@ -70,11 +70,7 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 {
 	log("WHITE: %s", mv.c_str());
 
-	_playerWhite->stop();
-	int retval = _board->move(mv);
-
-	switch (retval) {
-	case 0:
+    auto move_cb = [this]() {
         if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("check");
         else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
@@ -84,32 +80,33 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
 		_playerBlack->start(_board->getFenWithMove());
-		break;
-	case -3:
-		onPlayerWhiteResignRequest();
-		break;
-	default:
-        Sound::getInstance()->playEffect("illegal");
-		_playerWhite->start(_board->getFenWithMove());
-	}
 
-	if (Rule::getInstance()->isMate(_board->getFen())) {
-		std::string args = _board->getCurrentSide() == Board::Side::BLACK ?
+        if (Rule::getInstance()->isMate(_board->getFen())) {
+            std::string args = _board->getCurrentSide() == Board::Side::BLACK ?
 			"WIN:WHITE" : "WIN:BLACK";
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)args.c_str());
-	}
+            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                      (void *)args.c_str());
+        }
+    };
+
+	_playerWhite->stop();
+	int retval = _board->checkMove(mv);
+    if (retval == -3) {
+        onPlayerWhiteResignRequest();
+    } else if (retval < 0) {
+        Sound::getInstance()->playEffect("illegal");
+        _board->unselectAll();
+		_playerWhite->start(_board->getFenWithMove());
+    } else {
+        _board->moveWithCallback(mv, move_cb);
+    }
 }
 
 void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 {
 	log("BLACK: %s", mv.c_str());
 
-	_playerBlack->stop();
-	int retval = _board->move(mv);
-
-	switch (retval) {
-	case 0:
+    auto move_cb = [this]() {
         if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("check");
         else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
@@ -119,21 +116,26 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
 		_playerWhite->start(_board->getFenWithMove());
-		break;
-	case -3:
-		onPlayerBlackResignRequest();
-		break;
-	default:
-        Sound::getInstance()->playEffect("illegal");
-		_playerBlack->start(_board->getFenWithMove());
-	}
 
-	if (Rule::getInstance()->isMate(_board->getFen())) {
-		std::string args = (_board->getCurrentSide() == Board::Side::BLACK) ?
+        if (Rule::getInstance()->isMate(_board->getFen())) {
+            std::string args = (_board->getCurrentSide() == Board::Side::BLACK) ?
 			"WIN:WHITE" : "WIN:BLACK";
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)args.c_str());
-	}
+            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                      (void *)args.c_str());
+        }
+    };
+
+	_playerBlack->stop();
+	int retval = _board->checkMove(mv);
+    if (retval == -3) {
+        onPlayerBlackResignRequest();
+    } else if (retval < 0) {
+        Sound::getInstance()->playEffect("illegal");
+        _board->unselectAll();
+		_playerBlack->start(_board->getFenWithMove());
+    } else {
+        _board->moveWithCallback(mv, move_cb);
+    }
 }
 
 void GameLayer::onPlayerWhiteResignRequest()

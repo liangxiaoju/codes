@@ -537,6 +537,7 @@ struct PositionStruct {
   int MovePiece(int mv);                      // 搬一步棋的棋子
   void UndoMovePiece(int mv, int pcCaptured); // 撤消搬一步棋的棋子
   BOOL MakeMove(int mv);                      // 走一步棋
+  int GenerateMove(int sqSrc, int *mvs) const;
   int GenerateMoves(int *mvs) const;          // 生成所有走法
   BOOL LegalMove(int mv) const;               // 判断走法是否合理
   BOOL Checked(void) const;                   // 判断是否被将军

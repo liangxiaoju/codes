@@ -16,6 +16,7 @@ public:
 	bool isMate(std::string fen);
     bool isChecked(std::string fen);
     bool isCaptured(std::string fen);
+    std::vector<std::string> generateMoves(std::string fen, Vec2 src);
 
 private:
 	static Rule *s_rule;

@@ -1,6 +1,8 @@
 #include "Rule.h"
 #include "Utils.h"
 
+using namespace SimplePosition;
+
 Rule *Rule::s_rule = nullptr;
 
 Rule *Rule::getInstance() {
@@ -74,4 +76,30 @@ bool Rule::isCaptured(std::string fen)
 {
     _pos.FromFen(fen.c_str());
     return !!_pos.Captured();
+}
+
+std::vector<std::string> Rule::generateMoves(std::string fen, Vec2 src)
+{
+	int mvs[MAX_GEN_MOVES];
+	int sqSrc = COORD_XY(src.x+FILE_LEFT, 9-src.y+RANK_TOP);
+	int num, i;
+	std::vector<std::string> v;
+
+	_pos.FromFen(fen.c_str());
+	num = _pos.GenerateMove(sqSrc, mvs);
+
+	for (i = 0; i < num; i++) {
+		int m1 = SRC(mvs[i]);
+		int m2 = DST(mvs[i]);
+		std::string s, d;
+
+		s = Utils::toString(char(FILE_X(m1) - FILE_LEFT + 'a')) +
+			Utils::toString(char('9' - (RANK_Y(m1) - RANK_TOP)));
+		d = Utils::toString(char(FILE_X(m2) - FILE_LEFT + 'a')) +
+			Utils::toString(char('9' - (RANK_Y(m2) - RANK_TOP)));
+
+		v.push_back(s+d);
+	}
+
+	return v;
 }

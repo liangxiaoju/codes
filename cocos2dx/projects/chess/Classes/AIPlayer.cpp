@@ -324,7 +324,7 @@ void AIPlayer::start(std::string fen)
 	std::string cmd = std::string("position fen ") + fen;
 	sendWithoutReply(cmd);
 
-	RequestCallback cb = [&](std::string reply){
+	RequestCallback cb = [this](std::string reply){
 		if (reply.size() == 0) {
 			return;
 		}
@@ -336,9 +336,17 @@ void AIPlayer::start(std::string fen)
 				_delegate->onDrawRequest();
 		*/
 		} else {
-			auto substr = Utils::splitString(reply, ' ');
-			auto mv = substr[1];
-			_delegate->onMoveRequest(mv);
+            auto cb = [this, reply]() {
+                auto substr = Utils::splitString(reply, ' ');
+                auto mv = substr[1];
+                _delegate->onMoveRequest(mv);
+            };
+            /* make low level slower */
+            float t = _level < 2 ? 0.5 : 0;
+            auto delay = DelayTime::create(t);
+            auto callback = CallFunc::create(cb);
+            auto seq = Sequence::create(delay, callback, nullptr);
+            runAction(seq);
 		}
 	};
 
