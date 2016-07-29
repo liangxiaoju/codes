@@ -3,6 +3,7 @@
 #include "ReplayScene.h"
 #include "ChallengeScene.h"
 #include "LANFightScene.h"
+#include "TutorialScene.h"
 
 class DifficultyScene : public Scene
 {
@@ -46,7 +47,7 @@ public:
 			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 8);
+			auto scene = FightScene::create(FightScene::UI, FightScene::UI, 8);
 			Director::getInstance()->pushScene(scene);
 		});
 
@@ -100,7 +101,8 @@ bool MainMenuLayer::init()
 		Director::getInstance()->pushScene(ChallengeMenuL1::create());
 	});
 	b3->addClickEventListener([](Ref *ref){
-		Director::getInstance()->pushScene(ReplayScene::create());
+            //Director::getInstance()->pushScene(ReplayScene::create());
+        Director::getInstance()->pushScene(TutorialMenuScene::create());
 	});
 	b4->addClickEventListener([](Ref *ref){
 		Director::getInstance()->pushScene(LANFightScene::create());
@@ -158,7 +160,10 @@ bool MainMenuLayer::init()
 	//auto setting = Button::create("MainMenuScene/main_button_setting.png", "MainMenuScene/main_button_settingP.png");
 	auto setting = Button::create("MainMenuScene/main_button_setting.png");
 	//setting->setScale(1.2);
-	setting->addClickEventListener([](Ref *ref){ log("setting click"); });
+	setting->addClickEventListener([](Ref *ref){
+            log("setting click");
+            auto box = PopupBox::create();
+        });
 	setting->setZoomScale(0.1);
 
 	RelativeLayoutParameter* rp_r = RelativeLayoutParameter::create();
@@ -168,9 +173,16 @@ bool MainMenuLayer::init()
 
 	auto quit = Button::create("MainMenuScene/common_back.png");
 	//quit->setScale(1.2);
-	quit->addClickEventListener([](Ref *ref){
+	quit->addClickEventListener([this](Ref *ref){
 		log("quit click");
-		Director::getInstance()->end();
+        auto box = DialogBox::create(
+            "Are you sure to exit ?", "Yes", "No", [this](bool yes){
+                removeChildByName("box");
+                if (yes) {
+                    Director::getInstance()->end();
+                }
+            });
+        addChild(box, 1, "box");
 	});
 	quit->setZoomScale(0.1);
 

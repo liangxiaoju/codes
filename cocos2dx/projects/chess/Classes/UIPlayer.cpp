@@ -26,7 +26,7 @@ bool UIPlayer::init()
 	auto resign_cb = [this](EventCustom* ev) {
 		_delegate->onResignRequest();
 	};
-	/* response for draw*/
+	/* response for draw */
 	auto draw_cb = [this](EventCustom* ev) {
 		_delegate->onDrawRequest();
 	};
@@ -122,7 +122,11 @@ bool UIPlayer::onRequest(std::string req)
 		return true;
 	} else if (req == "regret") {
 		return true;
-	}
+	} else if(req.find("tip") != std::string::npos) {
+        auto substr = Utils::splitString(req, ':');
+        _delegate->onMoveRequest(substr[1]);
+        return true;
+    }
 
 	return false;
 }

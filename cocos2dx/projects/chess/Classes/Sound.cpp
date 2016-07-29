@@ -56,8 +56,15 @@ void Sound::stopBackgroundMusic()
 }
 void Sound::playEffect(std::string effect)
 {
+    if (!_effectEnable)
+        return;
+
     auto iter = _pathMap.find(effect);
     if (iter != _pathMap.end()) {
         _audio->playEffect(_pathMap[effect].c_str());
     }
+}
+void Sound::setEffectEnabled(bool enable)
+{
+    _effectEnable = enable;
 }

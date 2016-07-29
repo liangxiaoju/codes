@@ -2,9 +2,12 @@
 #define __CHALLENGECONTROL_H__
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
 #include "GameLayer.h"
+#include "EndGameData.h"
 
 USING_NS_CC;
+using namespace cocos2d::ui;
 
 class ChallengeControl : public Layer
 {

@@ -55,7 +55,7 @@ int Rule::check(std::string fen)
 			break;
 		}
 	}
-	log("evaluate=%d", _pos.Evaluate());
+	//log("evaluate=%d", _pos.Evaluate());
 
 	return ret;
 }
@@ -102,4 +102,22 @@ std::vector<std::string> Rule::generateMoves(std::string fen, Vec2 src)
 	}
 
 	return v;
+}
+
+int Rule::evaluate(std::string fen)
+{
+    _pos.FromFen(fen.c_str());
+    return _pos.Evaluate();
+}
+
+int Rule::getWhiteLife(std::string fen)
+{
+    _pos.FromFen(fen.c_str());
+    return _pos.getWhiteVl();
+}
+
+int Rule::getBlackLife(std::string fen)
+{
+    _pos.FromFen(fen.c_str());
+    return _pos.getBlackVl();
 }

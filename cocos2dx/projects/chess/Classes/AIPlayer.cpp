@@ -330,11 +330,13 @@ void AIPlayer::start(std::string fen)
 		}
 
 		if (reply.find("nobestmove") != std::string::npos) {
-				_delegate->onResignRequest();
-		/*
-		} else if (reply.find("draw") != std::string::npos) {
-				_delegate->onDrawRequest();
-		*/
+            if (_delegate->onRegretRequest != nullptr)
+                _delegate->onResignRequest();
+/*
+		} else if (_delegate->onDrawrequest != nullptr &&
+                   reply.find("draw") != std::string::npos) {
+            _delegate->onDrawRequest();
+*/
 		} else {
             auto cb = [this, reply]() {
                 auto substr = Utils::splitString(reply, ' ');
@@ -355,6 +357,30 @@ void AIPlayer::start(std::string fen)
 	sendWithCallBack(cmd, "bestmove", t/1000 + 1, cb);
 }
 
+void AIPlayer::getHelp(std::string fen, std::function<void(std::string mv)> callback)
+{
+	std::string cmd = std::string("position fen ") + fen;
+	sendWithoutReply(cmd);
+
+	RequestCallback cb = [callback](std::string reply){
+		if (reply.size() == 0) {
+            callback("");
+			return;
+		}
+
+		if (reply.find("nobestmove") != std::string::npos) {
+            callback("nobestmove");
+        } else {
+            auto substr = Utils::splitString(reply, ' ');
+            callback(substr[1]);
+        }
+    };
+
+	int t = int(_level*1000);
+	cmd = "go time " + Utils::toString(t);
+	sendWithCallBack(cmd, "bestmove", t/1000 + 1, cb);
+}
+
 void AIPlayer::stop()
 {
 	write(_wakeWriteFD, "W", 1);
@@ -368,7 +394,7 @@ bool AIPlayer::onRequest(std::string req)
 		return true;
 	} else if (req == "regret") {
 		return true;
-	}
+    }
 
 	return false;
 }

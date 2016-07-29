@@ -525,6 +525,14 @@ struct PositionStruct {
   void AddPiece(int sq, int pc); // 在棋盘上放一枚棋子
   void DelPiece(int sq, int pc);         // 从棋盘上拿走一枚棋子
 
+  int getWhiteVl() const {
+      return vlWhite;
+  }
+
+  int getBlackVl() const {
+      return vlBlack;
+  }
+
   int Evaluate(void) const {      // 局面评价函数
     return (sdPlayer == 0 ? vlWhite - vlBlack : vlBlack - vlWhite) + ADVANCED_VALUE;
   }
@@ -544,6 +552,7 @@ struct PositionStruct {
   BOOL IsMate(void);                          // 判断是否被杀
   int toArrayMv(const char *mv);
   void FromFen(const char *szFen);
+  void ToFen(char *szFen) const;
 
   int RepStatus(int nRecur = 1) const;        // 检测重复局面
   int RepValue(int nRepStatus) const {        // 重复局面分值

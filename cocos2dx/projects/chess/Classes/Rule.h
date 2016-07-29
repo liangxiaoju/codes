@@ -17,6 +17,9 @@ public:
     bool isChecked(std::string fen);
     bool isCaptured(std::string fen);
     std::vector<std::string> generateMoves(std::string fen, Vec2 src);
+    int evaluate(std::string fen);
+    int getWhiteLife(std::string fen);
+    int getBlackLife(std::string fen);
 
 private:
 	static Rule *s_rule;

@@ -184,6 +184,9 @@ Vec2 Board::convertLocalCoordToIndex(Vec2 coord)
 
 int Board::checkMove(std::string mv)
 {
+    if (mv.substr(0, 2) == mv.substr(2, 2))
+        return -1;
+
     auto vecs = Utils::toVecMove(mv);
     auto src = vecs[0];
     auto dst = vecs[1];

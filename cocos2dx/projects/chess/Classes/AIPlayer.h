@@ -19,6 +19,9 @@ public:
 	bool onRequest(std::string req) override;
 
 	void setLevel(int level) { _level = level; }
+
+    void getHelp(std::string fen, std::function<void(std::string)> cb);
+
 	virtual ~AIPlayer();
 
 private:

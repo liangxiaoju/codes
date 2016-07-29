@@ -17,11 +17,13 @@ public:
     void playBackgroundMusic();
     void stopBackgroundMusic();
     void playEffect(std::string effect);
+    void setEffectEnabled(bool enable);
 
 private:
     static Sound *s_sound;
     SimpleAudioEngine *_audio;
     std::unordered_map<std::string, std::string> _pathMap;
+    bool _effectEnable;
 };
 
 #endif

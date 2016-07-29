@@ -9,7 +9,7 @@ void EndGameData::updateEndGameClass(EndGameClass cls)
 			cls.progress, cls.id);
 
 	int ok = sqlite3_exec(_db, sql, 0, 0, 0);
-	
+
 	if( ok != SQLITE_OK)
 		log("Error in updateEndGameClass()");
 }
@@ -162,7 +162,7 @@ EndGameData::EndGameData(std::string fullpath)
 		ret = sqlite3_open(fullpath.c_str(), &_db);
 
 	if( ret != SQLITE_OK ) {
-		log("Error initializing DB\n");
+		log("Error initializing DB");
 	}
 }
 

@@ -6,6 +6,9 @@
 #include "ChallengeControl.h"
 #include "HeaderSprite.h"
 #include "Sound.h"
+#include "XQFile/XQJsonFile.h"
+#include "XQFile/XQFFile.h"
+#include "SchoolScene.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -153,8 +156,13 @@ bool ChallengeMenuL2::init(EndGameData::EndGameClass cls)
 			Button* btn = (Button*)item->getChildByName("Title Button");
 
 			if (btn->isEnabled()) {
-				log("create FightScene with feh: %s", _endGameItems[index].data.fen.c_str());
-				auto scene = ChallengeScene::create(_endGameItems[index]);
+				//log("create FightScene with feh: %s", _endGameItems[index].data.fen.c_str());
+				//auto scene = ChallengeScene::create(_endGameItems[index]);
+                //auto xqFile = new XQJsonFile();
+                //xqFile->load(_endGameItems[index].json);
+                auto xqFile = new XQFFile();
+                xqFile->load("test1.xqf");
+                auto scene = SchoolScene::create(xqFile);
 				Director::getInstance()->pushScene(scene);
 			}
 		}
@@ -190,7 +198,8 @@ bool ChallengeMenuL2::init(EndGameData::EndGameClass cls)
 			if (i < (progress+1)) {
 				btn->setEnabled(true);
 			} else {
-				btn->setEnabled(false);
+//				btn->setEnabled(false);
+				btn->setEnabled(true);
 			}
 
 			if (i < progress) {

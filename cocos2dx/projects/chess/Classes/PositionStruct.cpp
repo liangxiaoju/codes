@@ -3,8 +3,8 @@
  * Designed by Morning Yellow, Version: 0.2, Last Modified: Mar. 2008
  * Copyright (C) 2004-2008 www.xqbase.com
  *
- * ÏóÆåĞ¡Î×Ê¦ 0.2 µÄÄ¿±ê£º
- * Ò»¡¢ÊµÏÖÖĞ¹úÏóÆå¹æÔò¡£
+ * è±¡æ£‹å°å·«å¸ˆ 0.2 çš„ç›®æ ‡ï¼š
+ * ä¸€ã€å®ç°ä¸­å›½è±¡æ£‹è§„åˆ™ã€‚
  */
 
 #include "PositionStruct.h"
@@ -13,13 +13,13 @@ USING_NS_CC;
 
 namespace SimplePosition {
 
-// Zobrist±í
+// Zobristè¡¨
 static struct {
   ZobristStruct Player;
   ZobristStruct Table[14][256];
 } Zobrist;
 
-// ³õÊ¼»¯Zobrist±í
+// åˆå§‹åŒ–Zobristè¡¨
 static void InitZobrist(void) {
   int i, j;
   RC4Struct rc4;
@@ -33,12 +33,12 @@ static void InitZobrist(void) {
   }
 }
 
-void PositionStruct::ChangeSide(void) {         // ½»»»×ß×Ó·½
+void PositionStruct::ChangeSide(void) {         // äº¤æ¢èµ°å­æ–¹
 	sdPlayer = 1 - sdPlayer;
 	zobr.Xor(Zobrist.Player);
 }
 
-void PositionStruct::AddPiece(int sq, int pc) { // ÔÚÆåÅÌÉÏ·ÅÒ»Ã¶Æå×Ó
+void PositionStruct::AddPiece(int sq, int pc) { // åœ¨æ£‹ç›˜ä¸Šæ”¾ä¸€æšæ£‹å­
 	ucpcSquares[sq] = pc;
 	if (pc < 16) {
 		vlWhite += cucvlPiecePos[pc - 8][sq];
@@ -49,7 +49,7 @@ void PositionStruct::AddPiece(int sq, int pc) { // ÔÚÆåÅÌÉÏ·ÅÒ»Ã¶Æå×Ó
 	}
 }
 
-void PositionStruct::DelPiece(int sq, int pc) {         // ´ÓÆåÅÌÉÏÄÃ×ßÒ»Ã¶Æå×Ó
+void PositionStruct::DelPiece(int sq, int pc) {         // ä»æ£‹ç›˜ä¸Šæ‹¿èµ°ä¸€æšæ£‹å­
 	ucpcSquares[sq] = 0;
 	if (pc < 16) {
 		vlWhite -= cucvlPiecePos[pc - 8][sq];
@@ -93,8 +93,8 @@ void PositionStruct::FromFen(const char *szFen) {
 
   InitZobrist();
 
-  // FEN´®µÄÊ¶±ğ°üÀ¨ÒÔÏÂ¼¸¸ö²½Öè£º
-  // 1. ³õÊ¼»¯£¬Çå¿ÕÆåÅÌ
+  // FENä¸²çš„è¯†åˆ«åŒ…æ‹¬ä»¥ä¸‹å‡ ä¸ªæ­¥éª¤ï¼š
+  // 1. åˆå§‹åŒ–ï¼Œæ¸…ç©ºæ£‹ç›˜
   pcWhite[0] = SIDE_TAG(0) + PIECE_KING;
   pcWhite[1] = SIDE_TAG(0) + PIECE_ADVISOR;
   pcWhite[2] = SIDE_TAG(0) + PIECE_BISHOP;
@@ -115,7 +115,7 @@ void PositionStruct::FromFen(const char *szFen) {
   if (*lpFen == '\0') {
     return;
   }
-  // 2. ¶ÁÈ¡ÆåÅÌÉÏµÄÆå×Ó
+  // 2. è¯»å–æ£‹ç›˜ä¸Šçš„æ£‹å­
   i = RANK_TOP;
   j = FILE_LEFT;
   while (*lpFen != ' ') {
@@ -154,7 +154,7 @@ void PositionStruct::FromFen(const char *szFen) {
     }
   }
   lpFen ++;
-  // 3. È·¶¨ÂÖµ½ÄÄ·½×ß
+  // 3. ç¡®å®šè½®åˆ°å“ªæ–¹èµ°
   if (*lpFen == 'b') {
     ChangeSide();
   }
@@ -178,6 +178,64 @@ void PositionStruct::FromFen(const char *szFen) {
   }
 }
 
+// æ£‹å­ç±»å‹å¯¹åº”çš„æ£‹å­ç¬¦å·
+const char *const cszPieceBytes = "KABNRCP";
+
+/* æ£‹å­åºå·å¯¹åº”çš„æ£‹å­ç±»å‹
+ *
+ * ElephantEyeçš„æ£‹å­åºå·ä»0åˆ°47ï¼Œå…¶ä¸­0åˆ°15ä¸ç”¨ï¼Œ16åˆ°31è¡¨ç¤ºçº¢å­ï¼Œ32åˆ°47è¡¨ç¤ºé»‘å­ã€‚
+ * æ¯æ–¹çš„æ£‹å­é¡ºåºä¾æ¬¡æ˜¯ï¼šå¸…ä»•ä»•ç›¸ç›¸é©¬é©¬è½¦è½¦ç‚®ç‚®å…µå…µå…µå…µå…µ(å°†å£«å£«è±¡è±¡é©¬é©¬è½¦è½¦ç‚®ç‚®å’å’å’å’å’)
+ * æç¤ºï¼šåˆ¤æ–­æ£‹å­æ˜¯çº¢å­ç”¨"pc < 32"ï¼Œé»‘å­ç”¨"pc >= 32"
+ */
+const int cnPieceTypes[48] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6,
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6
+};
+
+inline char PIECE_BYTE(int pt) {
+  return cszPieceBytes[pt];
+}
+
+inline int PIECE_TYPE(int pc) {
+  return cnPieceTypes[pc];
+}
+
+// ç”ŸæˆFENä¸²
+void PositionStruct::ToFen(char *szFen) const {
+  int i, j, k, pc;
+  char *lpFen;
+
+  lpFen = szFen;
+  for (i = RANK_TOP; i <= RANK_BOTTOM; i ++) {
+    k = 0;
+    for (j = FILE_LEFT; j <= FILE_RIGHT; j ++) {
+      pc = this->ucpcSquares[COORD_XY(j, i)];
+      if (pc != 0) {
+        if (k > 0) {
+          *lpFen = k + '0';
+          lpFen ++;
+          k = 0;
+        }
+        *lpFen = PIECE_BYTE(PIECE_TYPE(pc)) + (pc < 32 ? 0 : 'a' - 'A');
+        lpFen ++;
+      } else {
+        k ++;
+      }
+    }
+    if (k > 0) {
+      *lpFen = k + '0';
+      lpFen ++;
+    }
+    *lpFen = '/';
+    lpFen ++;
+  }
+  *(lpFen - 1) = ' '; // æŠŠæœ€åä¸€ä¸ª'/'æ›¿æ¢æˆ' '
+  *lpFen = (this->sdPlayer == 0 ? 'w' : 'b');
+  lpFen ++;
+  *lpFen = '\0';
+}
+
 int PositionStruct::toArrayMv(const char *mv)
 {
   int sqSrc, sqDst;
@@ -186,7 +244,7 @@ int PositionStruct::toArrayMv(const char *mv)
   return (IN_BOARD(sqSrc) && IN_BOARD(sqDst) ? MOVE(sqSrc, sqDst) : 0);
 }
 
-// °áÒ»²½ÆåµÄÆå×Ó
+// æ¬ä¸€æ­¥æ£‹çš„æ£‹å­
 int PositionStruct::MovePiece(int mv) {
   int sqSrc, sqDst, pc, pcCaptured;
   sqSrc = SRC(mv);
@@ -201,7 +259,7 @@ int PositionStruct::MovePiece(int mv) {
   return pcCaptured;
 }
 
-// ³·Ïû°áÒ»²½ÆåµÄÆå×Ó
+// æ’¤æ¶ˆæ¬ä¸€æ­¥æ£‹çš„æ£‹å­
 void PositionStruct::UndoMovePiece(int mv, int pcCaptured) {
   int sqSrc, sqDst, pc;
   sqSrc = SRC(mv);
@@ -214,7 +272,7 @@ void PositionStruct::UndoMovePiece(int mv, int pcCaptured) {
   }
 }
 
-// ×ßÒ»²½Æå
+// èµ°ä¸€æ­¥æ£‹
 BOOL PositionStruct::MakeMove(int mv) {
 	int pcCaptured;
 	DWORD dwKey;
@@ -235,19 +293,19 @@ BOOL PositionStruct::MakeMove(int mv) {
 int PositionStruct::GenerateMove(int sqSrc, int *mvs) const {
   int i, j, nGenMoves, nDelta, sqDst;
   int pcSelfSide, pcOppSide, pcSrc, pcDst;
-  // Éú³ÉËùÓĞ×ß·¨£¬ĞèÒª¾­¹ıÒÔÏÂ¼¸¸ö²½Öè£º
+  // ç”Ÿæˆæ‰€æœ‰èµ°æ³•ï¼Œéœ€è¦ç»è¿‡ä»¥ä¸‹å‡ ä¸ªæ­¥éª¤ï¼š
 
   nGenMoves = 0;
   pcSelfSide = SIDE_TAG(sdPlayer);
   pcOppSide = OPP_SIDE_TAG(sdPlayer);
 
-  // 1. ÕÒµ½Ò»¸ö±¾·½Æå×Ó£¬ÔÙ×öÒÔÏÂÅĞ¶Ï£º
+  // 1. æ‰¾åˆ°ä¸€ä¸ªæœ¬æ–¹æ£‹å­ï¼Œå†åšä»¥ä¸‹åˆ¤æ–­ï¼š
   pcSrc = ucpcSquares[sqSrc];
   if ((pcSrc & pcSelfSide) == 0) {
     return 0;
   }
 
-  // 2. ¸ù¾İÆå×ÓÈ·¶¨×ß·¨
+  // 2. æ ¹æ®æ£‹å­ç¡®å®šèµ°æ³•
   switch (pcSrc - pcSelfSide) {
   case PIECE_KING:
     for (i = 0; i < 4; i ++) {
@@ -382,7 +440,7 @@ int PositionStruct::GenerateMove(int sqSrc, int *mvs) const {
   return nGenMoves;
 }
 
-// Éú³ÉËùÓĞ×ß·¨
+// ç”Ÿæˆæ‰€æœ‰èµ°æ³•
 int PositionStruct::GenerateMoves(int *mvs) const {
   int nGenMoves, sqSrc;
 
@@ -393,13 +451,13 @@ int PositionStruct::GenerateMoves(int *mvs) const {
   return nGenMoves;
 }
 
-// ÅĞ¶Ï×ß·¨ÊÇ·ñºÏÀí
+// åˆ¤æ–­èµ°æ³•æ˜¯å¦åˆç†
 BOOL PositionStruct::LegalMove(int mv) const {
   int sqSrc, sqDst, sqPin;
   int pcSelfSide, pcSrc, pcDst, nDelta;
-  // ÅĞ¶Ï×ß·¨ÊÇ·ñºÏ·¨£¬ĞèÒª¾­¹ıÒÔÏÂµÄÅĞ¶Ï¹ı³Ì£º
+  // åˆ¤æ–­èµ°æ³•æ˜¯å¦åˆæ³•ï¼Œéœ€è¦ç»è¿‡ä»¥ä¸‹çš„åˆ¤æ–­è¿‡ç¨‹ï¼š
 
-  // 1. ÅĞ¶ÏÆğÊ¼¸ñÊÇ·ñÓĞ×Ô¼ºµÄÆå×Ó
+  // 1. åˆ¤æ–­èµ·å§‹æ ¼æ˜¯å¦æœ‰è‡ªå·±çš„æ£‹å­
   sqSrc = SRC(mv);
   pcSrc = ucpcSquares[sqSrc];
   pcSelfSide = SIDE_TAG(sdPlayer);
@@ -407,14 +465,14 @@ BOOL PositionStruct::LegalMove(int mv) const {
     return FALSE;
   }
 
-  // 2. ÅĞ¶ÏÄ¿±ê¸ñÊÇ·ñÓĞ×Ô¼ºµÄÆå×Ó
+  // 2. åˆ¤æ–­ç›®æ ‡æ ¼æ˜¯å¦æœ‰è‡ªå·±çš„æ£‹å­
   sqDst = DST(mv);
   pcDst = ucpcSquares[sqDst];
   if ((pcDst & pcSelfSide) != 0) {
     return FALSE;
   }
 
-  // 3. ¸ù¾İÆå×ÓµÄÀàĞÍ¼ì²é×ß·¨ÊÇ·ñºÏÀí
+  // 3. æ ¹æ®æ£‹å­çš„ç±»å‹æ£€æŸ¥èµ°æ³•æ˜¯å¦åˆç†
   switch (pcSrc - pcSelfSide) {
   case PIECE_KING:
     return IN_FORT(sqDst) && KING_SPAN(sqSrc, sqDst);
@@ -460,20 +518,20 @@ BOOL PositionStruct::LegalMove(int mv) const {
   }
 }
 
-// ÅĞ¶ÏÊÇ·ñ±»½«¾ü
+// åˆ¤æ–­æ˜¯å¦è¢«å°†å†›
 BOOL PositionStruct::Checked() const {
   int i, j, sqSrc, sqDst;
   int pcSelfSide, pcOppSide, pcDst, nDelta;
   pcSelfSide = SIDE_TAG(sdPlayer);
   pcOppSide = OPP_SIDE_TAG(sdPlayer);
-  // ÕÒµ½ÆåÅÌÉÏµÄË§(½«)£¬ÔÙ×öÒÔÏÂÅĞ¶Ï£º
+  // æ‰¾åˆ°æ£‹ç›˜ä¸Šçš„å¸…(å°†)ï¼Œå†åšä»¥ä¸‹åˆ¤æ–­ï¼š
 
   for (sqSrc = 0; sqSrc < 256; sqSrc ++) {
     if (ucpcSquares[sqSrc] != pcSelfSide + PIECE_KING) {
       continue;
     }
 
-    // 1. ÅĞ¶ÏÊÇ·ñ±»¶Ô·½µÄ±ø(×ä)½«¾ü
+    // 1. åˆ¤æ–­æ˜¯å¦è¢«å¯¹æ–¹çš„å…µ(å’)å°†å†›
     if (ucpcSquares[SQUARE_FORWARD(sqSrc, sdPlayer)] == pcOppSide + PIECE_PAWN) {
       return TRUE;
     }
@@ -483,7 +541,7 @@ BOOL PositionStruct::Checked() const {
       }
     }
 
-    // 2. ÅĞ¶ÏÊÇ·ñ±»¶Ô·½µÄÂí½«¾ü(ÒÔÊË(Ê¿)µÄ²½³¤µ±×÷ÂíÍÈ)
+    // 2. åˆ¤æ–­æ˜¯å¦è¢«å¯¹æ–¹çš„é©¬å°†å†›(ä»¥ä»•(å£«)çš„æ­¥é•¿å½“ä½œé©¬è…¿)
     for (i = 0; i < 4; i ++) {
       if (ucpcSquares[sqSrc + ccAdvisorDelta[i]] != 0) {
         continue;
@@ -496,7 +554,7 @@ BOOL PositionStruct::Checked() const {
       }
     }
 
-    // 3. ÅĞ¶ÏÊÇ·ñ±»¶Ô·½µÄ³µ»òÅÚ½«¾ü(°üÀ¨½«Ë§¶ÔÁ³)
+    // 3. åˆ¤æ–­æ˜¯å¦è¢«å¯¹æ–¹çš„è½¦æˆ–ç‚®å°†å†›(åŒ…æ‹¬å°†å¸…å¯¹è„¸)
     for (i = 0; i < 4; i ++) {
       nDelta = ccKingDelta[i];
       sqDst = sqSrc + nDelta;
@@ -527,7 +585,7 @@ BOOL PositionStruct::Checked() const {
   return FALSE;
 }
 
-// ÅĞ¶ÏÊÇ·ñ±»É±
+// åˆ¤æ–­æ˜¯å¦è¢«æ€
 BOOL PositionStruct::IsMate(void) {
   int i, nGenMoveNum, pcCaptured;
   int mvs[MAX_GEN_MOVES];
@@ -545,7 +603,7 @@ BOOL PositionStruct::IsMate(void) {
   return TRUE;
 }
 
-// ¼ì²âÖØ¸´¾ÖÃæ
+// æ£€æµ‹é‡å¤å±€é¢
 int PositionStruct::RepStatus(int nRecur) const {
   BOOL bSelfSide, bPerpCheck, bOppPerpCheck;
   const MoveStruct *lpmvs;
@@ -572,3 +630,4 @@ int PositionStruct::RepStatus(int nRecur) const {
 }
 
 };
+

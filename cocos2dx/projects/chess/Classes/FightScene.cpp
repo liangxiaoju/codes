@@ -58,7 +58,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 
 	/* rotation for UI black player */
 	bool rotation = false;
-	if (black == Role::UI) {
+	if ((black == Role::UI) && (white != Role::UI)) {
 		_board->setRotation(180);
 		rotation = true;
 	}
@@ -67,10 +67,18 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	auto white_start_cb = [this, lheader, rheader, rotation](EventCustom* ev){
 		lheader->setActive(!rotation);
 		rheader->setActive(rotation);
+        int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
+        int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
+        lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
+        rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
 	};
 	auto black_start_cb = [this, lheader, rheader, rotation](EventCustom* ev){
 		rheader->setActive(!rotation);
 		lheader->setActive(rotation);
+        int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
+        int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
+        lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
+        rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
 	};
 
 	/* response for reset */
@@ -96,6 +104,38 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 		se.fen = _board->getFenWithMove();
 		UserData::getInstance()->insertSaveElement(se);
 	};
+    /* response for tip */
+    auto tip_cb = [this](EventCustom* ev) {
+        Player *currentPlayer;
+        if (_board->getCurrentSide() == Board::Side::WHITE) {
+            currentPlayer = _playerWhite;
+            /* no tip for AIPlayer */
+            if (_roleWhite == Role::AI)
+                return;
+        } else {
+            currentPlayer = _playerBlack;
+            if (_roleBlack == Role::AI)
+                return;
+        }
+
+        AIPlayer *ai;
+        if (_roleWhite == Role::AI)
+            ai = dynamic_cast<AIPlayer*>(_playerWhite);
+        else if (_roleBlack == Role::AI)
+            ai = dynamic_cast<AIPlayer*>(_playerBlack);
+        else {
+            return;
+        }
+
+        currentPlayer->stop();
+
+        auto cb = [this, ai, currentPlayer](std::string mv) {
+            log("TIP: %s", mv.c_str());
+            currentPlayer->onRequest("tip:" + mv);
+        };
+        ai->getHelp(_board->getFenWithMove(), cb);
+    };
+
     auto over_cb = [this](EventCustom *ev) {
         std::string event = (const char *)ev->getUserData();
         if (event.find("DRAW:") != std::string::npos) {
@@ -108,10 +148,11 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
         }
     };
 
-	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, white_start_cb, black_start_cb, over_cb](){
+	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, tip_cb, white_start_cb, black_start_cb, over_cb](){
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SWITCH, switch_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SAVE, save_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_TIP, tip_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_WHITE_START, white_start_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_BLACK_START, black_start_cb);
         getEventDispatcher()->addCustomEventListener(EVENT_GAMEOVER, over_cb);
@@ -121,6 +162,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 		getEventDispatcher()->removeCustomEventListeners(EVENT_RESET);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SWITCH);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SAVE);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_TIP);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_WHITE_START);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_BLACK_START);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_GAMEOVER);

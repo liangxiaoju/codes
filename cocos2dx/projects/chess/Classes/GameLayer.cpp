@@ -140,6 +140,8 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 
 void GameLayer::onPlayerWhiteResignRequest()
 {
+	if (_board->getCurrentSide() != Board::Side::WHITE)
+		return;
 	_playerWhite->stop();
 	_playerBlack->stop();
 
@@ -149,6 +151,8 @@ void GameLayer::onPlayerWhiteResignRequest()
 
 void GameLayer::onPlayerBlackResignRequest()
 {
+	if (_board->getCurrentSide() != Board::Side::BLACK)
+		return;
 	_playerWhite->stop();
 	_playerBlack->stop();
 
@@ -158,6 +162,8 @@ void GameLayer::onPlayerBlackResignRequest()
 
 void GameLayer::onPlayerWhiteDrawRequest()
 {
+	if (_board->getCurrentSide() != Board::Side::WHITE)
+		return;
 	bool draw = _playerBlack->onRequest("draw");
 	if (draw) {
 		_playerWhite->stop();
@@ -170,6 +176,8 @@ void GameLayer::onPlayerWhiteDrawRequest()
 
 void GameLayer::onPlayerBlackDrawRequest()
 {
+	if (_board->getCurrentSide() != Board::Side::BLACK)
+		return;
 	bool draw = _playerWhite->onRequest("draw");
 	if (draw) {
 		_playerWhite->stop();

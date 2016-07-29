@@ -46,3 +46,42 @@ bool WelcomeLayer::init()
 
     return true;
 }
+
+//setSearchResolutionsOrder
+/*
+ * if 1024x768 is set, "ui/menu/xx.png" will search "ui/menu/1024x768/xx.png"
+ */
+
+//loadFilenameLookupDictionaryFromFile
+/*
+ * @code
+ * <?xml version="1.0" encoding="UTF-8"?>
+ * <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ * <plist version="1.0">
+ * <dict>
+ *     <key>filenames</key>
+ *     <dict>
+ *         <key>sounds/click.wav</key>
+ *         <string>sounds/click.caf</string>
+ *         <key>sounds/endgame.wav</key>
+ *         <string>sounds/endgame.caf</string>
+ *         <key>sounds/gem-0.wav</key>
+ *         <string>sounds/gem-0.caf</string>
+ *     </dict>
+ *     <key>metadata</key>
+ *     <dict>
+ *         <key>version</key>
+ *         <integer>1</integer>
+ *     </dict>
+ * </dict>
+ * </plist>
+ * @endcode
+ */
+
+//setSearchPaths
+/*
+ *        For instance:
+ *            On Android, the default resource root path is "assets/".
+ *            If "/mnt/sdcard/" and "resources-large" were set to the search paths vector,
+ *            "resources-large" will be converted to "assets/resources-large" since it was a relative path.
+ */

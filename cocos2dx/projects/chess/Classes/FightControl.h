@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include "PopupBox.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
@@ -22,8 +23,8 @@ public:
 		auto backBtn = Button::create("FightSceneMenu/look_back.png");
 		backBtn->setZoomScale(0.1);
 		backBtn->addClickEventListener([](Ref *ref){
-			Director::getInstance()->popScene();
-		});
+                Director::getInstance()->popScene();
+            });
 		backBtn->setPosition(Vec2(100, visibleSize.height-100));
 		addChild(backBtn);
 		// -----
@@ -59,13 +60,16 @@ public:
 				[&](Ref *ref) {
 					log("onSave");
 					getEventDispatcher()->dispatchCustomEvent(EVENT_SAVE);
-					auto text = Text::create("Saved", "fonts/arial.ttf", 50);
+
+					auto text = Text::create("Save Success", "fonts/arial.ttf", 50);
 					text->setTextColor(Color4B::BLACK);
-					auto s = Director::getInstance()->getVisibleSize();
-					text->setPosition(Vec2(s.width/2, s.height/2));
-					addChild(text);
-					auto action = Sequence::create(DelayTime::create(3), RemoveSelf::create(), nullptr);
-					text->runAction(action);
+                    auto box = PopupBox::create();
+                    box->pushBackView(text);
+                    addChild(box);
+
+					auto action = Sequence::create(
+                        DelayTime::create(3), RemoveSelf::create(), nullptr);
+                    box->runAction(action->clone());
 				}));
 		_items.back()->setName("btn_save");
 		_items.pushBack(MenuItemImage::create(
@@ -83,7 +87,7 @@ public:
 				"FightSceneMenu/game_button_peaceG_new.png",
 				[&](Ref *ref) {
 					log("onPeace");
-					getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
+					getEventDispatcher()->dispatchCustomEvent(EVENT_TIP);
 				}));
 		_items.back()->setName("btn_peace");
 		_items.pushBack(MenuItemImage::create(
