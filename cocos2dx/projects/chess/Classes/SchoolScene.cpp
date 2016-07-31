@@ -22,16 +22,25 @@ bool SchoolScene::init(XQFile *xqFile)
     _playerWhite->setBoard(_board);
     _playerBlack->setBoard(_board);
 
-    auto gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
-    addChild(gameLayer);
-
-    auto text = Text::create("", "", 35);
     auto bsize = _board->getContentSize();
     auto width = vsize.width;
     auto height = (vsize.height-bsize.height)/2;
-    text->setContentSize(Size(width, height));
-    text->setPosition(Vec2(vsize.width/2, vsize.height-height/2));
-    addChild(text);
+    auto scrollView = ScrollView::create();
+    scrollView->setScrollBarEnabled(false);
+    scrollView->setBounceEnabled(true);
+    scrollView->setDirection(ScrollView::Direction::BOTH);
+    scrollView->setContentSize(Size(width, height));
+    scrollView->setInnerContainerSize(scrollView->getContentSize());
+    scrollView->setPosition(Vec2(0, vsize.height-height));
+    scrollView->jumpToTopLeft();
+    addChild(scrollView);
+
+    auto text = Text::create("", "", 35);
+    text->setAnchorPoint(Vec2(0,0));
+    scrollView->addChild(text);
+
+    auto gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
+    addChild(gameLayer);
 
     auto control = ChallengeControl::create();
     addChild(control);
@@ -39,11 +48,13 @@ bool SchoolScene::init(XQFile *xqFile)
     auto prev = Button::create("button.png");
     prev->setTitleText("Prev");
     prev->setTitleFontSize(35);
-    prev->addClickEventListener([this](Ref *ref) {
+    prev->addClickEventListener([this, text, scrollView](Ref *ref) {
             XQNode *node = _xqFile->prevStep();
             if (node == nullptr)
                 return;
             _board->undo();
+            text->setString(node->comment);
+            scrollView->setInnerContainerSize(text->getContentSize());
         });
     auto psize = prev->getContentSize();
     prev->setPosition(Vec2(origin.x+psize.width/2, origin.y+psize.height/2));
@@ -51,8 +62,8 @@ bool SchoolScene::init(XQFile *xqFile)
     auto next = Button::create("button.png");
     next->setTitleText("Next");
     next->setTitleFontSize(35);
-    next->addClickEventListener([this, text](Ref *ref) {
-            auto runNext = [this, text]() {
+    next->addClickEventListener([this, text, scrollView](Ref *ref) {
+            auto runNext = [this, text, scrollView]() {
                 XQNode *node = _xqFile->nextStep();
                 if (node == nullptr)
                     return;
@@ -61,6 +72,7 @@ bool SchoolScene::init(XQFile *xqFile)
                 log("MV: %s", mv.c_str());
                 log("COMMENT: %s", comment.c_str());
                 text->setString(comment);
+                scrollView->setInnerContainerSize(text->getContentSize());
                 if (_board->getCurrentSide() == Board::Side::WHITE) {
                     _playerWhite->onRequest(std::string("tip:") + mv);
                 } else {
@@ -112,4 +124,6 @@ bool SchoolScene::init(XQFile *xqFile)
 
 SchoolScene::~SchoolScene()
 {
+	if (_xqFile)
+		delete _xqFile;
 }

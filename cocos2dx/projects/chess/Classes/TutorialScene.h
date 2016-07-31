@@ -17,6 +17,7 @@ class TutorialMenuScene: public Scene
 public:
     bool init();
     CREATE_FUNC(TutorialMenuScene);
+	void load(int pid) { _pid = pid; }
 
     ~TutorialMenuScene();
 
@@ -26,6 +27,7 @@ private:
     ListView *_listview;
     Layout *_headview;
     Layout *_layout;
+	int _pid;
 };
 
 #endif

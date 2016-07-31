@@ -95,9 +95,9 @@ public:
         if (conv == (iconv_t)-1) {
             log("conversion from gb2312 to utf8 not available");
         } else {
-            char *pin = gbkstr.c_str();
+            const char *pin = gbkstr.c_str();
             char *pout = outBuf;
-            iconv(conv, &pin, &inSize, &pout, &outSize);
+            iconv(conv, (char **)(&pin), &inSize, &pout, &outSize);
             iconv_close(conv);
         }
 #endif

@@ -48,6 +48,7 @@ bool PopupBox::init()
     _layout->setBackGroundImageCapInsets(Rect(15, 15, 565-30, 199-30));
     _layout->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     _layout->setPosition(Vec2(winSize.width/2, winSize.height/2));
+    _layout->setContentSize(Size(100, 50));
     addChild(_layout);
 
     _layout->setScale(0.8f);
@@ -66,11 +67,12 @@ void PopupBox::pushBackView(Widget* child)
     widget->setLayoutParameter(_default_parameter->clone());
     _layout->addChild(child);
 
+    Size vsize = Director::getInstance()->getVisibleSize();
     Size wsize = widget->getContentSize();
     Size lsize = _layout->getContentSize();
-    float width = std::max(lsize.width, wsize.width);
-    float height = lsize.height + 50.0f + wsize.height;
-    _layout->setContentSize(Size(width+100, height+50));
+    float width = std::max(lsize.width, wsize.width+100);
+    float height = std::min(lsize.height + 50 + wsize.height, vsize.height);
+    _layout->setContentSize(Size(width, height));
 }
 
 DialogBox* DialogBox::create(Text *text, Button *positive, Button *negative)
@@ -127,7 +129,7 @@ bool DialogBox::init(std::string text,
                      std::function<void(bool positive)> cb)
 {
     auto t = Text::create(text, "fonts/arial.ttf", 50);
-    t->setTextColor(Color4B::BLACK);
+    t->setTextColor(Color4B::BLUE);
     auto p = Button::create("button.png");
     p->setTitleText(positive);
     p->setTitleFontSize(35);

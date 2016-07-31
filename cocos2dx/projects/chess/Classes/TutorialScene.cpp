@@ -23,37 +23,72 @@ bool TutorialMenuScene::init()
     _node_button->setTitleFontName("");
     _node_button->retain();
 
-    auto refresh = [this](int id) {
-        std::vector<TutorialData::TutorialCategory> categorys;
-        TutorialData::getInstance()->queryTutorialCategory(id, categorys);
-        std::vector<TutorialData::TutorialNode> nodes;
-        TutorialData::getInstance()->queryTutorialNode(id, nodes);
+    auto hideLoading = [this]() {
+        removeChildByName("outter");
+        removeChildByName("inner");
+    };
 
-        log("%s %d", __func__, __LINE__);
-        //_listview->removeAllItems();
-        for (auto &widget : _listview->getItems()) {
-            widget->removeFromParent();
-        }
-        _listview->requestDoLayout();
-        log("%s %d", __func__, __LINE__);
+    auto showLoading = [this]() {
+        auto vsize = Director::getInstance()->getVisibleSize();
+        RotateBy *rotateBy = RotateBy::create(0.1, -15);
+        RepeatForever *repeat = RepeatForever::create(rotateBy);
+        auto sp1 = Sprite::create("head/load_outter.png");
+        sp1->runAction(repeat);
+        sp1->setPosition(vsize.width/2, vsize.height/2);
+        addChild(sp1, 0, "outter");
+        auto sp2 = Sprite::create("load_inner.png");
+        sp2->setPosition(vsize.width/2, vsize.height/2);
+        addChild(sp2, 0, "inner");
+    };
 
-        for (auto &category : categorys) {
-            Button* btn = (Button*)_category_button->clone();
-            btn->setName("Category");
-            btn->setTag(category.id);
-            btn->setTitleText(category.name);
-            _listview->pushBackCustomItem(btn);
-            log("Category: %s", category.name.c_str());
-        }
+    auto refresh = [this, showLoading, hideLoading](int id) {
+        struct QueryData {
+            std::vector<TutorialData::TutorialNode>nodes;
+            std::vector<TutorialData::TutorialCategory>categorys;
+        };
 
-        for (auto &node : nodes) {
-            Button* btn = (Button*)_node_button->clone();
-            btn->setName("Node");
-            btn->setTag(node.id);
-            btn->setTitleText(node.name);
-            _listview->pushBackCustomItem(btn);
-            log("Node: %s", node.name.c_str());
-        }
+        auto updateUI= [this, hideLoading](QueryData data) {
+            auto nodes = data.nodes;
+            auto categorys = data.categorys;
+
+            for (auto &node : nodes) {
+                Button* btn = (Button*)_node_button->clone();
+                btn->setName("Node");
+                btn->setTag(node.id);
+                btn->setTitleText(node.name);
+                _listview->pushBackCustomItem(btn);
+                log("Node: %s", node.name.c_str());
+            }
+
+            for (auto &category : categorys) {
+                Button* btn = (Button*)_category_button->clone();
+                btn->setName("Category");
+                btn->setTag(category.id);
+                btn->setTitleText(category.name);
+                _listview->pushBackCustomItem(btn);
+                log("Category: %s", category.name.c_str());
+            }
+
+            hideLoading();
+            this->release();
+        };
+        auto queryData = [this, id, updateUI]() {
+            std::vector<TutorialData::TutorialCategory> categorys;
+            TutorialData::getInstance()->queryTutorialCategory(id, categorys);
+            std::vector<TutorialData::TutorialNode> nodes;
+            TutorialData::getInstance()->queryTutorialNode(id, nodes);
+            QueryData data = {nodes, categorys};
+
+            getScheduler()->performFunctionInCocosThread([updateUI, data](){ updateUI(data); });
+        };
+
+        _listview->removeAllItems();
+
+        this->retain();
+        auto thread = std::thread([queryData]{ queryData(); });
+        thread.detach();
+
+        showLoading();
     };
 
     _listview = ListView::create();
@@ -63,7 +98,7 @@ bool TutorialMenuScene::init()
     _listview->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
     _listview->setItemsMargin(50);
 
-    _listview->addEventListener([this,refresh](Ref *pSender, ListView::EventType type){
+    _listview->addEventListener([this,refresh, showLoading, hideLoading](Ref *pSender, ListView::EventType type){
     switch (type)
     {
         case ListView::EventType::ON_SELECTED_ITEM_START:
@@ -84,13 +119,37 @@ bool TutorialMenuScene::init()
                 log("+++");
 
                 if (btn->getName() == "Node") {
-                    auto node = TutorialData::getInstance()->getTutorialNode(id);
-                    auto xqFile = new XQJsonFile();
-                    xqFile->load(node.json);
-                    auto scene = SchoolScene::create(xqFile);
-                    Director::getInstance()->pushScene(scene);
+                    auto updateUI = [this](XQFile *xqFile) {
+                        auto scene = SchoolScene::create(xqFile);
+                        Director::getInstance()->pushScene(scene);
+                    };
+                    auto queryData = [this, id, updateUI, hideLoading]() {
+                        auto node = TutorialData::getInstance()->getTutorialNode(id);
+                        getScheduler()->performFunctionInCocosThread([this, hideLoading](){
+                                hideLoading();
+                                this->release();
+                                });
+                        if (node.type == 0) {
+                            //XQF
+                            auto xqFile = new XQJsonFile();
+                            xqFile->load(node.content);
+                            getScheduler()->performFunctionInCocosThread([updateUI, xqFile](){ updateUI(xqFile); });
+                        } else if (node.type == 1) {
+                            //TXT
+                            log("%s", node.content.c_str());
+                        }
+                    };
+
+                    this->retain();
+                    auto thread = std::thread([queryData]{ queryData(); });
+                    thread.detach();
+
+                    showLoading();
+
                 } else if (btn->getName() == "Category") {
-                    refresh(id);
+					auto scene = TutorialMenuScene::create();
+					scene->load(id);
+                    Director::getInstance()->pushScene(scene);
                 }
                 log("---");
 
@@ -126,7 +185,11 @@ bool TutorialMenuScene::init()
     back->setPosition(Vec2(100, vsize.height-100));
     addChild(back);
 
-    refresh(1);
+	_pid = 1;
+
+	setOnEnterCallback([this, refresh](){
+		refresh(_pid);
+	});
 
     return true;
 }

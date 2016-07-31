@@ -74,13 +74,13 @@ public:
 private:
     void deleteXQNode(XQNode *node)
     {
-        if (pRoot == nullptr)
+        if (node == nullptr)
             return;
-        if (pRoot->pRight != nullptr)
-            deleteXQNode(pRoot->pRight);
-        if (pRoot->pFirstChild)
-            deleteXQNode(pRoot->pFirstChild);
-        delete pRoot;
+        if (node->pRight)
+            deleteXQNode(node->pRight);
+        if (node->pFirstChild)
+            deleteXQNode(node->pFirstChild);
+        delete node;
     }
 };
 
@@ -141,10 +141,7 @@ public:
         }
     }
 
-    virtual ~XQFile()
-    {
-
-    }
+    virtual ~XQFile() {}
 
 protected:
     XQData _data;

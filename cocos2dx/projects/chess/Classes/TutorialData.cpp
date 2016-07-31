@@ -79,7 +79,7 @@ void TutorialData::queryTutorialCategory(int pid, std::vector<TutorialCategory> 
         e.progress = atoi(argv[4]);
         e.name = argv[5];
         e.desc = argv[6];
-        e.json = "";
+        e.content= "";
 
         vector->push_back(e);
         return 0;
@@ -110,9 +110,9 @@ void TutorialData::queryTutorialNode(int pid, std::vector<TutorialNode> &vector)
         e.progress = atoi(argv[4]);
         e.name = argv[5];
         e.desc = argv[6];
-        e.json = argv[7];
+        e.content= argv[7];
 
-        parseJson(e.data, e.json);
+        //parseJson(e.data, e.content);
 
         vector->push_back(e);
         return 0;
@@ -142,9 +142,9 @@ TutorialData::TutorialNode TutorialData::getTutorialNode(int id)
         node->progress = atoi(argv[4]);
         node->name = argv[5];
         node->desc = argv[6];
-        node->json = argv[7];
+        node->content= argv[7];
 
-        parseJson(node->data, node->json);
+        //parseJson(node->data, node->content);
 
         return 0;
     };

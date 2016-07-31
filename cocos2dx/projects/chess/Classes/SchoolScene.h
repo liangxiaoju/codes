@@ -29,7 +29,7 @@ public:
         }
     }
 
-    ~SchoolScene();
+    virtual ~SchoolScene();
 
 private:
     XQFile *_xqFile;

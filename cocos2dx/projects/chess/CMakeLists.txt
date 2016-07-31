@@ -128,6 +128,8 @@ endif( WIN32 )
 file(GLOB MYGAME_SRC Classes/*.cpp)
 file(GLOB ENGINE_SRC Classes/engine/*/*.cpp)
 file(GLOB SQLITE_SRC Classes/sqlite/*.c)
+file(GLOB GAMEROOM_SRC Classes/room/*.cpp)
+file(GLOB XQFILE_SRC Classes/XQFile/*.cpp)
 
 set(GAME_SRC
   Classes/AppDelegate.cpp
@@ -135,6 +137,8 @@ set(GAME_SRC
   ${MYGAME_SRC}
   ${ENGINE_SRC}
   ${SQLITE_SRC}
+  ${GAMEROOM_SRC}
+  ${XQFILE_SRC}
 )
 
 set(GAME_HEADERS

@@ -8,6 +8,17 @@ import sys
 import sqlite3
 import os
 
+
+def decode_string(s):
+    try:
+        s = s.decode("cp936").encode("utf-8")
+    except:
+        try:
+            s = s.decode("gb18030").encode("utf-8")
+        except:
+            s = s.decode("ISO-8859-2").encode("utf-8")
+    return s
+
 class DB(object):
 
     def __init__(self, filename="file.db"):
@@ -35,17 +46,34 @@ class DB(object):
         progress INTEGER DEFAULT 0,
         name TEXT,
         desc TEXT,
-        json TEXT
+        content TEXT
         )
         """ % tbl
         self._cursor.execute(sql)
 
-    def insert_record(self, tbl, pid, name, desc, json):
+    def insert_record_full(self, tbl, pid, status, type, progress, name, desc, content):
         sql = """
         INSERT INTO
-        %s (pid, name, desc, json)
+        %s (pid, status, type, progress, name, desc, content)
+        VALUES ('%d', '%d', '%d', '%d',  '%s', '%s', '%s')
+        """ % (tbl, pid, status, type, progress, name, desc, content)
+
+        try:
+            self._cursor.execute(sql)
+        except:
+            raise Exception(sql)
+
+        sql = "SELECT id FROM %s ORDER BY id DESC limit 1" % tbl
+        self._cursor.execute(sql)
+        return self._cursor.fetchone()[0]
+
+
+    def insert_record(self, tbl, pid, name, desc, content):
+        sql = """
+        INSERT INTO
+        %s (pid, name, desc, content)
         VALUES ('%d', '%s', '%s', '%s')
-        """ % (tbl, pid, name, desc, json)
+        """ % (tbl, pid, name, desc, content)
 
         try:
             self._cursor.execute(sql)
@@ -86,13 +114,7 @@ class XQFFile(object):
         len = unpack("B", self.data[offset])[0]
         name = self.data[offset+1:offset+1+len]
         name = unpack("%ds" % len, name)[0]
-        try:
-            s = name.decode("cp936").encode("utf-8")
-        except:
-            try:
-                s = name.decode("gb18030").encode("utf-8")
-            except:
-                s = name.decode("ISO-8859-2").encode("utf-8")
+        s = decode_string(name)
         return s
 
     def parse_header(self):
@@ -219,13 +241,7 @@ class XQFFile(object):
         buf = self.read_decrypt(offset, len)
         p = pack("%dB" % len, *buf)
         s = unpack("%ds" % len, p)[0]
-        try:
-            s = s.decode("cp936").encode("utf-8")
-        except:
-            try:
-                s = s.decode("gb18030").encode("utf-8")
-            except:
-                s = s.decode("ISO-8859-2").encode("utf-8")
+        s = decode_string(s)
         return s
 
     def read_decrypt_seq(self, len):
@@ -361,18 +377,34 @@ def main():
         root_id = db.insert_record("Category", 0, "ROOT", "", "")
 
         def listdir(pdir, pid):
-            for f in os.listdir(pdir):
+            l = os.listdir(pdir)
+            l.sort()
+
+            for f in l:
+                p = os.path.join(pdir, f)
+                if os.path.isfile(p):
+                    if p.endswith(".txt") or p.endswith(".TXT"):
+                        try:
+                            name = f.replace(".txt", "").replace(".TXT", "")
+                            content = ""
+                            with open(p, "r") as txt:
+                                content = txt.read();
+                            content = decode_string(content)
+                            id = db.insert_record_full("Node", pid, 0, 1, 0, name, "", content)
+                        except:
+                            print "Skip %s" % p
+                    elif p.endswith(".XQF") or p.endswith(".xqf"):
+                        try:
+                            json = XQFFile(p).jsonify()
+                            name = f.replace(".xqf", "").replace(".XQF", "")
+                            id = db.insert_record("Node", pid, name, "", json)
+                        except:
+                            print "Skip %s" % p
+            for f in l:
                 p = os.path.join(pdir, f)
                 if os.path.isdir(p):
                     id = db.insert_record("Category", pid, f, "", "")
                     listdir(p, id)
-                elif os.path.isfile(p):
-                    if p.endswith(".XQF") or p.endswith(".xqf"):
-                        try:
-                            json = XQFFile(p).jsonify()
-                            id = db.insert_record("Node", pid, f, "", json)
-                        except:
-                            print "Skip %s" % p
 
         if not os.path.isdir(root_dir):
             raise Exception("not direcotry")

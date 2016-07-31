@@ -20,7 +20,7 @@ public:
         int progress;
         std::string name;
         std::string desc;
-        std::string json;
+        std::string content;
     };
 
     struct TutorialNode {
@@ -31,7 +31,7 @@ public:
         int progress;
         std::string name;
         std::string desc;
-        std::string json;
+        std::string content;
 
         struct MoveItem {
             std::string src;
