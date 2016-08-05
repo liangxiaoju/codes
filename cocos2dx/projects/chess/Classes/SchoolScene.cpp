@@ -21,6 +21,8 @@ bool SchoolScene::init(XQFile *xqFile)
     _playerBlack = UIPlayer::create();
     _playerWhite->setBoard(_board);
     _playerBlack->setBoard(_board);
+    _playerWhite->forceStop(true);
+    _playerBlack->forceStop(true);
 
     auto bsize = _board->getContentSize();
     auto width = vsize.width;
@@ -28,7 +30,7 @@ bool SchoolScene::init(XQFile *xqFile)
     auto scrollView = ScrollView::create();
     scrollView->setScrollBarEnabled(false);
     scrollView->setBounceEnabled(true);
-    scrollView->setDirection(ScrollView::Direction::BOTH);
+    scrollView->setDirection(ScrollView::Direction::VERTICAL);
     scrollView->setContentSize(Size(width, height));
     scrollView->setInnerContainerSize(scrollView->getContentSize());
     scrollView->setPosition(Vec2(0, vsize.height-height));
@@ -36,7 +38,12 @@ bool SchoolScene::init(XQFile *xqFile)
     addChild(scrollView);
 
     auto text = Text::create("", "", 35);
+    // auto newline
+    text->ignoreContentAdaptWithSize(true);
+    text->setTextAreaSize(Size(width, 0));
     text->setAnchorPoint(Vec2(0,0));
+    text->setTextHorizontalAlignment(TextHAlignment::CENTER);
+    text->setTextColor(Color4B::GRAY);
     scrollView->addChild(text);
 
     auto gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
@@ -74,9 +81,9 @@ bool SchoolScene::init(XQFile *xqFile)
                 text->setString(comment);
                 scrollView->setInnerContainerSize(text->getContentSize());
                 if (_board->getCurrentSide() == Board::Side::WHITE) {
-                    _playerWhite->onRequest(std::string("tip:") + mv);
+                    _playerWhite->onRequest("move", mv);
                 } else {
-                    _playerBlack->onRequest(std::string("tip:") + mv);
+                    _playerBlack->onRequest("move", mv);
                 }
             };
 
@@ -85,6 +92,7 @@ bool SchoolScene::init(XQFile *xqFile)
                 log("ALT(%d)", v.size());
                 auto box = PopupBox::create();
                 auto b = Button::create("button.png");
+                b->setScaleY(1.3f);
                 auto button_cb = [this, v, runNext, box](Ref *ref) {
                     auto b1 = dynamic_cast<Button*>(ref);
                     _xqFile->selectNextAlt(v[b1->getTag()]);
@@ -95,7 +103,13 @@ bool SchoolScene::init(XQFile *xqFile)
                 b->addClickEventListener(button_cb);
                 for (int i = 0; i < v.size(); i++) {
                     Button* b1 = (Button*)b->clone();
-                    b1->setTitleText(v[i]->mv);
+                    auto move = Utils::toVecMove(v[i]->mv);
+                    auto piece = _board->pick(move[0]);
+                    if (piece == nullptr)
+                        continue;
+                    auto symbol = piece->getSymbol();
+                    auto str = Utils::convertMoveToString(v[i]->mv, symbol);
+                    b1->setTitleText(str);
                     box->pushBackView(b1);
                     b1->setTag(i);
                 }

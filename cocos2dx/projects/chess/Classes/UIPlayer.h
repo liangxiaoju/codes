@@ -16,8 +16,10 @@ public:
 
 	virtual void start(std::string fen) override;
 	virtual void stop() override;
+    void forceStop(bool stop);
 
-	virtual bool onRequest(std::string req) override;
+	virtual void onRequest(std::string req, std::string args="",
+                           std::function<void(bool)>callback=nullptr) override;
 
 	bool onTouchBegan(Touch *touch, Event *unused);
 	void onTouchMoved(Touch *touch, Event *unused);
@@ -30,6 +32,7 @@ private:
 	Piece *_selectedPiece;
 	EventListenerTouchOneByOne * _touchListener;
 	Board *_board;
+    bool _forceStop;
 };
 
 #endif

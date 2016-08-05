@@ -32,7 +32,8 @@ public:
 
 	virtual void start(std::string fen) override;
 	virtual void stop() override;
-	virtual bool onRequest(std::string req) override;
+	virtual void onRequest(std::string req, std::string args="",
+                           std::function<void(bool)>callback=nullptr) override;
 
 	virtual ~NetPlayer();
 

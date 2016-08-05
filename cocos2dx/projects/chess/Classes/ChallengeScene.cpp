@@ -6,6 +6,7 @@
 #include "ChallengeControl.h"
 #include "HeaderSprite.h"
 #include "Sound.h"
+#include "UserData.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -79,6 +80,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
             Sound::getInstance()->playEffect("draw");
         } else if (event.find("WIN:WHITE") != std::string::npos) {
             Sound::getInstance()->playEffect("win");
+            UserData::getInstance()->setIntegerForKey("ChallengeScene:LEVEL", _item.id);
         } else {
             Sound::getInstance()->playEffect("lose");
         }

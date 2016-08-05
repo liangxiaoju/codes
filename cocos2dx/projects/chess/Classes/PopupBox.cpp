@@ -133,14 +133,16 @@ bool DialogBox::init(std::string text,
     auto p = Button::create("button.png");
     p->setTitleText(positive);
     p->setTitleFontSize(35);
-    p->addClickEventListener([cb](Ref *ref){
+    p->addClickEventListener([this, cb](Ref *ref){
             cb(true);
+            removeFromParent();
         });
     auto n = Button::create("button.png");
     n->setTitleText(negative);
     n->setTitleFontSize(35);
-    n->addClickEventListener([cb](Ref *ref){
+    n->addClickEventListener([this, cb](Ref *ref){
             cb(false);
+            removeFromParent();
         });
 
     return init(t, p, n);

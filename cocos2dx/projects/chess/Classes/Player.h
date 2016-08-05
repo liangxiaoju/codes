@@ -26,7 +26,8 @@ public:
 
 	virtual void stop() = 0;
 
-	virtual bool onRequest(std::string req) = 0;
+	virtual void onRequest(std::string req, std::string args="",
+                           std::function<void(bool)>callback=nullptr) = 0;
 
 	class Delegate
 	{

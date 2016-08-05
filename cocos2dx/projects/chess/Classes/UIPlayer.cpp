@@ -1,6 +1,7 @@
 #include "UIPlayer.h"
 #include "HeaderSprite.h"
 #include "Sound.h"
+#include "PopupBox.h"
 
 bool UIPlayer::init()
 {
@@ -17,6 +18,7 @@ bool UIPlayer::init()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_touchListener, this);
 
 	_touchListener->setEnabled(false);
+    _forceStop = false;
 
 	/* response for regret */
 	auto regret_cb = [this](EventCustom* ev) {
@@ -30,17 +32,30 @@ bool UIPlayer::init()
 	auto draw_cb = [this](EventCustom* ev) {
 		_delegate->onDrawRequest();
 	};
+    auto request_deny_cb = [this](EventCustom* ev) {
+        std::string event = (const char *)ev->getUserData();
+        if (event.find("DRAW:") != std::string::npos) {
+            auto cb = [this](bool positive) {};
+            auto box = DialogBox::create("Disagree with draw !", "OK", "OK", cb);
+            getScene()->addChild(box);
+            log("request deny: draw");
+        } else if (event.find("REGRET:") != std::string::npos) {
 
-	setOnEnterCallback([this, regret_cb, resign_cb, draw_cb](){
+        }
+    };
+
+	setOnEnterCallback([this, regret_cb, resign_cb, draw_cb, request_deny_cb](){
 		getEventDispatcher()->addCustomEventListener(EVENT_REGRET, regret_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_RESIGN, resign_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_DRAW, draw_cb);
+		getEventDispatcher()->addCustomEventListener(EVENT_REQUEST_DENY, request_deny_cb);
 	});
 
 	setOnExitCallback([this](){
 		getEventDispatcher()->removeCustomEventListeners(EVENT_REGRET);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_RESIGN);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_DRAW);
+		getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_DENY);
 	});
 
 	return true;
@@ -108,7 +123,8 @@ void UIPlayer::onTouchCancelled(Touch *touch, Event *event) {
 
 void UIPlayer::start(std::string fen)
 {
-	_touchListener->setEnabled(true);
+    if (!_forceStop)
+        _touchListener->setEnabled(true);
 }
 
 void UIPlayer::stop()
@@ -116,18 +132,33 @@ void UIPlayer::stop()
 	_touchListener->setEnabled(false);
 }
 
-bool UIPlayer::onRequest(std::string req)
+void UIPlayer::forceStop(bool stop)
+{
+    _forceStop = stop;
+    if (stop)
+        this->stop();
+}
+
+void UIPlayer::onRequest(std::string req, std::string args,
+                         std::function<void(bool)>callback)
 {
 	if (req == "draw") {
-		return true;
+        //popup
+        auto cb = [callback](bool positive) {
+            callback(positive);
+        };
+        auto box = DialogBox::create("Accept draw ?", "Yes", "No", cb);
+        addChild(box);
 	} else if (req == "regret") {
-		return true;
-	} else if(req.find("tip") != std::string::npos) {
-        auto substr = Utils::splitString(req, ':');
-        _delegate->onMoveRequest(substr[1]);
-        return true;
+        callback(true);
+    } else if (req == "resign") {
+        //popup
+        callback(true);
+    } else if (req == "move") {
+        _delegate->onMoveRequest(args);
     }
 
-	return false;
+    if (callback)
+        callback(false);
 }
 

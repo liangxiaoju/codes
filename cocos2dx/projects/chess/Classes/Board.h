@@ -75,7 +75,12 @@ public:
 			Side::WHITE : Side::BLACK;
 	}
 
-private:
+	void addPiece(Vec2 index, Piece *p);
+	void removePiece(Vec2 index);
+
+    virtual ~Board();
+
+protected:
 	std::string _initFen;
 	float _startX;
 	float _startY;
@@ -90,9 +95,6 @@ private:
 	Style _style;
 	Side _currSide;
 	Node *_pieceLayer;
-
-	void addPiece(Vec2 index, Piece *p);
-	void removePiece(Vec2 index);
 
 	void initFromFen(std::string fen);
 };

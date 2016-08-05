@@ -98,7 +98,7 @@ bool TutorialMenuScene::init()
     _listview->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
     _listview->setItemsMargin(50);
 
-    _listview->addEventListener([this,refresh, showLoading, hideLoading](Ref *pSender, ListView::EventType type){
+    _listview->addEventListener([this, showLoading, hideLoading](Ref *pSender, ListView::EventType type){
     switch (type)
     {
         case ListView::EventType::ON_SELECTED_ITEM_START:
@@ -119,30 +119,39 @@ bool TutorialMenuScene::init()
                 log("+++");
 
                 if (btn->getName() == "Node") {
-                    auto updateUI = [this](XQFile *xqFile) {
+                    auto updateUI = [this, hideLoading](XQFile *xqFile) {
                         auto scene = SchoolScene::create(xqFile);
                         Director::getInstance()->pushScene(scene);
+                        hideLoading();
+                        this->release();
                     };
                     auto queryData = [this, id, updateUI, hideLoading]() {
                         auto node = TutorialData::getInstance()->getTutorialNode(id);
-                        getScheduler()->performFunctionInCocosThread([this, hideLoading](){
-                                hideLoading();
-                                this->release();
-                                });
                         if (node.type == 0) {
                             //XQF
                             auto xqFile = new XQJsonFile();
                             xqFile->load(node.content);
-                            getScheduler()->performFunctionInCocosThread([updateUI, xqFile](){ updateUI(xqFile); });
+                            getScheduler()->performFunctionInCocosThread(
+                                [updateUI, xqFile](){
+                                    updateUI(xqFile);
+                                });
                         } else if (node.type == 1) {
                             //TXT
                             log("%s", node.content.c_str());
+                            getScheduler()->performFunctionInCocosThread(
+                                [this, hideLoading](){
+                                    hideLoading();
+                                    this->release();
+                                });
                         }
                     };
 
                     this->retain();
                     auto thread = std::thread([queryData]{ queryData(); });
                     thread.detach();
+
+                    for (auto &item : _listview->getItems())
+                        item->removeFromParent();
 
                     showLoading();
 
@@ -188,7 +197,7 @@ bool TutorialMenuScene::init()
 	_pid = 1;
 
 	setOnEnterCallback([this, refresh](){
-		refresh(_pid);
+            refresh(_pid);
 	});
 
     return true;

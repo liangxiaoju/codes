@@ -126,22 +126,20 @@ void NetPlayer::stop()
     stopAllActions();
 }
 
-bool NetPlayer::onRequest(std::string req)
+void NetPlayer::onRequest(std::string req, std::string args,
+                          std::function<void(bool)>callback)
 {
 	if (req == "draw") {
 		_client->emit("control", "draw");
-		return true;
 	} else if (req == "regret") {
 		_client->emit("control", "regret");
 		/* TODO: return true/false according to the ack */
-		return true;
 	} else if (req == "reset") {
 		_client->emit("control", "reset");
-		return true;
 	} else if (req == "switch") {
 		_client->emit("control", "switch");
-		return true;
 	}
 
-	return false;
+    if (callback)
+        callback(false);
 }

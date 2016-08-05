@@ -53,6 +53,12 @@ public:
 
 	void clearRecordTbl();
 	void clearSaveTbl();
+    void clearUserInfoTbl();
+
+    int getIntegerForKey(std::string key, int defaultValue);
+    void setIntegerForKey(std::string key, int value);
+    std::string getStringForKey(std::string key, std::string defaultValue);
+    void setStringForKey(std::string key, std::string value);
 
 	UserData(std::string fullpath);
 	virtual ~UserData();

@@ -31,6 +31,8 @@ USING_NS_CC;
 #define EVENT_SUSPEND "EV_SUSPEND"
 #define EVENT_RESUME "EV_RESUME"
 
+#define EVENT_REQUEST_DENY "EV_REQUEST_DENY"
+
 namespace std {
 	template <>
 	struct hash<cocos2d::Vec2>
@@ -107,6 +109,61 @@ public:
         delete [] outBuf;
 
         return utf8str;
+    }
+
+    static std::string convertMoveToString(std::string mv, char symbol)
+    {
+        auto v = toVecMove(mv);
+        auto src = v[0];
+        auto dst = v[1];
+
+        if ((src.x < 0 || src.x > 8 || src.y < 0 || src.y > 9) ||
+            (dst.x < 0 || dst.x > 8 || dst.y < 0 || dst.y > 9))
+                return "";
+
+        std::map<char, std::string> symbolMap = {
+            {'r', "车"}, {'n', "马"}, {'b', "象"}, {'a', "士"}, {'k', "将"}, {'c', "炮"}, {'p', "卒"},
+            {'R', "车"}, {'N', "马"}, {'B', "相"}, {'A', "士"}, {'K', "帅"}, {'C', "炮"}, {'P', "兵"}
+        };
+
+        std::string name = symbolMap.at(symbol);
+
+        std::vector<std::string> numRedMap = {"一","二","三","四","五","六","七","八","九"};
+        std::vector<std::string> numBlackMap = {"1","2","3","4","5","6","7","8","9"};
+
+        std::vector<std::string> numMap;
+        if (std::string("RNBAKCP").find(symbol) != std::string::npos) {
+            numMap = numRedMap;
+            src.x = 8 - src.x;
+            dst.x = 8 - dst.x;
+        } else {
+            numMap = numBlackMap;
+            src.y = 9 - src.y;
+            dst.y = 9 - dst.y;
+        }
+
+        std::string action = "";
+        if (src.y == dst.y) {
+            action = "平";
+        } else if (src.y < dst.y) {
+            action = "进";
+        } else {
+            action = "退";
+        }
+
+        std::string sname = numMap[src.x];
+
+        std::string dname;
+        if (std::string("rRcCpPkK").find(symbol) != std::string::npos) {
+            if (src.y == dst.y)
+                dname = numMap[dst.x];
+            else
+                dname = numMap[abs(dst.y-src.y) - 1];
+        } else {
+            dname = numMap[dst.x];
+        }
+
+        return name+sname+action+dname;
     }
 };
 

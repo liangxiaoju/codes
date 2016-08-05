@@ -142,78 +142,118 @@ void GameLayer::onPlayerWhiteResignRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::WHITE)
 		return;
-	_playerWhite->stop();
-	_playerBlack->stop();
 
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-			(void *)"WIN:BLACK");
+    auto cb = [this](bool reply) {
+        _playerWhite->stop();
+        _playerBlack->stop();
+
+        getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                  (void *)"WIN:BLACK");
+    };
+    _playerBlack->onRequest("resign", "", cb);
 }
 
 void GameLayer::onPlayerBlackResignRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::BLACK)
 		return;
-	_playerWhite->stop();
-	_playerBlack->stop();
 
-	getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-			(void *)"WIN:WHITE");
+    auto cb = [this](bool reply) {
+        _playerWhite->stop();
+        _playerBlack->stop();
+
+        getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                  (void *)"WIN:WHITE");
+    };
+    _playerWhite->onRequest("resign", "", cb);
 }
 
 void GameLayer::onPlayerWhiteDrawRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::WHITE)
 		return;
-	bool draw = _playerBlack->onRequest("draw");
-	if (draw) {
-		_playerWhite->stop();
-		_playerBlack->stop();
 
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)"DRAW:");
-	}
+    auto cb = [this](bool reply) {
+        if (reply) {
+            _playerWhite->stop();
+            _playerBlack->stop();
+
+            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                      (void *)"DRAW:");
+        } else {
+            // popup
+            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
+                                                      (void*)"DRAW:");
+            _playerWhite->start(_board->getFenWithMove());
+        }
+    };
+
+    _playerBlack->onRequest("draw", "", cb);
 }
 
 void GameLayer::onPlayerBlackDrawRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::BLACK)
 		return;
-	bool draw = _playerWhite->onRequest("draw");
-	if (draw) {
-		_playerWhite->stop();
-		_playerBlack->stop();
+    auto cb = [this](bool reply) {
+        if (reply) {
+            _playerWhite->stop();
+            _playerBlack->stop();
 
-		getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-				(void *)"DRAW:");
-	}
+            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
+                                                      (void *)"DRAW:");
+        } else {
+            // popup
+            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
+                                                      (void*)"DRAW:");
+            _playerBlack->start(_board->getFenWithMove());
+        }
+    };
+	_playerWhite->onRequest("draw", "", cb);
 }
 
 void GameLayer::onPlayerWhiteRegretRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::WHITE)
 		return;
-	if (! _playerBlack->onRequest("regret"))
-		return;
-	_board->undo();
-	_board->undo();
-    Sound::getInstance()->playEffect("undo");
+
+    auto cb = [this](bool reply) {
+        if (reply) {
+            _board->undo();
+            _board->undo();
+            Sound::getInstance()->playEffect("undo");
+        } else {
+            // popup
+            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
+                                                      (void*)"REGRET:");
+        }
+    };
+	_playerBlack->onRequest("regret", "", cb);
 }
 
 void GameLayer::onPlayerBlackRegretRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::BLACK)
 		return;
-	if (! _playerWhite->onRequest("regret"))
-		return;
-	_board->undo();
-	_board->undo();
-    Sound::getInstance()->playEffect("undo");
 
-	if (_board->getCurrentSide() != Board::Side::BLACK) {
-		_playerBlack->stop();
-		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
-		_playerWhite->start(_board->getFenWithMove());
-	}
+    auto cb = [this](bool reply) {
+        if (reply) {
+            _board->undo();
+            _board->undo();
+            Sound::getInstance()->playEffect("undo");
+
+            if (_board->getCurrentSide() != Board::Side::BLACK) {
+                _playerBlack->stop();
+                getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
+                _playerWhite->start(_board->getFenWithMove());
+            }
+        } else {
+            // popup
+            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
+                                                      (void*)"REGRET:");
+        }
+    };
+	_playerWhite->onRequest("regret", "", cb);
 }
 
 int GameLayer::onRequest(std::string req)

@@ -16,7 +16,8 @@ public:
 	CREATE_FUNC(AIPlayer);
 	void start(std::string fen) override;
 	void stop() override;
-	bool onRequest(std::string req) override;
+	void onRequest(std::string req, std::string args="",
+                   std::function<void(bool)>callback=nullptr) override;
 
 	void setLevel(int level) { _level = level; }
 

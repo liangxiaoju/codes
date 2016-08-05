@@ -87,7 +87,7 @@ public:
 				"FightSceneMenu/game_button_peaceG_new.png",
 				[&](Ref *ref) {
 					log("onPeace");
-					getEventDispatcher()->dispatchCustomEvent(EVENT_TIP);
+					getEventDispatcher()->dispatchCustomEvent(EVENT_DRAW);
 				}));
 		_items.back()->setName("btn_peace");
 		_items.pushBack(MenuItemImage::create(

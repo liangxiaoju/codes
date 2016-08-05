@@ -4,7 +4,7 @@ UserData *UserData::s_userData = nullptr;
 
 void UserData::createTable()
 {
-	const char *sql_createtable;
+	char *sql_createtable;
 	sqlite3_stmt *stmt;
 	int ok;
 
@@ -22,7 +22,8 @@ void UserData::createTable()
 	ok = sqlite3_prepare_v2(_db, sql_createtable, -1, &stmt, nullptr);
 	ok |= sqlite3_step(stmt);
 	ok |= sqlite3_finalize(stmt);
-	
+    sqlite3_free(sql_createtable);
+
 	if( ok != SQLITE_OK && ok != SQLITE_DONE)
 		log("Error in CREATE TABLE saveTbl");
 
@@ -41,9 +42,23 @@ void UserData::createTable()
 	ok = sqlite3_prepare_v2(_db, sql_createtable, -1, &stmt, nullptr);
 	ok |= sqlite3_step(stmt);
 	ok |= sqlite3_finalize(stmt);
-	
+    sqlite3_free(sql_createtable);
+
 	if( ok != SQLITE_OK && ok != SQLITE_DONE)
 		log("Error in CREATE TABLE recordTbl");
+
+    sql_createtable = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS "
+                                      "defaultTbl("
+                                      "key TEXT PRIMARY KEY, "
+                                      "value TEXT)"
+        );
+	ok = sqlite3_prepare_v2(_db, sql_createtable, -1, &stmt, nullptr);
+	ok |= sqlite3_step(stmt);
+	ok |= sqlite3_finalize(stmt);
+    sqlite3_free(sql_createtable);
+
+	if( ok != SQLITE_OK && ok != SQLITE_DONE)
+		log("Error in CREATE TABLE defaultTbl");
 }
 
 void UserData::querySaveTbl(std::vector<SaveElement> &vector)
@@ -126,7 +141,8 @@ void UserData::insertRecordElement(RecordElement element)
 			element.fen.c_str());
 
 	int ok = sqlite3_exec(_db, sql, 0, 0, 0);
-	
+    sqlite3_free(sql);
+
 	if( ok != SQLITE_OK)
 		log("Error in insertRecordElement()");
 }
@@ -145,7 +161,8 @@ void UserData::insertSaveElement(SaveElement element)
 			element.fen.c_str());
 
 	int ok = sqlite3_exec(_db, sql, 0, 0, 0);
-	
+    sqlite3_free(sql);
+
 	if(ok != SQLITE_OK)
 		log("Error in insertSaveElement()");
 }
@@ -154,6 +171,7 @@ void UserData::deleteRecordElement(int id)
 {
 	char *sql = sqlite3_mprintf("DELETE FROM recordTbl WHERE id='%d'", id);
 	int ok = sqlite3_exec(_db, sql, nullptr, nullptr, nullptr);
+    sqlite3_free(sql);
 
 	if( ok != SQLITE_OK && ok != SQLITE_DONE)
 		log("Error in deleteRecordElement()");
@@ -163,6 +181,7 @@ void UserData::deleteSaveElement(int id)
 {
 	char *sql = sqlite3_mprintf("DELETE FROM saveTbl WHERE id='%d'", id);
 	int ok = sqlite3_exec(_db, sql, nullptr, nullptr, nullptr);
+    sqlite3_free(sql);
 
 	if( ok != SQLITE_OK)
 		log("Error in deleteSaveElement()");
@@ -171,7 +190,7 @@ void UserData::deleteSaveElement(int id)
 void UserData::clearRecordTbl()
 {
 	int ok = sqlite3_exec(_db, "DELETE FROM recordTbl", nullptr, nullptr, nullptr);
-    
+
     if( ok != SQLITE_OK)
         log("Error in clearRecordTbl()");
 }
@@ -181,6 +200,88 @@ void UserData::clearSaveTbl()
 	int ok = sqlite3_exec(_db, "DELETE FROM saveTbl", 0, 0, 0);
     if( ok != SQLITE_OK)
         log("Error in clearSaveTbl()");
+}
+
+int UserData::getIntegerForKey(std::string key, int defaultValue)
+{
+    auto callback = [](void *v, int argc, char **argv, char **colName)->int{
+        if (argc != 1) {
+            log("argc!=1");
+            return SQLITE_ERROR;
+        }
+
+        std::string *text = (std::string*)v;
+        *text = argv[0];
+
+        return 0;
+    };
+
+    std::string text;
+    char *sql = sqlite3_mprintf(
+        "SELECT value FROM defaultTbl WHERE key='%s'", key.c_str());
+    int ok = sqlite3_exec(_db, sql, callback, &text, 0);
+    sqlite3_free(sql);
+
+    int value;
+    if (ok != SQLITE_OK)
+        value = defaultValue;
+    else
+        value = atoi(text.c_str());
+
+    return value;
+}
+
+void UserData::setIntegerForKey(std::string key, int value)
+{
+    char text[32];
+    snprintf(text, sizeof(text), "%d", value);
+
+    char *sql = sqlite3_mprintf(
+        "REPLACE into defaultTbl(key,value) values('%s','%s')", key.c_str(), text);
+    int ok = sqlite3_exec(_db, sql, 0, 0, 0);
+    if (ok != SQLITE_OK)
+        log("Error in setIntegerForKey()");
+    sqlite3_free(sql);
+}
+
+std::string UserData::getStringForKey(std::string key, std::string defaultValue)
+{
+    auto callback = [](void *v, int argc, char **argv, char **colName)->int{
+        if (argc != 1) {
+            log("argc!=1");
+            return SQLITE_ERROR;
+        }
+
+        std::string *text = (std::string*)v;
+        *text = argv[0];
+
+        return 0;
+    };
+
+    std::string text;
+    char *sql = sqlite3_mprintf(
+        "SELECT value FROM defaultTbl WHERE key='%s'", key.c_str());
+    int ok = sqlite3_exec(_db, sql, callback, &text, 0);
+    sqlite3_free(sql);
+
+    std::string value;
+    if (ok != SQLITE_OK)
+        value = defaultValue;
+    else
+        value = text;
+
+    return value;
+}
+
+void UserData::setStringForKey(std::string key, std::string value)
+{
+    char *sql = sqlite3_mprintf(
+        "REPLACE into defaultTbl(key,value) values('%s','%s')",
+        key.c_str(), value.c_str());
+    int ok = sqlite3_exec(_db, sql, 0, 0, 0);
+    if (ok != SQLITE_OK)
+        log("Error in setStringForKey()");
+    sqlite3_free(sql);
 }
 
 UserData::UserData(std::string fullpath)

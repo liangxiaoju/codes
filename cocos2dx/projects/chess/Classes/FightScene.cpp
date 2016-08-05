@@ -131,7 +131,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 
         auto cb = [this, ai, currentPlayer](std::string mv) {
             log("TIP: %s", mv.c_str());
-            currentPlayer->onRequest("tip:" + mv);
+            currentPlayer->onRequest("move", mv);
         };
         ai->getHelp(_board->getFenWithMove(), cb);
     };
@@ -140,11 +140,17 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
         std::string event = (const char *)ev->getUserData();
         if (event.find("DRAW:") != std::string::npos) {
             Sound::getInstance()->playEffect("draw");
+            int count = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
+            UserData::getInstance()->setIntegerForKey("FightScene:DRAW", count+1);
         } else if (((event.find("WIN:WHITE") != std::string::npos) && (_roleWhite == Role::UI))
                    || ((event.find("WIN:BLACK") != std::string::npos) && (_roleBlack == Role::UI))) {
             Sound::getInstance()->playEffect("win");
+            int count = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
+            UserData::getInstance()->setIntegerForKey("FightScene:WIN", count+1);
         } else {
             Sound::getInstance()->playEffect("lose");
+            int count = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
+            UserData::getInstance()->setIntegerForKey("FightScene:LOSE", count+1);
         }
     };
 

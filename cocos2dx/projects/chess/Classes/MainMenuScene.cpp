@@ -4,6 +4,7 @@
 #include "ChallengeScene.h"
 #include "LANFightScene.h"
 #include "TutorialScene.h"
+#include "ResearchScene.h"
 
 class DifficultyScene : public Scene
 {
@@ -43,7 +44,8 @@ public:
 			Director::getInstance()->pushScene(scene);
 		});
 		b3->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 5);
+            //auto scene = FightScene::create(FightScene::UI, FightScene::AI, 5);
+            auto scene = ResearchScene::create();
 			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
@@ -177,7 +179,7 @@ bool MainMenuLayer::init()
 		log("quit click");
         auto box = DialogBox::create(
             "Are you sure to exit ?", "Yes", "No", [this](bool yes){
-                removeChildByName("box");
+                //removeChildByName("box");
                 if (yes) {
                     Director::getInstance()->end();
                 }

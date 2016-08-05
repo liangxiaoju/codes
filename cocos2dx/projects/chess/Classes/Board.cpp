@@ -408,3 +408,12 @@ void Board::setRotation(float rotation)
 		p->setRotation(-rotation);
 	}
 }
+
+Board::~Board()
+{
+    for (auto &mv : _historyMv) {
+        Piece *p = mv.second;
+        if (p)
+            p->release();
+    }
+}

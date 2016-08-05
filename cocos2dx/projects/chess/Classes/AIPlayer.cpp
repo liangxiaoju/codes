@@ -388,13 +388,33 @@ void AIPlayer::stop()
 	sendWithReply("stop", "nobestmove");
 }
 
-bool AIPlayer::onRequest(std::string req)
+void AIPlayer::onRequest(std::string req, std::string args,
+                         std::function<void(bool)> callback)
 {
 	if (req == "draw") {
-		return true;
+        std::string fen = args;
+        sendWithoutReply("position fen " + fen);
+        std::string reply = sendWithReply("go time 0", "bestmove", 1);
+        if (reply.find("bestmove") == 0) {
+            std::string mv = Utils::splitString(reply, ' ')[1];
+            sendWithoutReply("position fen " + fen + " " + mv);
+            RequestCallback cb = [callback](std::string reply) {
+                if (reply.find("draw") != std::string::npos) {
+                    callback(true);
+                } else {
+                    callback(false);
+                }
+            };
+            sendWithCallBack("go draw time " + Utils::toString(_level*1000),
+                             "bestmove", _level+1, cb);
+        } else {
+            callback(false);
+        }
 	} else if (req == "regret") {
-		return true;
+        callback(true);
+    } else if (req == "resign") {
+        callback(true);
+    } else {
+        callback(false);
     }
-
-	return false;
 }
