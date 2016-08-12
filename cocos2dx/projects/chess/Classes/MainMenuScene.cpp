@@ -5,6 +5,7 @@
 #include "LANFightScene.h"
 #include "TutorialScene.h"
 #include "ResearchScene.h"
+#include "SettingMenu.h"
 
 class DifficultyScene : public Scene
 {
@@ -162,9 +163,9 @@ bool MainMenuLayer::init()
 	//auto setting = Button::create("MainMenuScene/main_button_setting.png", "MainMenuScene/main_button_settingP.png");
 	auto setting = Button::create("MainMenuScene/main_button_setting.png");
 	//setting->setScale(1.2);
-	setting->addClickEventListener([](Ref *ref){
+	setting->addClickEventListener([this](Ref *ref){
             log("setting click");
-            auto box = PopupBox::create();
+            SettingMenu::getInstance()->show();
         });
 	setting->setZoomScale(0.1);
 
@@ -177,14 +178,12 @@ bool MainMenuLayer::init()
 	//quit->setScale(1.2);
 	quit->addClickEventListener([this](Ref *ref){
 		log("quit click");
-        auto box = DialogBox::create(
+        DialogBox::create(
             "Are you sure to exit ?", "Yes", "No", [this](bool yes){
-                //removeChildByName("box");
                 if (yes) {
                     Director::getInstance()->end();
                 }
             });
-        addChild(box, 1, "box");
 	});
 	quit->setZoomScale(0.1);
 

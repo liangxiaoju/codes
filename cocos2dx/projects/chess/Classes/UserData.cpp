@@ -11,13 +11,14 @@ void UserData::createTable()
 	sql_createtable = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS "
 					   "saveTbl("
 							   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                               "type INTEGER, "
 							   "date TEXT, "
 							   "roleWhite INTEGER, "
 							   "roleBlack INTEGER, "
 							   "level INTEGER, "
 							   "white TEXT, "
 							   "black TEXT, "
-							   "fen TEXT)"
+							   "content TEXT)"
 							   );
 	ok = sqlite3_prepare_v2(_db, sql_createtable, -1, &stmt, nullptr);
 	ok |= sqlite3_step(stmt);
@@ -67,20 +68,21 @@ void UserData::querySaveTbl(std::vector<SaveElement> &vector)
 
 		std::vector<SaveElement> *vector = (std::vector<SaveElement> *)v;
 
-		if (argc != 8) {
-			log("argc!=8");
+		if (argc != 9) {
+			log("argc!=9");
 			return SQLITE_ERROR;
 		}
 
 		SaveElement e;
 		e.id = atoi(argv[0]);
-		e.date = argv[1];
-		e.roleWhite = atoi(argv[2]);
-		e.roleBlack = atoi(argv[3]);
-		e.level = atoi(argv[4]);
-		e.white = argv[5];
-		e.black = argv[6];
-		e.fen = argv[7];
+        e.type = atoi(argv[1]);
+		e.date = argv[2];
+		e.roleWhite = atoi(argv[3]);
+		e.roleBlack = atoi(argv[4]);
+		e.level = atoi(argv[5]);
+		e.white = argv[6];
+		e.black = argv[7];
+		e.content = argv[8];
 
 		vector->push_back(e);
 
@@ -151,14 +153,15 @@ void UserData::insertSaveElement(SaveElement element)
 {
 	char *sql = sqlite3_mprintf(
 			"INSERT INTO "
-			"saveTbl (date,roleWhite,roleBlack,level,white,black,fen) "
-			"VALUES (datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s')",
+			"saveTbl (type,date,roleWhite,roleBlack,level,white,black,content) "
+			"VALUES (%d,datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s')",
+            element.type,
 			element.roleWhite,
 			element.roleBlack,
 			element.level,
 			element.white.c_str(),
 			element.black.c_str(),
-			element.fen.c_str());
+			element.content.c_str());
 
 	int ok = sqlite3_exec(_db, sql, 0, 0, 0);
     sqlite3_free(sql);
@@ -216,17 +219,16 @@ int UserData::getIntegerForKey(std::string key, int defaultValue)
         return 0;
     };
 
-    std::string text;
+    char defaultValueText[32];
+    snprintf(defaultValueText, sizeof(defaultValueText), "%d", defaultValue);
+
+    std::string text = defaultValueText;
     char *sql = sqlite3_mprintf(
         "SELECT value FROM defaultTbl WHERE key='%s'", key.c_str());
     int ok = sqlite3_exec(_db, sql, callback, &text, 0);
     sqlite3_free(sql);
 
-    int value;
-    if (ok != SQLITE_OK)
-        value = defaultValue;
-    else
-        value = atoi(text.c_str());
+    int value = atoi(text.c_str());
 
     return value;
 }
@@ -258,17 +260,13 @@ std::string UserData::getStringForKey(std::string key, std::string defaultValue)
         return 0;
     };
 
-    std::string text;
+    std::string text = defaultValue;
     char *sql = sqlite3_mprintf(
         "SELECT value FROM defaultTbl WHERE key='%s'", key.c_str());
     int ok = sqlite3_exec(_db, sql, callback, &text, 0);
     sqlite3_free(sql);
 
-    std::string value;
-    if (ok != SQLITE_OK)
-        value = defaultValue;
-    else
-        value = text;
+    std::string value = text;
 
     return value;
 }

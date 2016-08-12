@@ -32,9 +32,7 @@ bool PopupBox::init()
     Size winSize = Director::getInstance()->getWinSize();
 
     auto listener = EventListenerTouchOneByOne::create();
-    listener->onTouchBegan = [](Touch *t, Event *e) {
-        return true;
-    };
+    listener->onTouchBegan = CC_CALLBACK_2(PopupBox::onTouchBegan, this);
     listener->setSwallowTouches(true);
     getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
@@ -51,14 +49,26 @@ bool PopupBox::init()
     _layout->setContentSize(Size(100, 50));
     addChild(_layout);
 
-    _layout->setScale(0.8f);
-    auto s1 = ScaleTo::create(0.1f, 1.1f);
-    auto s2 = ScaleTo::create(0.07f, 0.9f);
-    auto s3 = ScaleTo::create(0.05f, 1.0f);
-    Sequence *seq = Sequence::create(s1, s2, s3, nullptr);
-    _layout->runAction(seq);
+    setOnEnterCallback([this]() {
+            _layout->setScale(0.8f);
+            auto s1 = ScaleTo::create(0.1f, 1.1f);
+            auto s2 = ScaleTo::create(0.07f, 0.9f);
+            auto s3 = ScaleTo::create(0.05f, 1.0f);
+            Sequence *seq = Sequence::create(s1, s2, s3, nullptr);
+            _layout->runAction(seq);
+        });
 
     return true;
+}
+
+bool PopupBox::onTouchBegan(Touch *touch, Event *event)
+{
+    return true;
+}
+
+Rect PopupBox::getInnerBoundingBox()
+{
+    return _layout->getBoundingBox();
 }
 
 void PopupBox::pushBackView(Widget* child)
@@ -145,5 +155,117 @@ bool DialogBox::init(std::string text,
             removeFromParent();
         });
 
-    return init(t, p, n);
+    if (!init(t, p, n))
+        return false;
+
+    Director::getInstance()->getRunningScene()->addChild(this);
+
+    return true;
+}
+
+PopupMessage* PopupMessage::create(std::string text, std::function<void(void)>cb)
+{
+    PopupMessage* widget = new (std::nothrow) PopupMessage();
+    if (widget && widget->init(text, cb)) {
+        widget->autorelease();
+        return widget;
+    }
+    CC_SAFE_DELETE(widget);
+    return nullptr;
+}
+
+bool PopupMessage::init(std::string text, std::function<void(void)>cb)
+{
+    if (!PopupBox::init())
+        return false;
+
+    auto t = Text::create(text, "fonts/arial.ttf", 50);
+    t->setTextColor(Color4B::BLUE);
+
+    auto button = Button::create("button.png");
+    button->setTitleText("OK");
+    button->setTitleFontSize(35);
+    button->addClickEventListener([this, cb](Ref *ref) {
+            if (cb != nullptr)
+                cb();
+            removeFromParent();
+        });
+
+    pushBackView(t);
+    pushBackView(button);
+
+    Director::getInstance()->getRunningScene()->addChild(this);
+
+    return true;
+}
+
+PopupMenu *PopupMenu::create(std::vector<std::string> vec,
+                             std::function<void(int index)>cb)
+{
+    PopupMenu* widget = new (std::nothrow) PopupMenu();
+    if (widget && widget->init(vec, cb)) {
+        widget->autorelease();
+        return widget;
+    }
+    CC_SAFE_DELETE(widget);
+    return nullptr;
+}
+
+bool PopupMenu::init(std::vector<std::string> vec,
+                     std::function<void(int index)>cb)
+{
+    if (!PopupBox::init())
+        return false;
+
+    Size winSize = Director::getInstance()->getWinSize();
+
+    auto listview = ListView::create();
+    listview->setDirection(ListView::Direction::VERTICAL);
+    listview->setBounceEnabled(true);
+    listview->setScrollBarEnabled(false);
+    listview->setGravity(ListView::Gravity::CENTER_HORIZONTAL);
+    listview->setItemsMargin(50);
+    listview->addEventListener([this, cb](Ref *pSender, ListView::EventType type) {
+            ListView *listview = static_cast<ListView*>(pSender);
+            switch (type) {
+            case ListView::EventType::ON_SELECTED_ITEM_START: {
+                log("select start index = %d", listview->getCurSelectedIndex());
+                break;
+            }
+            case ListView::EventType::ON_SELECTED_ITEM_END: {
+                log("select end index = %d", listview->getCurSelectedIndex());
+                int index = listview->getCurSelectedIndex();
+                //somehow we cannot remove listview in its event callback
+                getScheduler()->performFunctionInCocosThread([this, cb, index]() {
+                        this->removeFromParent();
+                        cb(index);
+                    });
+                break;
+            }
+            default:
+                break;
+            }
+        });
+
+    float width=0, height=0;
+    for (auto &str : vec) {
+        auto button = Button::create("button.png");
+        button->setZoomScale(0.1);
+        button->setTitleFontSize(35);
+        button->setTitleFontName("");
+        button->setTitleText(str);
+        listview->pushBackCustomItem(button);
+
+        width = std::max(width, button->getContentSize().width);
+        height += button->getContentSize().height;
+    }
+    height += (listview->getItems().size() - 1) * listview->getItemsMargin();
+    height = std::min(height, winSize.height/2);
+    listview->setContentSize(Size(width, height));
+
+    pushBackView(listview);
+
+    Director::getInstance()->getRunningScene()->addChild(this);
+
+    return true;
 }

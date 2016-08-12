@@ -2,6 +2,7 @@
 #include "MainMenuScene.h"
 #include "BGLayer.h"
 #include "Sound.h"
+#include "SettingMenu.h"
 
 using namespace CocosDenshion;
 
@@ -42,7 +43,8 @@ bool WelcomeLayer::init()
     sp2->setPosition(vsize.width/2, vsize.height/2);
     addChild(sp2, 0, "inner");
 
-    Sound::getInstance()->playBackgroundMusic();
+    //load setting
+    SettingMenu::getInstance();
 
     return true;
 }

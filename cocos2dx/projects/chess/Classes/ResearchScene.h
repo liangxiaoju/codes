@@ -134,4 +134,19 @@ private:
     Vec2 _selectedIndex;
 };
 
+class ResearchSceneL2 : public Scene
+{
+public:
+    virtual bool init(std::string fen);
+    static ResearchSceneL2 *create(std::string fen) {
+        auto pRet = new (std::nothrow) ResearchSceneL2();
+        if (pRet && pRet->init(fen)) {
+            pRet->autorelease();
+            return pRet;
+        }
+        CC_SAFE_DELETE(pRet);
+        return nullptr;
+    }
+};
+
 #endif

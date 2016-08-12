@@ -80,14 +80,30 @@ public:
 
     virtual ~Board();
 
+    struct Move {
+        Vec2 src;
+        Vec2 dst;
+        Piece *capture;
+        std::string comment;
+    };
+
+    std::vector<Move> getHistoryMoves() { return _historyMv; }
+
+    void addComment(std::string comment) {
+        if (!_historyMv.empty()) {
+            _historyMv[_historyMv.size()-1].comment = comment;
+        }
+    }
+
 protected:
 	std::string _initFen;
 	float _startX;
 	float _startY;
 	float _stepX;
 	float _stepY;
-	typedef std::pair<Vec2, Vec2> Move;
-	std::vector<std::pair<Move, Piece*>> _historyMv;
+
+    std::vector<Move> _historyMv;
+
 	std::map<Vec2, Sprite*> _marked;
 	std::map<Vec2, Sprite*> _selected;
 	std::vector<Sprite*> _tips;

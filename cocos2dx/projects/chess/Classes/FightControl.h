@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "PopupBox.h"
+#include "NumberButton.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;

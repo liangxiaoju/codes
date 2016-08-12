@@ -77,3 +77,57 @@ XQNode *XQJsonFile::handleMoveList(XQNode *parent, rapidjson::Value &array)
 
     return retNode;
 }
+
+std::string XQJsonFile::save()
+{
+    XQNode *node = _data.pRoot;
+
+    rapidjson::Document document;
+    document.SetObject();
+    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+    rapidjson::Value movelist(rapidjson::kArrayType);
+    rapidjson::Value submovelist(rapidjson::kObjectType);
+    rapidjson::Value move(rapidjson::kObjectType);
+
+    document.AddMember("SubTitle",
+                       rapidjson::Value(_data.header.title.c_str(), allocator),
+                       allocator);
+    document.AddMember("fen", rapidjson::Value(_data.header.fen.c_str(), allocator),
+                       allocator);
+
+    while (node) {
+        rapidjson::Value step(rapidjson::kObjectType);
+
+        auto mv = Utils::toVecMove(node->mv);
+        step.AddMember("src",
+                       rapidjson::Value(node->mv.substr(0, 2).c_str(), allocator),
+                       allocator);
+        step.AddMember("dst",
+                       rapidjson::Value(node->mv.substr(2, 2).c_str(), allocator),
+                       allocator);
+        if (node->comment.size() > 0) {
+            step.AddMember("comment",
+                           rapidjson::Value(node->comment.c_str(), allocator),
+                           allocator);
+        }
+        movelist.PushBack(step, allocator);
+
+        //TODO submovelist
+        if (node->pRight) {
+
+        }
+
+        node = node->pFirstChild;
+    }
+
+    move.AddMember("movelist", movelist, allocator);
+    //move.AddMember("submovelist", submovelist, allocator);
+
+    document.AddMember("move", move, allocator);
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+
+    return buffer.GetString();
+}

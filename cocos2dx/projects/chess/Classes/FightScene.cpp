@@ -96,12 +96,13 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	/* response for save */
 	auto save_cb = [this](EventCustom* ev) {
 		UserData::SaveElement se;
+        se.type = TYPE_FIGHT;
 		se.roleWhite = _roleWhite;
 		se.roleBlack = _roleBlack;
 		se.level = _level;
 		se.white = "white";
 		se.black = "black";
-		se.fen = _board->getFenWithMove();
+		se.content = _board->getFenWithMove();
 		UserData::getInstance()->insertSaveElement(se);
 	};
     /* response for tip */

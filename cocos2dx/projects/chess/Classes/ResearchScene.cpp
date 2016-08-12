@@ -1,6 +1,10 @@
 #include "ResearchScene.h"
 #include "BGLayer.h"
-#include "FightScene.h"
+#include "FightControl.h"
+#include "XQFile/XQJsonFile.h"
+#include "UserData.h"
+#include "UIPlayer.h"
+#include "GameLayer.h"
 
 bool ResearchScene::init()
 {
@@ -44,7 +48,7 @@ bool ResearchScene::init()
     done->setTitleFontSize(35);
     done->addClickEventListener([this](Ref *ref) {
             std::string fen = _board->getFen();
-            auto scene = FightScene::create(FightScene::UI, FightScene::UI, 1, fen);
+            auto scene = ResearchSceneL2::create(fen);
             Director::getInstance()->replaceScene(scene);
         });
     auto dsize = done->getContentSize();
@@ -129,4 +133,62 @@ void ResearchScene::onTouchEnded(Touch *touch, Event *event)
             _board->unselect(index);
         }
     }
+}
+
+
+bool ResearchSceneL2::init(std::string fen)
+{
+    if (!Scene::init())
+        return false;
+
+    auto vsize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto bgLayer = BGLayer::create();
+    addChild(bgLayer);
+
+    auto board = Board::createWithFen(fen);
+    auto playerWhite = UIPlayer::create();
+    playerWhite->setBoard(board);
+    auto playerBlack = UIPlayer::create();
+    playerBlack->setBoard(board);
+    auto gameLayer = GameLayer::create(playerWhite, playerBlack, board);
+    addChild(gameLayer);
+
+    auto control = FightControl::create();
+    addChild(control);
+
+    auto save_cb = [fen, board, playerWhite, playerBlack, gameLayer](EventCustom *ev) {
+        board->addComment("Done");
+        auto xqFile = new XQJsonFile();
+        auto header = xqFile->getHeader();
+        header->title = "Research Create";
+        header->fen = fen;
+        for (auto &move : board->getHistoryMoves()) {
+            XQNode *node = new XQNode();
+            node->mv = Utils::toUcciMove(move.src, move.dst);
+            node->comment = move.comment;
+            xqFile->addStep(node);
+        }
+        std::string json = xqFile->save();
+        delete xqFile;
+        log("Research: %s", json.c_str());
+
+        UserData::SaveElement e;
+        e.type = TYPE_RESEARCH;
+        e.roleWhite = 0;//UI
+        e.roleBlack = 0;//UI
+        e.content = json;
+        UserData::getInstance()->insertSaveElement(e);
+    };
+
+    setOnEnterCallback([this, save_cb]() {
+            getEventDispatcher()->addCustomEventListener(EVENT_SAVE, save_cb);
+        });
+
+    setOnExitCallback([this]() {
+            getEventDispatcher()->removeCustomEventListeners(EVENT_SAVE);
+        });
+
+    return true;
 }

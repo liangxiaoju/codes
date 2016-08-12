@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "Utils.h"
+#include "SettingMenu.h"
 
 const std::string Board::START_FEN =
 	"rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR r";
@@ -73,10 +74,9 @@ std::string Board::getFenWithMove()
 	if (_historyMv.empty())
 		return fen;
 
-	for (auto mv : _historyMv) {
-		Move m = mv.first;
-		auto ucciMv = Utils::toUcciMove(m.first, m.second);
-		moves = moves + " " + ucciMv;
+	for (auto &move : _historyMv) {
+        auto ucciMv = Utils::toUcciMove(move.src, move.dst);
+        moves = moves + " " + ucciMv;
 	}
 
 	return fen + " moves" + moves;
@@ -221,8 +221,7 @@ int Board::move(Vec2 src, Vec2 dst)
 	if (dp != nullptr) {
 		dp->retain();
 	}
-	Move mv = std::make_pair(src, dst);
-	_historyMv.push_back(std::make_pair(mv, dp));
+    _historyMv.push_back({src, dst, dp});
 
 	removePiece(dst);
 	removePiece(src);
@@ -256,8 +255,7 @@ void Board::moveWithCallback(std::string mv, std::function<void()> cb)
 	if (dp != nullptr) {
 		dp->retain();
 	}
-	Move last_mv = std::make_pair(src, dst);
-	_historyMv.push_back(std::make_pair(last_mv, dp));
+    _historyMv.push_back({src, dst, dp});
 
     _mapPieces.erase(src);
     _mapPieces[dst] = p;
@@ -282,11 +280,10 @@ void Board::undo()
 	if (_historyMv.empty())
 		return;
 
-	auto last = _historyMv.back();
-	Move mv = last.first;
-	Piece *p = last.second;
-	Vec2 src = mv.first;
-	Vec2 dst = mv.second;
+    auto move = _historyMv.back();
+    Vec2 src = move.src;
+    Vec2 dst = move.dst;
+    Piece *p = move.capture;
 
 	unselectAll();
 
@@ -308,12 +305,10 @@ void Board::undo()
 	changeSide();
 
 	if (!_historyMv.empty()) {
-		auto last = _historyMv.back();
-		Move mv = last.first;
-		//Piece *p = last.second;
-		Vec2 src = mv.first;
-		Vec2 dst = mv.second;
-		markMove(src, dst);
+        auto move = _historyMv.back();
+        Vec2 src = move.src;
+        Vec2 dst = move.dst;
+        markMove(src, dst);
 	}
 }
 
@@ -361,16 +356,18 @@ void Board::select(Vec2 index)
 	_pieceLayer->addChild(s);
 	_selected[index] = s;
 
-	std::vector<std::string> mvs =
-		Rule::getInstance()->generateMoves(getFenWithMove(), index);
+    if (SettingMenu::getInstance()->isTipsEnabled()) {
+        std::vector<std::string> mvs =
+            Rule::getInstance()->generateMoves(getFenWithMove(), index);
 
-	for (auto &mv : mvs) {
-    	auto dst = Utils::toVecMove(mv)[1];
-		auto s = Sprite::create("FightSceneMenu/red.png");
-		s->setPosition(convertIndexToLocalCoord(dst));
-		_pieceLayer->addChild(s);
-		_tips.push_back(s);
-	}
+        for (auto &mv : mvs) {
+            auto dst = Utils::toVecMove(mv)[1];
+            auto s = Sprite::create("FightSceneMenu/red.png");
+            s->setPosition(convertIndexToLocalCoord(dst));
+            _pieceLayer->addChild(s);
+            _tips.push_back(s);
+        }
+    }
 }
 
 void Board::unselect(Vec2 index)
@@ -411,8 +408,8 @@ void Board::setRotation(float rotation)
 
 Board::~Board()
 {
-    for (auto &mv : _historyMv) {
-        Piece *p = mv.second;
+    for (auto &move : _historyMv) {
+        Piece *p = move.capture;
         if (p)
             p->release();
     }

@@ -88,12 +88,50 @@ class XQFile
 {
 public:
     virtual void load(std::string name) = 0;
-    virtual XQHeader getHeader() { return _data.header; };
-    virtual std::string getInitFen() { return _data.header.fen; };
+    virtual std::string save() { return ""; }
+    virtual XQHeader* getHeader() { return &_data.header; }
+    virtual std::string getInitFen() { return _data.header.fen; }
     virtual void reset()
     {
         _data.pCurNode = nullptr;
     }
+
+    //For Writer
+    virtual void addStep(XQNode *node)
+    {
+        if (_data.pRoot == nullptr) {
+            _data.pRoot = node;
+            _data.pCurNode = node;
+            return;
+        }
+        XQNode *parent = _data.pCurNode;
+        parent->pCurChild = parent->pFirstChild = node;
+        node->pParent = parent;
+    }
+    virtual void addAltStep(XQNode *node)
+    {
+        if (_data.pCurNode == nullptr)
+            return;
+        XQNode *sibling = _data.pCurNode;
+        while (sibling->pRight) {
+            sibling = sibling->pRight;
+        }
+        sibling->pRight = node;
+        node->pLeft = sibling;
+        node->pParent = sibling->pParent;
+        //setCurAlt(node);
+    }
+    virtual void setCurStep(XQNode *node)
+    {
+        _data.pCurNode = node;
+    }
+    virtual void setCurAlt(XQNode *node)
+    {
+        _data.pCurNode = node;
+        node->pParent->pCurChild = node;
+    }
+
+    //For Reader
     virtual XQNode *nextStep()
     {
         if (_data.pCurNode == nullptr) {
@@ -105,7 +143,7 @@ public:
             return nullptr;
         _data.pCurNode = node;
         return node;
-    };
+    }
     virtual XQNode *prevStep()
     {
         if (_data.pCurNode == nullptr)
@@ -115,7 +153,7 @@ public:
             return nullptr;
         _data.pCurNode = node;
         return node;
-    };
+    }
     virtual std::vector<XQNode*> getNextAlts()
     {
         std::vector<XQNode*> v;

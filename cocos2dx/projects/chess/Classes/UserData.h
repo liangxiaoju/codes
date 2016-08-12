@@ -6,18 +6,25 @@
 
 USING_NS_CC;
 
+#define TYPE_RESEARCH 1
+#define TYPE_CHALLENGE 2
+#define TYPE_LANFIGHT 3
+#define TYPE_FIGHT 4
+#define TYPE_TUTORIAL 5
+
 class UserData {
 public:
 
 	struct SaveElement {
 		int id;
+        int type;
 		std::string date;
 		int roleWhite;
 		int roleBlack;
 		int level;
 		std::string white;
 		std::string black;
-		std::string fen;
+        std::string content;
 	};
 
 	struct RecordElement {

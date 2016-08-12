@@ -87,7 +87,7 @@ bool ReplayScene::init()
 
 			FightScene::Role roleWhite = (FightScene::Role)e.roleWhite;
 			FightScene::Role roleBlack = (FightScene::Role)e.roleBlack;
-			auto scene = FightScene::create(roleWhite, roleBlack, e.level, e.fen);
+			auto scene = FightScene::create(roleWhite, roleBlack, e.level, e.content);
 			Director::getInstance()->replaceScene(scene);
 		}
 	default:

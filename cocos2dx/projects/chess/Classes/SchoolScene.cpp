@@ -87,33 +87,23 @@ bool SchoolScene::init(XQFile *xqFile)
                 }
             };
 
-            auto v = _xqFile->getNextAlts();
-            if (v.size() > 1) {
-                log("ALT(%d)", v.size());
-                auto box = PopupBox::create();
-                auto b = Button::create("button.png");
-                b->setScaleY(1.3f);
-                auto button_cb = [this, v, runNext, box](Ref *ref) {
-                    auto b1 = dynamic_cast<Button*>(ref);
-                    _xqFile->selectNextAlt(v[b1->getTag()]);
-                    removeChild(box);
-                    runNext();
-                };
-                b->setTitleFontSize(35);
-                b->addClickEventListener(button_cb);
-                for (int i = 0; i < v.size(); i++) {
-                    Button* b1 = (Button*)b->clone();
-                    auto move = Utils::toVecMove(v[i]->mv);
-                    auto piece = _board->pick(move[0]);
+            auto alts = _xqFile->getNextAlts();
+            if (alts.size() > 1) {
+                log("ALT(%d)", alts.size());
+                std::vector<std::string> items;
+                for (auto &alt : alts) {
+                    auto mv = Utils::toVecMove(alt->mv);
+                    auto piece = _board->pick(mv[0]);
                     if (piece == nullptr)
                         continue;
                     auto symbol = piece->getSymbol();
-                    auto str = Utils::convertMoveToString(v[i]->mv, symbol);
-                    b1->setTitleText(str);
-                    box->pushBackView(b1);
-                    b1->setTag(i);
+                    auto str = Utils::convertMoveToString(alt->mv, symbol);
+                    items.push_back(str);
                 }
-                addChild(box);
+                auto menu = PopupMenu::create(items, [this, runNext, alts](int index) {
+                        _xqFile->selectNextAlt(alts[index]);
+                        runNext();
+                    });
             } else {
                 runNext();
             }

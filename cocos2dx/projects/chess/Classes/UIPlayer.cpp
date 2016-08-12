@@ -35,9 +35,7 @@ bool UIPlayer::init()
     auto request_deny_cb = [this](EventCustom* ev) {
         std::string event = (const char *)ev->getUserData();
         if (event.find("DRAW:") != std::string::npos) {
-            auto cb = [this](bool positive) {};
-            auto box = DialogBox::create("Disagree with draw !", "OK", "OK", cb);
-            getScene()->addChild(box);
+            PopupMessage::create("Disagree with draw !");
             log("request deny: draw");
         } else if (event.find("REGRET:") != std::string::npos) {
 
@@ -147,8 +145,7 @@ void UIPlayer::onRequest(std::string req, std::string args,
         auto cb = [callback](bool positive) {
             callback(positive);
         };
-        auto box = DialogBox::create("Accept draw ?", "Yes", "No", cb);
-        addChild(box);
+        DialogBox::create("Accept draw ?", "Yes", "No", cb);
 	} else if (req == "regret") {
         callback(true);
     } else if (req == "resign") {
