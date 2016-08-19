@@ -29,6 +29,7 @@ public:
 
 	struct RecordElement {
 		int id;
+        int type;
 		std::string date;
 		int roleWhite;
 		int roleBlack;
@@ -36,7 +37,7 @@ public:
 		std::string white;
 		std::string black;
 		std::string win;
-		std::string fen;
+		std::string content;
 	};
 
 	static UserData *getInstance()

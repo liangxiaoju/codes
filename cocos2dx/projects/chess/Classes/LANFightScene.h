@@ -7,7 +7,7 @@
 #include "NetPlayer.h"
 #include "Board.h"
 #include "GameLayer.h"
-#include "FightControl.h"
+#include "ControlLayer.h"
 #include "room/RoomManager.h"
 #include <memory>  // for std::shared_ptr
 #include <atomic>
@@ -24,7 +24,7 @@ public:
 private:
 	void scan();
 
-    FightControl *_fightControl;
+    LANFightControlLayer *_fightControl;
 	UIPlayer *_playerUI;
 	NetPlayer *_playerNet;
 	Player *_playerWhite;

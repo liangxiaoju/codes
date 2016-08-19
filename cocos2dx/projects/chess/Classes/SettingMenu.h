@@ -16,6 +16,7 @@ public:
     bool isMusicEnabled();
     bool isEffectEnabled();
     bool isTipsEnabled();
+    bool isVibrateEnabled();
     void load();
     void save();
     void show();
@@ -27,6 +28,7 @@ private:
     bool _music_enabled;
     bool _effect_enabled;
     bool _tips_enabled;
+    bool _vibrate_enabled;
 };
 
 #endif

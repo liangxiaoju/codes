@@ -262,13 +262,13 @@ void Board::moveWithCallback(std::string mv, std::function<void()> cb)
     changeSide();
 
     unmarkMoveAll();
-    markMove(src, dst);
 
-    auto moveTo = MoveTo::create(0.15, convertIndexToLocalCoord(dst));
-    auto callback = CallFunc::create([this, p, dp, cb]() {
+    auto moveTo = MoveTo::create(0.3, convertIndexToLocalCoord(dst));
+    auto callback = CallFunc::create([this, p, dp, cb, src, dst]() {
             if (dp != nullptr)
                 _pieceLayer->removeChild(dp, true);
             p->release();
+            markMove(src, dst);
             cb();
         });
     auto seq = Sequence::create(moveTo, callback, nullptr);
@@ -399,11 +399,27 @@ void Board::unselectAll()
 
 void Board::setRotation(float rotation)
 {
-	_pieceLayer->setRotation(rotation);
-	for (auto &kv: _mapPieces) {
-		Piece *p = kv.second;
-		p->setRotation(-rotation);
-	}
+    if (rotation == 180) {
+        _pieceLayer->setRotation(rotation);
+        for (auto &kv: _mapPieces) {
+            Piece *p = kv.second;
+            p->setRotation(-rotation);
+        }
+    } else if (rotation == 90) {
+        if (_pieceLayer->getRotation() == 180) {
+            for (auto &kv : _mapPieces) {
+                Piece *p = kv.second;
+                if (p->getSide() == Piece::Side::WHITE)
+                    p->setRotation(180);
+            }
+        } else {
+            for (auto &kv : _mapPieces) {
+                Piece *p = kv.second;
+                if (p->getSide() == Piece::Side::BLACK)
+                    p->setRotation(180);
+            }
+        }
+    }
 }
 
 Board::~Board()

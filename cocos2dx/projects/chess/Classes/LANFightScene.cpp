@@ -21,7 +21,7 @@ bool LANFightScene::init()
 	auto bgLayer = BGLayer::create();
 	addChild(bgLayer);
 
-	_fightControl = FightControl::create();
+	_fightControl = LANFightControlLayer::create();
 	addChild(_fightControl, 1);
 
 	/* response for reset */
@@ -41,7 +41,7 @@ bool LANFightScene::init()
 			_playerNet->onRequest("reset");
 		}
         removeChild(_fightControl);
-        _fightControl = FightControl::create();
+        _fightControl = LANFightControlLayer::create();
         addChild(_fightControl, 1);
 	};
 	/* response for switch */
@@ -63,7 +63,7 @@ bool LANFightScene::init()
 			_playerNet->onRequest("switch");
 		}
         removeChild(_fightControl);
-        _fightControl = FightControl::create();
+        _fightControl = LANFightControlLayer::create();
         addChild(_fightControl, 1);
 	};
     auto suspend_cb = [this](EventCustom *ev) {

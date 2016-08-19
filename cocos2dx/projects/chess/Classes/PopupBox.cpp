@@ -1,4 +1,5 @@
 #include "PopupBox.h"
+#include "Localization.h"
 
 PopupBox::PopupBox()
 {
@@ -138,7 +139,7 @@ bool DialogBox::init(std::string text,
                      std::string negative,
                      std::function<void(bool positive)> cb)
 {
-    auto t = Text::create(text, "fonts/arial.ttf", 50);
+    auto t = Text::create(text, "", 40);
     t->setTextColor(Color4B::BLUE);
     auto p = Button::create("button.png");
     p->setTitleText(positive);
@@ -179,11 +180,11 @@ bool PopupMessage::init(std::string text, std::function<void(void)>cb)
     if (!PopupBox::init())
         return false;
 
-    auto t = Text::create(text, "fonts/arial.ttf", 50);
+    auto t = Text::create(text, "", 40);
     t->setTextColor(Color4B::BLUE);
 
     auto button = Button::create("button.png");
-    button->setTitleText("OK");
+    button->setTitleText(TR("OK"));
     button->setTitleFontSize(35);
     button->addClickEventListener([this, cb](Ref *ref) {
             if (cb != nullptr)

@@ -1,6 +1,7 @@
 #include "SchoolScene.h"
-#include "ChallengeControl.h"
+#include "ControlLayer.h"
 #include "PopupBox.h"
+#include "Localization.h"
 
 bool SchoolScene::init(XQFile *xqFile)
 {
@@ -49,11 +50,11 @@ bool SchoolScene::init(XQFile *xqFile)
     auto gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
     addChild(gameLayer);
 
-    auto control = ChallengeControl::create();
+    auto control = TutorialControlLayer::create();
     addChild(control);
 
     auto prev = Button::create("button.png");
-    prev->setTitleText("Prev");
+    prev->setTitleText(TR("Prev Step"));
     prev->setTitleFontSize(35);
     prev->addClickEventListener([this, text, scrollView](Ref *ref) {
             XQNode *node = _xqFile->prevStep();
@@ -67,7 +68,7 @@ bool SchoolScene::init(XQFile *xqFile)
     prev->setPosition(Vec2(origin.x+psize.width/2, origin.y+psize.height/2));
 
     auto next = Button::create("button.png");
-    next->setTitleText("Next");
+    next->setTitleText(TR("Next Step"));
     next->setTitleFontSize(35);
     next->addClickEventListener([this, text, scrollView](Ref *ref) {
             auto runNext = [this, text, scrollView]() {

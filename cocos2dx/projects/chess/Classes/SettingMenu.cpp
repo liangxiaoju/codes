@@ -1,6 +1,7 @@
 #include "SettingMenu.h"
 #include "UserData.h"
 #include "Sound.h"
+#include "Localization.h"
 
 class CheckBoxItem : public Widget
 {
@@ -28,7 +29,7 @@ public:
         param = RelativeLayoutParameter::create();
         param->setAlign(
             RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_CENTER_VERTICAL);
-        auto text = Text::create(content, "fonts/arial.ttf", 35);
+        auto text = Text::create(content, "", 35);
         text->setTextColor(Color4B::BLACK);
         text->setLayoutParameter(param);
 
@@ -104,14 +105,20 @@ bool SettingMenu::init()
         save();
         log("tips enabled: %s", selected ? "true" : "false");
     };
+    auto vibrate_cb = [this](bool selected) {
+        _vibrate_enabled = selected;
+        save();
+    };
 
     music_cb(_music_enabled);
     effect_cb(_effect_enabled);
     tips_cb(_tips_enabled);
+    vibrate_cb(_vibrate_enabled);
 
-    pushBackView(CheckBoxItem::create("Background Music:", music_cb, _music_enabled));
-    pushBackView(CheckBoxItem::create("Effect Sound:", effect_cb, _effect_enabled));
-    pushBackView(CheckBoxItem::create("Tips:", tips_cb, _tips_enabled));
+    pushBackView(CheckBoxItem::create(TR("Background Music:"), music_cb, _music_enabled));
+    pushBackView(CheckBoxItem::create(TR("Game Effect Sound:"), effect_cb, _effect_enabled));
+    pushBackView(CheckBoxItem::create(TR("Show Tips:"), tips_cb, _tips_enabled));
+    pushBackView(CheckBoxItem::create(TR("Vibrate Effect:"), vibrate_cb, _vibrate_enabled));
 
     return true;
 }
@@ -143,11 +150,17 @@ bool SettingMenu::isTipsEnabled()
     return _tips_enabled;
 }
 
+bool SettingMenu::isVibrateEnabled()
+{
+    return _vibrate_enabled;
+}
+
 void SettingMenu::load()
 {
     _music_enabled = !!UserData::getInstance()->getIntegerForKey("MusicEnabled", 1);
     _effect_enabled = !!UserData::getInstance()->getIntegerForKey("EffectEnabled", 1);
     _tips_enabled = !!UserData::getInstance()->getIntegerForKey("TipsEnabled", 0);
+    _vibrate_enabled = !!UserData::getInstance()->getIntegerForKey("VibrateEnabled", 1);
 }
 
 void SettingMenu::save()
@@ -155,6 +168,7 @@ void SettingMenu::save()
     UserData::getInstance()->setIntegerForKey("MusicEnabled", _music_enabled ? 1 : 0);
     UserData::getInstance()->setIntegerForKey("EffectEnabled", _effect_enabled ? 1 : 0);
     UserData::getInstance()->setIntegerForKey("TipsEnabled", _tips_enabled ? 1 : 0);
+    UserData::getInstance()->setIntegerForKey("VibrateEnabled", _vibrate_enabled ? 1 : 0);
 }
 
 void SettingMenu::show()

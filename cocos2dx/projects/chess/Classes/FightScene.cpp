@@ -2,9 +2,10 @@
 #include "UserData.h"
 #include "GameLayer.h"
 #include "BGLayer.h"
-#include "FightControl.h"
+#include "XQFile/XQJsonFile.h"
 #include "HeaderSprite.h"
 #include "Sound.h"
+#include "ControlLayer.h"
 
 bool FightScene::init(Role white, Role black, int level, std::string fen)
 {
@@ -48,7 +49,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	_gameLayer->addChild(rheader);
 	addChild(_gameLayer);
 
-	auto fightControl = FightControl::create();
+	auto fightControl = FightControlLayer::create();
 	addChild(fightControl);
 
 	_roleWhite = white;
@@ -137,22 +138,53 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
         ai->getHelp(_board->getFenWithMove(), cb);
     };
 
-    auto over_cb = [this](EventCustom *ev) {
+    auto over_cb = [this, origin, vsize](EventCustom *ev) {
+
         std::string event = (const char *)ev->getUserData();
+        Sprite *sprite;
+
         if (event.find("DRAW:") != std::string::npos) {
             Sound::getInstance()->playEffect("draw");
             int count = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
             UserData::getInstance()->setIntegerForKey("FightScene:DRAW", count+1);
+            sprite = Sprite::create("ChallengeScene/text_hq.png");
         } else if (((event.find("WIN:WHITE") != std::string::npos) && (_roleWhite == Role::UI))
                    || ((event.find("WIN:BLACK") != std::string::npos) && (_roleBlack == Role::UI))) {
             Sound::getInstance()->playEffect("win");
             int count = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
             UserData::getInstance()->setIntegerForKey("FightScene:WIN", count+1);
+            sprite = Sprite::create("ChallengeScene/text_yq.png");
         } else {
             Sound::getInstance()->playEffect("lose");
             int count = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
             UserData::getInstance()->setIntegerForKey("FightScene:LOSE", count+1);
+            sprite = Sprite::create("ChallengeScene/text_sq.png");
         }
+        addChild(sprite);
+        sprite->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
+
+        auto xqFile = new XQJsonFile();
+        auto header = xqFile->getHeader();
+        header->title = "FightScene";
+        header->fen = _fen;
+        for (auto &move : _board->getHistoryMoves()) {
+            XQNode *node = new XQNode();
+            node->mv = Utils::toUcciMove(move.src, move.dst);
+            node->comment = move.comment;
+            xqFile->addStep(node);
+        }
+        std::string json = xqFile->save();
+        delete xqFile;
+        log("FightScene: %s", json.c_str());
+
+        UserData::RecordElement e;
+        e.type = TYPE_FIGHT;
+        e.roleWhite = _roleWhite;
+        e.roleBlack = _roleBlack;
+        e.level = _level;
+        e.win = "";
+        e.content = json;
+        UserData::getInstance()->insertRecordElement(e);
     };
 
 	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, tip_cb, white_start_cb, black_start_cb, over_cb](){

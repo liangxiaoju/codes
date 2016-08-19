@@ -1,10 +1,12 @@
 #include "MainMenuScene.h"
 #include "FightScene.h"
+#include "LocalFightScene.h"
 #include "ReplayScene.h"
 #include "ChallengeScene.h"
 #include "LANFightScene.h"
 #include "TutorialScene.h"
 #include "ResearchScene.h"
+#include "Localization.h"
 #include "SettingMenu.h"
 
 class DifficultyScene : public Scene
@@ -50,7 +52,8 @@ public:
 			Director::getInstance()->pushScene(scene);
 		});
 		b4->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::UI, 8);
+            //auto scene = FightScene::create(FightScene::UI, FightScene::UI, 8);
+            auto scene = LocalFightScene::create();
 			Director::getInstance()->pushScene(scene);
 		});
 
@@ -179,7 +182,8 @@ bool MainMenuLayer::init()
 	quit->addClickEventListener([this](Ref *ref){
 		log("quit click");
         DialogBox::create(
-            "Are you sure to exit ?", "Yes", "No", [this](bool yes){
+            TR("Do you want to exit the game ?"), TR("OK"), TR("Cancel"),
+            [this](bool yes) {
                 if (yes) {
                     Director::getInstance()->end();
                 }

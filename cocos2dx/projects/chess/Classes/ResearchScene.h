@@ -4,40 +4,53 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "Board.h"
+#include "NumberButton.h"
 
 USING_NS_CC;
 using namespace cocos2d::ui;
 
-class PiecePannel : public Node
+class PiecePannel : public HBox
 {
 public:
-    bool init(std::string fen) {
-        if (!Node::init())
+    bool init(Piece::Side side)
+    {
+        if (!HBox::init())
             return false;
 
-        setContentSize(Size(100*6, 100));
-        _stepX = 100;
-        _stepY = 100;
-        setAnchorPoint(Vec2(0.5, 0.5));
+        struct _data {
+            char symbol;
+            int count;
+        };
+        std::vector<_data> datas;
+        if (side == Piece::Side::WHITE)
+            datas = {{'R', 2}, {'N', 2}, {'B', 2}, {'A', 2}, {'C', 2}, {'P', 5}};
+        else
+            datas = {{'r', 2}, {'n', 2}, {'b', 2}, {'a', 2}, {'c', 2}, {'p', 5}};
 
-        int n = 0;
-        for (auto it = fen.begin(); it != fen.end(); ++it) {
-            if (isdigit(*it))
-                n = *it - '0';
-            else {
-                for (int i = 0; i < n; i++) {
-                    auto p = Piece::create(*it);
-                    if (p == nullptr)
-                        break;
-                    addPiece(p);
-                }
-            }
+        for (auto &data : datas) {
+            char symbol = data.symbol;
+            int count = data.count;
+            auto filename = Piece::symbolToFileName(symbol);
+            auto button = NumberButton::create(filename, "", "", count, false);
+            addChild(button);
+            auto param = LinearLayoutParameter::create();
+            param->setMargin(Margin(10, 0, 10, 0));
+            button->setLayoutParameter(param);
+            _symbolMap[symbol] = button;
+            button->setTag(symbol);
+            button->addClickEventListener([this](Ref *ref) {
+                    select(dynamic_cast<NumberButton*>(ref));
+                });
+            auto size = getContentSize();
+            auto bsize = button->getContentSize();
+            setContentSize(Size(size.width+bsize.width+10*2, bsize.height));
         }
+
         return true;
     }
-    static PiecePannel* create(std::string fen) {
-        PiecePannel *pRet = new(std::nothrow) PiecePannel();
-        if (pRet && pRet->init(fen)) {
+    static PiecePannel* create(Piece::Side side) {
+        auto pRet = new(std::nothrow) PiecePannel();
+        if (pRet && pRet->init(side)) {
             pRet->autorelease();
             return pRet;
         } else {
@@ -45,76 +58,63 @@ public:
             return nullptr;
         }
     }
-
-    Piece *select(Vec2 index) {
-        removeChildByName("select");
-        int x = index.x;
-        log("pannel: select %d", x);
-        if (!_data[x].empty()) {
-            auto p = _data[x].back();
-            auto s = Sprite::create("board/OOS.png");
-            s->setPosition(p->getPosition());
-            addChild(s, 0, "select");
-            return p;
-        }
-        return nullptr;
-    }
-
-    void unselect() {
-        removeChildByName("select");
-    }
-
-    void addPiece(Piece *p) {
+    void select(NumberButton *button)
+    {
         unselect();
-        char symbol = p->getSymbol();
-        int index = convertSymbolToIndex(symbol);
-        _data[index].push_back(p);
-        p->setPosition(convertIndexToCoord(Vec2(index,0)));
-        addChild(p);
-        log("pannel: add %c to %d (%f %f)", symbol, index,
-            p->getPositionX(), p->getPositionY());
+        _selected = button;
+        auto s = Sprite::create("board/OOS.png");
+        s->setPosition(button->getPosition());
+        addChild(s, 0, "select");
     }
+    void unselect()
+    {
+        removeChildByName("select");
+        _selected = nullptr;
+    }
+    Piece *getSelectedPiece()
+    {
+        if (_selected == nullptr)
+            return nullptr;
 
-    void removePiece(Piece *p) {
-        unselect();
-        char symbol = p->getSymbol();
-        int index = convertSymbolToIndex(symbol);
-        log("pannel: remove %c from %d", symbol, index);
-        auto v = &_data[index];
-        auto iter = std::find(v->begin(), v->end(), p);
-        if (iter != v->end()) {
-            v->erase(iter);
-            removeChild(p);
+        return Piece::create(_selected->getTag());
+    }
+    void addPiece(Piece *piece)
+    {
+        auto symbol = piece->getSymbol();
+        auto button = _symbolMap[symbol];
+        if (button)
+            button->incNumber();
+    }
+    void removePiece(Piece *piece)
+    {
+        auto symbol = piece->getSymbol();
+        auto button = _symbolMap[symbol];
+        if (button)
+            button->decNumber();
+    }
+    void clear()
+    {
+        for (auto &kv : _symbolMap) {
+            auto button = kv.second;
+            if (button) {
+                button->setNumber(0);
+            }
         }
     }
-
-    Vec2 convertWorldCoordToIndex(Vec2 coord) {
-        coord = this->convertToNodeSpace(coord);
-        Vec2 index;
-
-        index.x = floorf(coord.x/_stepX);
-        index.y = 0;
-        return index;
+    void reinit()
+    {
+        for (auto &kv : _symbolMap) {
+            auto symbol = kv.first;
+            auto button = kv.second;
+            int count = 2;
+            if (symbol == 'p' || symbol == 'P')
+                count = 5;
+            button->setNumber(count);
+        }
     }
-
-    Vec2 convertIndexToCoord(Vec2 index) {
-        Vec2 coord;
-        coord.y = _stepY/2;
-        coord.x = index.x * _stepX + _stepX/2;
-        return coord;
-    }
-
 private:
-    int convertSymbolToIndex(char symbol) {
-        std::map<char,int> map = {
-            {'r',0},{'n',1},{'b',2},{'a',3},{'c',4},{'p',5},
-            {'R',0},{'N',1},{'B',2},{'A',3},{'C',4},{'P',5},
-        };
-        return map[symbol];
-    }
-    std::vector<Piece*> _data[6];
-    float _stepX;
-    float _stepY;
+    std::map<char, NumberButton*> _symbolMap;
+    NumberButton *_selected;
 };
 
 class ResearchScene : public Scene
@@ -131,7 +131,6 @@ private:
     PiecePannel *_pannelBottom;
     EventListenerTouchOneByOne * _touchListener;
     Piece *_selectedPiece;
-    Vec2 _selectedIndex;
 };
 
 class ResearchSceneL2 : public Scene

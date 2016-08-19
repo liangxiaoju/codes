@@ -1,5 +1,7 @@
 #include "Piece.h"
 
+const std::string Piece::_bitMapBaseDir = "piece/WOOD/";
+
 Piece* Piece::create(char c) {
     Piece *pRet = new Piece();
     if (pRet && pRet->initWithSymbol(c)) {
@@ -68,18 +70,21 @@ bool Piece::initWithSymbol(char c)
 
 bool Piece::initWithType(Side side, Role role)
 {
-	std::string filename;
-
 	if (!Sprite::init())
 		return false;
 
 	_side = side;
 	_role = role;
 
-	filename = _bitMap.at(std::make_pair(side, role));
-	setTexture("piece/WOOD/" + filename);
+	_filename = _bitMapBaseDir + _bitMap.at(std::make_pair(side, role));
+	setTexture(_filename);
 
-	//log("Piece: %s\n", filename.c_str());
+	//log("Piece: %s\n", _filename.c_str());
 
 	return true;
+}
+
+Piece *Piece::clone()
+{
+    return Piece::create(_side, _role);
 }

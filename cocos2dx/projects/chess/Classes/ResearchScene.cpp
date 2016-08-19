@@ -1,10 +1,11 @@
 #include "ResearchScene.h"
 #include "BGLayer.h"
-#include "FightControl.h"
+#include "ControlLayer.h"
 #include "XQFile/XQJsonFile.h"
 #include "UserData.h"
 #include "UIPlayer.h"
 #include "GameLayer.h"
+#include "Localization.h"
 
 bool ResearchScene::init()
 {
@@ -20,31 +21,60 @@ bool ResearchScene::init()
     _board = Board::createWithFen("4k4/9/9/9/9/9/9/9/9/4K4 r");
     auto bsize = _board->getContentSize();
     _board->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
-    _board->setScale(vsize.width/bsize.width);
+    auto factor = vsize.width/bsize.width;
+    _board->setScale(factor);
     addChild(_board);
-    bsize = _board->getContentSize();
+    bsize = _board->getContentSize() * factor;
 
-    _pannelTop = PiecePannel::create("2r2n2b2a2c5p");
-    _pannelTop->setScale(vsize.width/bsize.width);
-    auto psize = _pannelTop->getContentSize();
-    _pannelTop->setPosition(origin.x+vsize.width/2,
-                            origin.y+vsize.height/2+bsize.height/2+psize.height);
-    addChild(_pannelTop);
-    _pannelBottom = PiecePannel::create("2R2N2B2A2C5P");
-    _pannelBottom->setScale(vsize.width/bsize.width);
-    _pannelBottom->setPosition(origin.x+vsize.width/2,
-                               origin.y+vsize.height/2-bsize.height/2-psize.height);
-    addChild(_pannelBottom);
+    _pannelTop = PiecePannel::create(Piece::Side::BLACK);
+    _pannelTop->setScale(factor);
+    auto psize = _pannelTop->getContentSize() * _pannelTop->getScaleX();
+    _pannelTop->setAnchorPoint(Vec2(0.5, 0.5));
+    _pannelTop->setPosition(
+        Vec2(origin.x+vsize.width/2,
+             origin.y+vsize.height/2+bsize.height/2+psize.height/2+10));
+    addChild(_pannelTop, 1);
+    _pannelBottom = PiecePannel::create(Piece::Side::WHITE);
+    _pannelBottom->setScale(factor);
+    _pannelBottom->setAnchorPoint(Vec2(0.5, 0.5));
+    _pannelBottom->setPosition(
+        Vec2(origin.x+vsize.width/2,
+             origin.y+vsize.height/2-bsize.height/2-psize.height/2-10));
+    addChild(_pannelBottom, 1);
 
-    _touchListener = EventListenerTouchOneByOne::create();
-    _touchListener->onTouchBegan = CC_CALLBACK_2(ResearchScene::onTouchBegan, this);
-    _touchListener->onTouchEnded = CC_CALLBACK_2(ResearchScene::onTouchEnded, this);
-    getEventDispatcher()->addEventListenerWithSceneGraphPriority(_touchListener, this);
-
-    _touchListener->setEnabled(true);
+    auto place = Button::create("button.png");
+    place->setTitleText(TR("Full Pieces"));
+    place->setTitleFontSize(35);
+    place->addClickEventListener([this, place, origin, vsize, factor](Ref *ref) {
+            if (place->getTitleText() == TR("Full Pieces")) {
+                removeChild(_board);
+                _board = Board::create();
+                _board->setPosition(origin.x + vsize.width/2,
+                                    origin.y + vsize.height/2);
+                _board->setScale(factor);
+                addChild(_board);
+                _pannelTop->clear();
+                _pannelBottom->clear();
+                place->setTitleText(TR("Clear Pieces"));
+            } else {
+                removeChild(_board);
+                _board = Board::createWithFen("4k4/9/9/9/9/9/9/9/9/4K4 r");
+                _board->setPosition(origin.x + vsize.width/2,
+                                    origin.y + vsize.height/2);
+                _board->setScale(factor);
+                addChild(_board);
+                _pannelTop->reinit();
+                _pannelBottom->reinit();
+                place->setTitleText(TR("Full Pieces"));
+            }
+        });
+    auto placeSize = place->getContentSize();
+    place->setPosition(Vec2(origin.x+vsize.width-placeSize.width/2,
+                           origin.y+placeSize.height/2));
+    addChild(place);
 
     auto done = Button::create("button.png");
-    done->setTitleText("Done");
+    done->setTitleText(TR("Done"));
     done->setTitleFontSize(35);
     done->addClickEventListener([this](Ref *ref) {
             std::string fen = _board->getFen();
@@ -52,9 +82,31 @@ bool ResearchScene::init()
             Director::getInstance()->replaceScene(scene);
         });
     auto dsize = done->getContentSize();
-    done->setPosition(Vec2(origin.x+vsize.width-dsize.width/2,
+    done->setPosition(Vec2(origin.x+vsize.width-dsize.width/2-placeSize.width-30,
                            origin.y+dsize.height/2));
     addChild(done);
+
+    auto back = Button::create("DifficultyScene/look_back.png");
+    back->addClickEventListener([](Ref *ref){
+            Director::getInstance()->popScene();
+        });
+    back->setZoomScale(0.1);
+    back->setPosition(Vec2(100, vsize.height-100));
+    addChild(back);
+
+    _touchListener = EventListenerTouchOneByOne::create();
+    _touchListener->onTouchBegan = CC_CALLBACK_2(ResearchScene::onTouchBegan, this);
+    _touchListener->onTouchEnded = CC_CALLBACK_2(ResearchScene::onTouchEnded, this);
+    _touchListener->setSwallowTouches(true);
+
+    setOnEnterCallback([this]() {
+            getEventDispatcher()->addEventListenerWithFixedPriority(
+                _touchListener, -1);
+        });
+    setOnExitCallback([this]() {
+            //not attach to node, so we have to remove it myself
+            getEventDispatcher()->removeEventListener(_touchListener);
+        });
 
     return true;
 }
@@ -64,23 +116,46 @@ bool ResearchScene::onTouchBegan(Touch *touch, Event *event)
     Vec2 touchPos = touch->getLocation();
 
     Rect boardRect = _board->getBoundingBox();
-    Rect pannelTopRect = _pannelTop->getBoundingBox();
-    Rect pannelBottomRect = _pannelBottom->getBoundingBox();
+    Rect topRect = _pannelTop->getBoundingBox();
+    Rect bottomRect = _pannelBottom->getBoundingBox();
 
     if (boardRect.containsPoint(touchPos)) {
         log("Researchscene: touch board");
         Vec2 index = _board->convertWorldCoordToIndex(touchPos);
         Piece *p = _board->pick(index);
-        if (p == _selectedPiece) {
+        Piece *topPiece = _pannelTop->getSelectedPiece();
+        Piece *bottomPiece = _pannelBottom->getSelectedPiece();
+
+        Piece *selectedPiece;
+        if (topPiece)
+            selectedPiece = topPiece;
+        else if(bottomPiece)
+            selectedPiece = bottomPiece;
+        else
+            selectedPiece = _selectedPiece;
+
+        if (p && (p == selectedPiece)) {
             return true;
         }
-        if (_selectedPiece != nullptr) {
-            _selectedPiece->retain();
-            //remove _selectedPiece at SRC
-            if (_selectedIndex.y >= 0)
-                _board->removePiece(_selectedIndex);
-            _pannelTop->removePiece(_selectedPiece);
-            _pannelBottom->removePiece(_selectedPiece);
+        if (selectedPiece && p && (p->getSymbol() == 'k' || p->getSymbol() == 'K')) {
+            _board->unselectAll();
+            _pannelTop->unselect();
+            _pannelBottom->unselect();
+            _selectedPiece = nullptr;
+            return true;
+        }
+
+        if (selectedPiece) {
+            selectedPiece->retain();
+            //remove selectedPiece at SRC
+            if (_selectedPiece)
+                _board->removePiece(_board->convertLocalCoordToIndex(
+                                        _selectedPiece->getPosition()));
+            if (topPiece)
+                _pannelTop->removePiece(topPiece);
+            if (bottomPiece)
+                _pannelBottom->removePiece(bottomPiece);
+
             //move DST piece to pannel
             if (p != nullptr) {
                 p->retain();
@@ -91,36 +166,56 @@ bool ResearchScene::onTouchBegan(Touch *touch, Event *event)
                     _pannelTop->addPiece(p);
                 p->release();
             }
-            //place _selectedPiece at DST
-            _board->addPiece(index, _selectedPiece);
-            _selectedPiece->release();
-            _selectedPiece = nullptr;
+
+            //place selectedPiece at DST
+            _board->addPiece(index, selectedPiece);
+            selectedPiece->release();
+
             _board->unselectAll();
+            _pannelTop->unselect();
+            _pannelBottom->unselect();
+            _selectedPiece = nullptr;
         } else {
             _board->unselectAll();
             _board->select(index);
             _selectedPiece = p;
-            _selectedIndex = index;
         }
-
-    } else if (pannelTopRect.containsPoint(touchPos)) {
-        log("ResearchScene: touch Top");
-        Vec2 index = _pannelTop->convertWorldCoordToIndex(touchPos);
-        Vec2 tmp = _pannelTop->convertToNodeSpace(touchPos);
-        log("toIndex: (%f %f)->(%f %f)", tmp.x, tmp.y, index.x, index.y);
-        _selectedPiece = _pannelTop->select(index);
-        _selectedIndex = Vec2(index.x, -1);
-    } else if (pannelBottomRect.containsPoint(touchPos)) {
-        log("ResearchScene: touch Bottom");
-        Vec2 index = _pannelBottom->convertWorldCoordToIndex(touchPos);
-        Vec2 tmp = _pannelTop->convertToNodeSpace(touchPos);
-        log("toIndex: (%f %f)->(%f %f)", tmp.x, tmp.y, index.x, index.y);
-        _selectedPiece = _pannelBottom->select(index);
-        _selectedIndex = Vec2(index.x, -1);
-    } else
+        return true;
+    } else if (topRect.containsPoint(touchPos)) {
+        _pannelBottom->unselect();
+        if (_selectedPiece) {
+            if (_selectedPiece->getSide() == Piece::Side::BLACK) {
+                _board->removePiece(_board->convertLocalCoordToIndex(
+                                        _selectedPiece->getPosition()));
+                _pannelTop->addPiece(_selectedPiece);
+            }
+            _board->unselectAll();
+            _selectedPiece = nullptr;
+            return true;
+        }
         return false;
+    } else if (bottomRect.containsPoint(touchPos)) {
+        _pannelTop->unselect();
+        if (_selectedPiece) {
+            if (_selectedPiece->getSide() == Piece::Side::WHITE) {
+                _board->removePiece(_board->convertLocalCoordToIndex(
+                                        _selectedPiece->getPosition()));
+                _pannelBottom->addPiece(_selectedPiece);
+            }
+            _board->unselectAll();
+            _selectedPiece = nullptr;
+            return true;
+        }
+        return false;
+    } else {
+        _board->unselectAll();
+        _selectedPiece = nullptr;
+        _pannelTop->unselect();
+        _pannelBottom->unselect();
+        return false;
+    }
 
-    return true;
+    return false;
 }
 
 void ResearchScene::onTouchEnded(Touch *touch, Event *event)
@@ -155,7 +250,7 @@ bool ResearchSceneL2::init(std::string fen)
     auto gameLayer = GameLayer::create(playerWhite, playerBlack, board);
     addChild(gameLayer);
 
-    auto control = FightControl::create();
+    auto control = ResearchControlLayer::create();
     addChild(control);
 
     auto save_cb = [fen, board, playerWhite, playerBlack, gameLayer](EventCustom *ev) {

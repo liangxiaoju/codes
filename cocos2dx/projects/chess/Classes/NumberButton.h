@@ -10,8 +10,14 @@ using namespace cocos2d::ui;
 class NumberButton : public Button
 {
 public:
-    static NumberButton *create(const std::string& filename, int num=0);
-    virtual bool init(const std::string& filename, int num);
+    static NumberButton *create(const std::string& normal,
+                                const std::string& selected="",
+                                const std::string& disabled="",
+                                int num=0, bool autoDec=true);
+    virtual bool init(const std::string& normal,
+                      const std::string& selected,
+                      const std::string& disabled,
+                      int num, bool autoDec);
     virtual void setNumber(int num);
     virtual void incNumber();
     virtual void decNumber();
@@ -20,7 +26,9 @@ public:
 
 private:
     int _number;
+    bool _autoDec;
     Button *_mark;
+    Layout *_layout;
 };
 
 #endif

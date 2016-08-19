@@ -7,7 +7,9 @@
 # generated files
 #
 linux-build
-/projects/**/bin
+/projects/*/bin
+/projects/*/*/bin
+/projects/*/*/libs
 gen
 obj
 assets
@@ -30,3 +32,6 @@ tmp
 
 tags
 TAGS
+
+cscope.files
+cscope.out

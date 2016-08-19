@@ -31,6 +31,12 @@ public:
 	Side getSide() { return _side; };
 	static Side symbolToSide(char c) { return _symbolMap.at(c).first; };
 	static Role symbolToRole(char c) { return _symbolMap.at(c).second; };
+    static std::string symbolToFileName(char c)
+    {
+        auto side = symbolToSide(c);
+        auto role = symbolToRole(c);
+        return _bitMapBaseDir + _bitMap.at(std::make_pair(side, role));
+    }
 	static char toSymbol(Side side, Role role)
 	{
 		for (auto &kv : _symbolMap) {
@@ -49,13 +55,17 @@ public:
 	}
 
 	char getSymbol() { return toSymbol(_side, _role); }
+    Piece *clone();
+    std::string getFileName() { return _filename; }
 
 private:
 	bool initWithSymbol(char c);
 	bool initWithType(Side side, Role role);
 	Role _role;
 	Side _side;
+    std::string _filename;
 
+    static const std::string _bitMapBaseDir;
 	static const std::map<std::pair<Side, Role>, std::string> _bitMap;
 	static const std::map<char, std::pair<Side, Role>> _symbolMap;
 };

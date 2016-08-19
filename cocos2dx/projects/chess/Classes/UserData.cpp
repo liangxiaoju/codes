@@ -31,6 +31,7 @@ void UserData::createTable()
 	sql_createtable = sqlite3_mprintf("CREATE TABLE IF NOT EXISTS "
 					   "recordTbl("
 							   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                               "type INTEGER, "
 							   "date TEXT, "
 							   "roleWhite INTEGER, "
 							   "roleBlack INTEGER, "
@@ -38,7 +39,7 @@ void UserData::createTable()
 							   "white TEXT, "
 							   "black TEXT, "
 							   "win TEXT, "
-							   "fen TEXT)"
+							   "content TEXT)"
 							   );
 	ok = sqlite3_prepare_v2(_db, sql_createtable, -1, &stmt, nullptr);
 	ok |= sqlite3_step(stmt);
@@ -101,21 +102,22 @@ void UserData::queryRecordTbl(std::vector<RecordElement> &vector)
 
 		std::vector<RecordElement> *vector = (std::vector<RecordElement> *)v;
 
-		if (argc != 9) {
-			log("argc!=9");
+		if (argc != 10) {
+			log("argc!=10");
 			return SQLITE_ERROR;
 		}
 
 		RecordElement e;
 		e.id = atoi(argv[0]);
-		e.date = argv[1];
-		e.roleWhite = atoi(argv[2]);
-		e.roleBlack = atoi(argv[3]);
-		e.level = atoi(argv[4]);
-		e.white = argv[5];
-		e.black = argv[6];
-		e.win = argv[7];
-		e.fen = argv[8];
+        e.type = atoi(argv[1]);
+		e.date = argv[2];
+		e.roleWhite = atoi(argv[3]);
+		e.roleBlack = atoi(argv[4]);
+		e.level = atoi(argv[5]);
+		e.white = argv[6];
+		e.black = argv[7];
+		e.win = argv[8];
+		e.content = argv[9];
 
 		vector->push_back(e);
 
@@ -132,15 +134,16 @@ void UserData::insertRecordElement(RecordElement element)
 {
 	char *sql = sqlite3_mprintf(
 			"INSERT INTO "
-			"recordTbl (date,roleWhite,roleBlack,level,white,black,win,fen) "
-			"VALUES (datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s','%s')",
+			"recordTbl (type,date,roleWhite,roleBlack,level,white,black,win,content) "
+			"VALUES (%d,datetime('now', 'localtime'),%d,%d,%d,'%s','%s','%s','%s')",
+            element.type,
 			element.roleWhite,
 			element.roleBlack,
 			element.level,
 			element.white.c_str(),
 			element.black.c_str(),
 			element.win.c_str(),
-			element.fen.c_str());
+			element.content.c_str());
 
 	int ok = sqlite3_exec(_db, sql, 0, 0, 0);
     sqlite3_free(sql);

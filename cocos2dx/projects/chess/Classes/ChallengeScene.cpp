@@ -3,7 +3,7 @@
 #include "GameLayer.h"
 #include "BGLayer.h"
 #include "AIPlayer.h"
-#include "ChallengeControl.h"
+#include "ControlLayer.h"
 #include "HeaderSprite.h"
 #include "Sound.h"
 #include "UserData.h"
@@ -50,9 +50,9 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 		lheader->setActive(false);
 	};
 
-	auto control = ChallengeControl::create();
+	auto control = ChallengeControlLayer::create();
 	addChild(control);
-	control->setEndGameItem(item);
+	//control->setEndGameItem(item);
 
 	/* response for reset */
 	auto reset_cb = [this](EventCustom* ev) {
@@ -74,16 +74,48 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 			Director::getInstance()->replaceScene(scene);
 		}
 	};
-    auto over_cb = [this](EventCustom *ev) {
+    auto over_cb = [this, origin, vsize](EventCustom *ev) {
         std::string event = (const char *)ev->getUserData();
+        Sprite *sprite;
+
+        auto white_win_callback = [&](){
+            std::vector<EndGameData::EndGameClass> endGameClass;
+            EndGameData::getInstance()->queryEndGameClass(endGameClass);
+            for (auto &cls : endGameClass) {
+                if (cls.tid == _item.tid) {
+                    if (cls.progress == _item.sort) {
+                        cls.progress = _item.sort+1;
+                        EndGameData::getInstance()->updateEndGameClass(cls);
+                    }
+                    break;
+                }
+            }
+            auto next = Button::create("ChallengeScene/button_next.png");
+            next->setTitleText("Next");
+            next->setTitleFontSize(35);
+            next->setZoomScale(0.1);
+            next->addClickEventListener([&](Ref *ref){
+                    getEventDispatcher()->dispatchCustomEvent(EVENT_NEXT);
+                });
+            auto vsize = Director::getInstance()->getVisibleSize();
+            next->setPosition(Vec2(vsize.width/2, vsize.height/3));
+            addChild(next);
+        };
+
         if (event.find("DRAW:") != std::string::npos) {
             Sound::getInstance()->playEffect("draw");
+            sprite = Sprite::create("ChallengeScene/text_hq.png");
         } else if (event.find("WIN:WHITE") != std::string::npos) {
             Sound::getInstance()->playEffect("win");
             UserData::getInstance()->setIntegerForKey("ChallengeScene:LEVEL", _item.id);
+            sprite = Sprite::create("ChallengeScene/text_yq.png");
+            white_win_callback();
         } else {
             Sound::getInstance()->playEffect("lose");
+            sprite = Sprite::create("ChallengeScene/text_sq.png");
         }
+        addChild(sprite);
+        sprite->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
     };
 
 	setOnEnterCallback([this, reset_cb, next_cb, white_start_cb, black_start_cb, over_cb](){
