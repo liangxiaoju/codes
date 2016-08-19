@@ -14,7 +14,9 @@ os.chdir(options.dir)
 
 handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
-httpd = SimpleHTTPServer.BaseHTTPServer.HTTPServer(("", 80), handler)
+httpd = SimpleHTTPServer.BaseHTTPServer.HTTPServer(("", 8000), handler)
+sa = httpd.socket.getsockname()
+print "Serving HTTP on", sa[0], "port", sa[1], "..."
 
 httpd.serve_forever()
 
