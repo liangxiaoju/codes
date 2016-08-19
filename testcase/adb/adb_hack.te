@@ -1,0 +1,4 @@
+set_prop(kernel, system_radio_prop)
+allow kernel adbd_socket:sock_file rw_file_perms;
+allow kernel self:sock_file rw_file_perms;
+allow kernel self:capability dac_override;
