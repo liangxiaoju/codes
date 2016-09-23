@@ -90,8 +90,8 @@ public:
 			addrto[i].sin_port = htons(SCAN_PORT);
 
 			ret = sendto(_sockfd,
-					msg.c_str(), msg.size(),
-					0, (struct sockaddr*)&addrto[i], nlen);  
+                         msg.c_str(), msg.size(),
+                         0, (struct sockaddr*)&addrto[i], nlen);
 			if (ret < 0) {
 				perror("sendto");
 				return -1;
@@ -104,10 +104,10 @@ public:
 	int read(RoomPacket &packet)
 	{
 		int err;
-		int len = sizeof(struct sockaddr_in);  
+		int len = sizeof(struct sockaddr_in);
 		char msg[4096];
 
-		struct sockaddr_in from;  
+		struct sockaddr_in from;
 		memset(&from, 0, sizeof(from));
 
 		fd_set fdset;
@@ -121,7 +121,7 @@ public:
 			std::unique_lock<std::mutex> lock(_mutex_r);
 
 			err = recvfrom(_sockfd, msg, sizeof(msg), 0,
-					(struct sockaddr*)&from, (socklen_t*)&len);  
+                           (struct sockaddr*)&from, (socklen_t*)&len);
 			if (err < 0) {
 				perror("recvfrom");
 				return -1;
@@ -172,9 +172,9 @@ private:
 			return -1;
 		}
 
-		const int opt = 1;  
+		const int opt = 1;
 		err = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
-				(char *)&opt, sizeof(opt));  
+				(char *)&opt, sizeof(opt));
 		if (err < 0) {
 			perror("setsockopt");
 			close(fd);
@@ -301,7 +301,7 @@ public:
 
 				for (auto &v : infos) {
 					if (v.name == packet["NAME"] &&
-							v.name == packet["ADDR"])
+							v.host == packet["ADDR"])
 						return;
 				}
 

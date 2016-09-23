@@ -32,28 +32,17 @@ bool UIPlayer::init()
 	auto draw_cb = [this](EventCustom* ev) {
 		_delegate->onDrawRequest();
 	};
-    auto request_deny_cb = [this](EventCustom* ev) {
-        std::string event = (const char *)ev->getUserData();
-        if (event.find("DRAW:") != std::string::npos) {
-            PopupMessage::create("Disagree with draw !");
-            log("request deny: draw");
-        } else if (event.find("REGRET:") != std::string::npos) {
 
-        }
-    };
-
-	setOnEnterCallback([this, regret_cb, resign_cb, draw_cb, request_deny_cb](){
+	setOnEnterCallback([this, regret_cb, resign_cb, draw_cb](){
 		getEventDispatcher()->addCustomEventListener(EVENT_REGRET, regret_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_RESIGN, resign_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_DRAW, draw_cb);
-		getEventDispatcher()->addCustomEventListener(EVENT_REQUEST_DENY, request_deny_cb);
 	});
 
 	setOnExitCallback([this](){
 		getEventDispatcher()->removeCustomEventListeners(EVENT_REGRET);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_RESIGN);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_DRAW);
-		getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_DENY);
 	});
 
 	return true;
@@ -147,15 +136,28 @@ void UIPlayer::onRequest(std::string req, std::string args,
         };
         DialogBox::create("Accept draw ?", "Yes", "No", cb);
 	} else if (req == "regret") {
-        callback(true);
+        auto cb = [callback](bool positive) {
+            callback(positive);
+        };
+        DialogBox::create("Accept regret ?", "Yes", "No", cb);
     } else if (req == "resign") {
         //popup
+        PopupMessage::create("You win");
         callback(true);
     } else if (req == "move") {
         _delegate->onMoveRequest(args);
     }
-
-    if (callback)
-        callback(false);
 }
 
+void UIPlayer::onReply(std::string reply, std::string args)
+{
+    if (reply == "regret") {
+        if (args == "deny") {
+            PopupMessage::create("Deny to regret !");
+        }
+    } else if (reply == "draw") {
+        if (args == "deny") {
+            PopupMessage::create("Disagree with draw !");
+        }
+    }
+}

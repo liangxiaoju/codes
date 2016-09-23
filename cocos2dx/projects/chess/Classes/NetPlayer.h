@@ -34,6 +34,7 @@ public:
 	virtual void stop() override;
 	virtual void onRequest(std::string req, std::string args="",
                            std::function<void(bool)>callback=nullptr) override;
+    virtual void onReply(std::string reply, std::string args="") override;
 
 	virtual ~NetPlayer();
 

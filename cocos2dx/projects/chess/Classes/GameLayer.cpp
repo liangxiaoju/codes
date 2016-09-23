@@ -178,12 +178,12 @@ void GameLayer::onPlayerWhiteDrawRequest()
             _playerWhite->stop();
             _playerBlack->stop();
 
+            _playerWhite->onReply("draw", "accept");
+
             getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
                                                       (void *)"DRAW:");
         } else {
-            // popup
-            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
-                                                      (void*)"DRAW:");
+            _playerWhite->onReply("draw", "deny");
             _playerWhite->start(_board->getFenWithMove());
         }
     };
@@ -200,12 +200,12 @@ void GameLayer::onPlayerBlackDrawRequest()
             _playerWhite->stop();
             _playerBlack->stop();
 
+            _playerBlack->onReply("draw", "accept");
+
             getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
                                                       (void *)"DRAW:");
         } else {
-            // popup
-            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
-                                                      (void*)"DRAW:");
+            _playerBlack->onReply("draw", "deny");
             _playerBlack->start(_board->getFenWithMove());
         }
     };
@@ -222,10 +222,9 @@ void GameLayer::onPlayerWhiteRegretRequest()
             _board->undo();
             _board->undo();
             Sound::getInstance()->playEffect("undo");
+            _playerWhite->onReply("regret", "accept");
         } else {
-            // popup
-            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
-                                                      (void*)"REGRET:");
+            _playerWhite->onReply("regret", "deny");
         }
     };
 	_playerBlack->onRequest("regret", "", cb);
@@ -247,10 +246,9 @@ void GameLayer::onPlayerBlackRegretRequest()
                 getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
                 _playerWhite->start(_board->getFenWithMove());
             }
+            _playerBlack->onReply("regret", "accept");
         } else {
-            // popup
-            getEventDispatcher()->dispatchCustomEvent(EVENT_REQUEST_DENY,
-                                                      (void*)"REGRET:");
+            _playerBlack->onReply("regret", "deny");
         }
     };
 	_playerWhite->onRequest("regret", "", cb);

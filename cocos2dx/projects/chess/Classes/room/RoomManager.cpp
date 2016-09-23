@@ -35,7 +35,7 @@ void RoomManager::leaveRoom(RoomClient *client)
 	}
 }
 
-RoomServer *RoomManager::createRoom()
+RoomServer *RoomManager::createRoom(std::string name, std::string desc)
 {
 	RoomServer *server = new (std::nothrow) RoomServer("", 6000);
 	int err = server->start();
@@ -44,13 +44,15 @@ RoomServer *RoomManager::createRoom()
 		server = NULL;
 	}
 
-	Broadcast::NotifyCallBack notify = [this]
+	Broadcast::NotifyCallBack notify = [this, name, desc]
 		(Broadcast *broadcast, const RoomPacket &packet) {
 			RoomPacket reply;
 			if (packet["FROM"] == "scanner") {
 				reply["TYPE"] = "scan";
 				reply["FROM"] = "manager";
 				reply["CONTENT"] = "I am here.";
+                reply["NAME"] = name;
+                reply["DESC"] = desc;
 				broadcast->send(reply);
 			}
 		};

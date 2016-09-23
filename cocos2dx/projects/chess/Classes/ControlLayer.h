@@ -24,6 +24,7 @@ public:
     virtual void initSettingMenu();
     virtual bool isControlPannelVisible();
     virtual void setControlPannelVisible(bool visible);
+    virtual void setEnabled(bool enable);
 
     virtual ~ControlLayer();
 
@@ -65,7 +66,6 @@ public:
     virtual bool init();
     CREATE_FUNC(LANFightControlLayer);
     virtual std::vector<Widget*> getControlPannelWidgets();
-    void setEnabled(bool enable);
 };
 
 class TutorialControlLayer : public ControlLayer

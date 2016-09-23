@@ -418,3 +418,7 @@ void AIPlayer::onRequest(std::string req, std::string args,
         callback(false);
     }
 }
+
+void AIPlayer::onReply(std::string reply, std::string args)
+{
+}

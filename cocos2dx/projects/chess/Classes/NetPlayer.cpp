@@ -31,13 +31,14 @@ bool NetPlayer::init(RoomClient *client)
 		if (content.find("position") != std::string::npos) {
 
 			_client->emit("action", "ok");
-
-			if (content.find_first_of(_fen) == std::string::npos) {
+/*
+  // if regret ?
+			if (content.find(_fen) == std::string::npos) {
 				log("@@ position not match: %s", content.c_str());
 				return;
 			}
-
-			if (content.find_first_of("moves") == std::string::npos) {
+*/
+			if (content.find("moves") == std::string::npos) {
 				log("@@ ignore: %s", content.c_str());
 				return;
 			}
@@ -64,21 +65,53 @@ bool NetPlayer::init(RoomClient *client)
 
 		auto content = packet["CONTENT"];
 
-		if (content.find("regret") != std::string::npos) {
+		if (content.find("request:regret") != std::string::npos) {
 			log("@@ request regret");
 			_delegate->onRegretRequest();
-		} else if (content.find("draw") != std::string::npos) {
+		} else if (content.find("request:draw") != std::string::npos) {
 			log("@@ request draw");
 			_delegate->onDrawRequest();
-		} else if (content.find("reset") != std::string::npos) {
+		} else if (content.find("request:reset") != std::string::npos) {
 			log("@@ request reset");
-			Director::getInstance()->getEventDispatcher()
-				->dispatchCustomEvent(EVENT_RESET, (void*)"Net");
-		} else if (content.find("switch") != std::string::npos) {
-			log("@@ request switch");
-			Director::getInstance()->getEventDispatcher()
-				->dispatchCustomEvent(EVENT_SWITCH, (void*)"Net");
-		}
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_RESET, (void*)"Net");
+        } else if (content.find("request:resign") != std::string::npos) {
+            log("@@ request resign");
+            _delegate->onResignRequest();
+
+		} else if (content.find("reply:regret:deny") != std::string::npos) {
+			log("@@ reply request deny");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:REGRET:DENY");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+        } else if (content.find("reply:regret:accept") != std::string::npos) {
+			log("@@ reply request accept");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:REGRET:ACCEPT");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+
+        } else if (content.find("reply:draw:accept") != std::string::npos) {
+			log("@@ reply draw accept");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:DRAW:ACCEPT");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+        } else if (content.find("reply:draw:deny") != std::string::npos) {
+			log("@@ reply draw deny");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:DRAW:DENY");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+
+        } else if (content.find("reply:reset:accept") != std::string::npos) {
+            log("@@ reply reset accept");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:RESET:ACCEPT");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+        } else if (content.find("reply:reset:deny") != std::string::npos) {
+            log("@@ reply reset deny");
+			getEventDispatcher()->dispatchCustomEvent(
+                EVENT_REQUEST_REPLY, (void*)"REPLY:RESET:DENY");
+            getEventDispatcher()->removeCustomEventListeners(EVENT_REQUEST_REPLY);
+        }
 	};
 
 	_client->on("action", [onAction](RoomClient *client, const RoomPacket &packet) {
@@ -129,17 +162,103 @@ void NetPlayer::stop()
 void NetPlayer::onRequest(std::string req, std::string args,
                           std::function<void(bool)>callback)
 {
-	if (req == "draw") {
-		_client->emit("control", "draw");
-	} else if (req == "regret") {
-		_client->emit("control", "regret");
-		/* TODO: return true/false according to the ack */
-	} else if (req == "reset") {
-		_client->emit("control", "reset");
-	} else if (req == "switch") {
-		_client->emit("control", "switch");
-	}
+	std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
 
-    if (callback)
-        callback(false);
+	if (req == "draw") {
+
+        Director::getInstance()->getEventDispatcher()->addCustomEventListener(
+            EVENT_REQUEST_REPLY, [this, isDestroyed, callback](EventCustom *ev) {
+                if (*isDestroyed) {
+                    log("onRequest: NetPlayer instance was destroyed!");
+                    return;
+                }
+                std::string event = (const char *)ev->getUserData();
+
+                log("@@ REPLY: %s", event.c_str());
+
+                if (event.find("REPLY:DRAW:DENY") != std::string::npos) {
+                    if (callback)
+                        callback(false);
+                } else if (event.find("REPLY:DRAW:ACCEPT") != std::string::npos) {
+                    if (callback)
+                        callback(true);
+                }
+            });
+
+		_client->emit("control", "request:draw");
+
+	} else if (req == "regret") {
+
+        Director::getInstance()->getEventDispatcher()->addCustomEventListener(
+            EVENT_REQUEST_REPLY, [this, isDestroyed, callback](EventCustom *ev) {
+                if (*isDestroyed) {
+                    log("onRequest: NetPlayer instance was destroyed!");
+                    return;
+                }
+                std::string event = (const char *)ev->getUserData();
+
+                log("@@ REPLY: %s", event.c_str());
+
+                if (event.find("REPLY:REGRET:DENY") != std::string::npos) {
+                    if (callback)
+                        callback(false);
+                } else if (event.find("REPLY:REGRET:ACCEPT") != std::string::npos) {
+                    if (callback)
+                        callback(true);
+                }
+            });
+
+        _client->emit("control", "request:regret");
+
+	} else if (req == "reset") {
+
+        Director::getInstance()->getEventDispatcher()->addCustomEventListener(
+            EVENT_REQUEST_REPLY, [this, isDestroyed, callback](EventCustom *ev) {
+                if (*isDestroyed) {
+                    log("onRequest: NetPlayer instance was destroyed!");
+                    return;
+                }
+                std::string event = (const char *)ev->getUserData();
+
+                log("@@ REPLY: %s", event.c_str());
+
+                if (event.find("REPLY:RESET:DENY") != std::string::npos) {
+                    if (callback)
+                        callback(false);
+                } else if (event.find("REPLY:RESET:ACCEPT") != std::string::npos) {
+                    if (callback)
+                        callback(true);
+                }
+            });
+
+        _client->emit("control", "request:reset");
+    } else if (req == "resign") {
+
+        _client->emit("control", "request:resign");
+
+        if (callback)
+            callback(true);
+    }
+}
+
+void NetPlayer::onReply(std::string reply, std::string args)
+{
+    log("@@ onReply: %s %s", reply.c_str(), args.c_str());
+
+    if (reply == "regret") {
+        if (args == "accept")
+            _client->emit("control", "reply:regret:accept");
+        else
+            _client->emit("control", "reply:regret:deny");
+    } else if (reply == "draw") {
+        if (args == "accept")
+            _client->emit("control", "reply:draw:accept");
+        else
+            _client->emit("control", "reply:draw:deny");
+    } else if (reply == "reset") {
+        if (args == "accept")
+            _client->emit("control", "reply:reset:accept");
+        else
+            _client->emit("control", "reply:reset:deny");
+    }
 }

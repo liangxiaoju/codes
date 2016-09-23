@@ -6,6 +6,8 @@
 #include "HeaderSprite.h"
 #include "Sound.h"
 #include "ControlLayer.h"
+#include "PopupBox.h"
+#include "Localization.h"
 
 bool FightScene::init(Role white, Role black, int level, std::string fen)
 {
@@ -38,6 +40,17 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 
 	auto lheader = HeaderSprite::createWithType(HeaderSprite::Type::LEFT);
 	auto rheader = HeaderSprite::createWithType(HeaderSprite::Type::RIGHT);
+    lheader->addClickEventListener([](Ref *ref) {
+            int win = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
+            int draw = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
+            int lose = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
+            PopupMessage::create(TR("win: ") + Utils::toString(win) + "\n" +
+                                 TR("lose: ") + Utils::toString(lose) + "\n" +
+                                 TR("draw: ") + Utils::toString(draw));
+        });
+    rheader->addClickEventListener([this](Ref *ref) {
+            PopupMessage::create(TR("level: ") + Utils::toString(_level));
+        });
 	auto lsize = lheader->getContentSize();
 	auto rsize = rheader->getContentSize();
 	lheader->setPosition(origin.x+vsize.width/2, origin.y+lsize.height/2+20);
@@ -65,21 +78,23 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	}
 
 	/* active/deactive header */
-	auto white_start_cb = [this, lheader, rheader, rotation](EventCustom* ev){
+	auto white_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
 		lheader->setActive(!rotation);
 		rheader->setActive(rotation);
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
+        fightControl->setEnabled(!rotation);
 	};
-	auto black_start_cb = [this, lheader, rheader, rotation](EventCustom* ev){
+	auto black_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
 		rheader->setActive(!rotation);
 		lheader->setActive(rotation);
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
+        fightControl->setEnabled(rotation);
 	};
 
 	/* response for reset */
@@ -97,7 +112,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	/* response for save */
 	auto save_cb = [this](EventCustom* ev) {
 		UserData::SaveElement se;
-        se.type = TYPE_FIGHT;
+        //se.type = TYPE_FIGHT;
 		se.roleWhite = _roleWhite;
 		se.roleBlack = _roleBlack;
 		se.level = _level;

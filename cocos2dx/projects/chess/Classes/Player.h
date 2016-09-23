@@ -29,6 +29,8 @@ public:
 	virtual void onRequest(std::string req, std::string args="",
                            std::function<void(bool)>callback=nullptr) = 0;
 
+    virtual void onReply(std::string reply, std::string args="") = 0;
+
 	class Delegate
 	{
 	public:

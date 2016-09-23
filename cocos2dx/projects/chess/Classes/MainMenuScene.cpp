@@ -111,7 +111,7 @@ bool MainMenuLayer::init()
         Director::getInstance()->pushScene(TutorialMenuScene::create());
 	});
 	b4->addClickEventListener([](Ref *ref){
-		Director::getInstance()->pushScene(LANFightScene::create());
+		Director::getInstance()->pushScene(LANTopScene::create());
 	});
 
 	b1->setZoomScale(0.1);

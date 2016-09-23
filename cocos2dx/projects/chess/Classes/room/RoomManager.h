@@ -20,7 +20,7 @@ public:
 	std::vector<RoomInfo> scanRoom(int max = 1, int timeout = 5);
 	RoomClient* joinRoom(std::string clientName, RoomInfo info);
 	void leaveRoom(RoomClient *client);
-	RoomServer *createRoom();
+	RoomServer *createRoom(std::string name, std::string desc="");
 	void destroyRoom(RoomServer *server);
 
 private:

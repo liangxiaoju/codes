@@ -18,6 +18,7 @@ public:
 	void stop() override;
 	void onRequest(std::string req, std::string args="",
                    std::function<void(bool)>callback=nullptr) override;
+    void onReply(std::string reply, std::string args="") override;
 
 	void setLevel(int level) { _level = level; }
 

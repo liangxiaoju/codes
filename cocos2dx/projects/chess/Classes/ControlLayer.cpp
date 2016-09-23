@@ -178,12 +178,20 @@ void ControlLayer::initSettingMenu()
 {
 }
 
+void ControlLayer::setEnabled(bool enable)
+{
+    _pannel->setEnabled(enable);
+}
+
 bool FightControlLayer::init()
 {
     if (!ControlLayer::init())
         return false;
 
     auto over_callback = [this](EventCustom* ev) {
+
+        setEnabled(true);
+
         std::vector<std::string> names = {"regret", "lose", "peace"};
 
         for (auto &name : names) {
@@ -222,6 +230,9 @@ bool ChallengeControlLayer::init()
         return false;
 
     auto over_callback = [this](EventCustom* ev) {
+
+        setEnabled(true);
+
         std::vector<std::string> names = {"regret", "lose"};
 
         for (auto &name : names) {
@@ -259,6 +270,9 @@ bool ResearchControlLayer::init()
         return false;
 
     auto over_callback = [this](EventCustom* ev) {
+
+        setEnabled(true);
+
         std::vector<std::string> names = {"regret"};
 
         for (auto &name : names) {
@@ -296,6 +310,9 @@ bool LANFightControlLayer::init()
         return false;
 
     auto over_callback = [this](EventCustom* ev) {
+
+        setEnabled(true);
+
         std::vector<std::string> names = {"regret", "lose", "peace"};
 
         for (auto &name : names) {
@@ -324,13 +341,8 @@ bool LANFightControlLayer::init()
 std::vector<Widget*> LANFightControlLayer::getControlPannelWidgets()
 {
     std::vector<std::string> names = {"save", "lose", "peace",
-                                      "again", "regret", "switch"};
+                                      "again", "regret"};
     return generateControlPannelWidgets(names);
-}
-
-void LANFightControlLayer::setEnabled(bool enable)
-{
-    _pannel->setEnabled(enable);
 }
 
 bool TutorialControlLayer::init()

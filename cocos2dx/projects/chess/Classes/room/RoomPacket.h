@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 
+/* notice: find_first_of will match any char in delim */
 void inline split(std::string& s, std::vector<std::string>& ret,
 		const std::string delim)
 {
@@ -37,10 +38,10 @@ public:
 		std::vector<RoomPacket> packets;
 
 		do {
-			prefix = message.find_first_of(PREFIX, index);
+			prefix = message.find(PREFIX, index);
 			if (prefix == std::string::npos)
 				break;
-			postfix = message.find_first_of(POSTFIX, index);
+			postfix = message.find(POSTFIX, index);
 			if (postfix == std::string::npos)
 				break;
 			index = postfix + strlen(POSTFIX);
@@ -71,8 +72,8 @@ public:
 
 	RoomPacket(std::string message)
 	{
-		size_t prefix = message.find_first_of(PREFIX);
-		size_t postfix = message.find_first_of(POSTFIX);
+		size_t prefix = message.find(PREFIX);
+		size_t postfix = message.find(POSTFIX);
 
 		if ((prefix != std::string::npos) &&
 				(postfix != std::string::npos)) {

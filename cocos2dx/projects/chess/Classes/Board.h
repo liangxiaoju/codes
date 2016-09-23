@@ -25,7 +25,7 @@ public:
 
 	bool initWithFen(std::string fen);
 	static Board* createWithFen(std::string fen) {
-		Board *pRet = new Board();
+		Board *pRet = new (std::nothrow) Board();
 		if (pRet && pRet->initWithFen(fen)) {
 			pRet->autorelease();
 			return pRet;

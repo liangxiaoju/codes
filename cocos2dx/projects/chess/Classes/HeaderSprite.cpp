@@ -48,8 +48,14 @@ bool HeaderSprite::initWithType(Type type)
 
 	addChild(rbox);
 	_layout = rbox;
+    _head = head;
 
 	return true;
+}
+
+void HeaderSprite::addClickEventListener(const std::function<void(Ref*)>& callback)
+{
+    _head->addClickEventListener([callback](Ref *ref) { callback(ref); });
 }
 
 void HeaderSprite::setNameLine(std::string name)
