@@ -26,9 +26,11 @@ public:
 
 	virtual void stop() = 0;
 
+    /* request the player to do */
 	virtual void onRequest(std::string req, std::string args="",
                            std::function<void(bool)>callback=nullptr) = 0;
 
+    /* reply to the player */
     virtual void onReply(std::string reply, std::string args="") = 0;
 
 	class Delegate

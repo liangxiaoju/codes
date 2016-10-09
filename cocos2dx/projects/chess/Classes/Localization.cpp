@@ -25,17 +25,19 @@ bool Localization::init()
     {
     case LanguageType::CHINESE:
         _localizationJson->initLanguageData("language/zh-CN.lang.json");
+        log("Language: Chinese");
         break;
     case LanguageType::ENGLISH:
     default:
         _localizationJson->initLanguageData("language/en-US.lang.json");
+        log("Language: English");
         break;
     }
 
     return true;
 }
 
-std::string Localization::getLocalizationString(std::string key)
+std::string Localization::getLocalizationString(const std::string key)
 {
     return _localizationJson->getLocalizationString(key);
 }

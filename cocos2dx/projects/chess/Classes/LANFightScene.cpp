@@ -7,6 +7,7 @@
 #include "Localization.h"
 #include "CheckBoxItem.h"
 #include "PopupBox.h"
+#include "NetworkInfo.h"
 
 bool LANScene::init()
 {
@@ -97,7 +98,7 @@ bool LANTopScene::init()
     create->setZoomScale(0.1);
     create->setTitleFontSize(35);
     create->setTitleFontName("");
-    create->setTitleText(TR("create"));
+    create->setTitleText(TR("create room"));
     create->addClickEventListener([this](Ref *ref) {
             auto scene = LANCreateScene::create();
             Director::getInstance()->pushScene(scene);
@@ -107,7 +108,7 @@ bool LANTopScene::init()
     join->setZoomScale(0.1);
     join->setTitleFontSize(35);
     join->setTitleFontName("");
-    join->setTitleText(TR("join"));
+    join->setTitleText(TR("join room"));
     join->addClickEventListener([this](Ref *ref) {
             auto scene = LANJoinScene::create();
             Director::getInstance()->pushScene(scene);
@@ -115,6 +116,12 @@ bool LANTopScene::init()
 
     pushBackView(create);
     pushBackView(join);
+
+    setOnEnterCallback([this]() {
+            if (NetworkInfo::getInstance()->isWifiConnected() == false) {
+                PopupMessage::create(TR("Please connect wifi first"));
+            }
+        });
 
     return true;
 }
@@ -124,13 +131,13 @@ bool LANCreateScene::init()
     if (!LANScene::init())
         return false;
 
-    setTitle(TR("Create"));
+    setTitle(TR("create room"));
 
     auto load = Button::create("button.png");
     load->setZoomScale(0.1);
     load->setTitleFontSize(35);
     load->setTitleFontName("");
-    load->setTitleText(TR("load"));
+    load->setTitleText(TR("load file"));
     load->addClickEventListener([this](Ref *ref) {
             auto scene = LANLoadScene::create();
             Director::getInstance()->replaceScene(scene);
@@ -140,7 +147,7 @@ bool LANCreateScene::init()
     create->setZoomScale(0.1);
     create->setTitleFontSize(35);
     create->setTitleFontName("");
-    create->setTitleText(TR("create"));
+    create->setTitleText(TR("new game"));
     create->addClickEventListener([this](Ref *ref) {
             auto scene = LANWaitScene::create(_fen, _side);
             Director::getInstance()->replaceScene(scene);
@@ -168,6 +175,8 @@ bool LANLoadScene::init()
 {
     if (!LANScene::init())
         return false;
+
+    setTitle(TR("load file"));
 
     auto vsize = Director::getInstance()->getVisibleSize();
 
@@ -228,7 +237,7 @@ bool LANWaitScene::init(std::string fen, std::string side)
     if (!LANScene::init())
         return false;
 
-    setTitle(TR("Wait"));
+    setTitle(TR("wait"));
 
     _fen = fen;
     _side = side;
@@ -237,7 +246,12 @@ bool LANWaitScene::init(std::string fen, std::string side)
 
     auto vsize = Director::getInstance()->getVisibleSize();
 
-    auto text = Text::create("Side: " + side + "\n\nWaiting ...", "", 35);
+    std::string textstr = TR("Your side:");
+    textstr += (side == "black") ? TR("black") : TR("red");
+    textstr += "\n\n";
+    textstr += TR("Waitting to be connected ...");
+
+    auto text = Text::create(textstr, "", 35);
     text->setTextColor(Color4B::GRAY);
 
     pushBackView(text);
@@ -354,7 +368,7 @@ bool LANJoinScene::init()
 
     auto vsize = Director::getInstance()->getVisibleSize();
 
-    setTitle(TR("Join"));
+    setTitle(TR("join room"));
 
     auto listview = ListView::create();
     listview->setDirection(ScrollView::Direction::VERTICAL);
@@ -567,14 +581,15 @@ bool LANFightScene::init(std::string fen, std::string side,
                 }
             };
 
-            DialogBox::create(TR("Allow to reset ?"), TR("Yes"), TR("No"), callback);
+            DialogBox::create(TR("Opponent request to reset"),
+                              TR("Accept"), TR("Deny"), callback);
         } else {
             log("reset request from UI");
             auto callback = [this, reset_scene](bool reply) {
                 if (reply) {
                     reset_scene();
                 } else {
-                    PopupMessage::create(TR("Deny to reset"));
+                    PopupMessage::create(TR("Opponent refuse to reset"));
                 }
             };
 
@@ -593,7 +608,7 @@ bool LANFightScene::init(std::string fen, std::string side,
         se.content = _board->getFenWithMove();
         UserData::getInstance()->insertSaveElement(se);
 
-        PopupMessage::create(TR("Save Done"));
+        PopupMessage::create(TR("Save done"));
     };
 
     auto over_cb = [this, origin, vsize](EventCustom *ev) {

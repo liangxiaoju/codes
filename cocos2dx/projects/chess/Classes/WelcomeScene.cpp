@@ -28,7 +28,7 @@ bool WelcomeLayer::init()
     addChild(bg);
 
     auto rotateBy = RotateBy::create(0.1, -15);
-    Repeat *repeat = Repeat::create(rotateBy, 10);
+    Repeat *repeat = Repeat::create(rotateBy, 5);
     CallFunc *callback = CallFunc::create([]() {
             Director::getInstance()->replaceScene(MainMenuScene::create());
         });

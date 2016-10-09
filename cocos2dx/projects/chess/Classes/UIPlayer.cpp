@@ -134,15 +134,15 @@ void UIPlayer::onRequest(std::string req, std::string args,
         auto cb = [callback](bool positive) {
             callback(positive);
         };
-        DialogBox::create("Accept draw ?", "Yes", "No", cb);
+        DialogBox::create(TR("Opponent request to draw"), TR("Accept"), TR("Deny"), cb);
 	} else if (req == "regret") {
         auto cb = [callback](bool positive) {
             callback(positive);
         };
-        DialogBox::create("Accept regret ?", "Yes", "No", cb);
+        DialogBox::create(TR("Opponent request to regret"), TR("Accept"), TR("Deny"), cb);
     } else if (req == "resign") {
         //popup
-        PopupMessage::create("You win");
+        PopupMessage::create(TR("Opponent throw in the towel"));
         callback(true);
     } else if (req == "move") {
         _delegate->onMoveRequest(args);
@@ -153,11 +153,11 @@ void UIPlayer::onReply(std::string reply, std::string args)
 {
     if (reply == "regret") {
         if (args == "deny") {
-            PopupMessage::create("Deny to regret !");
+            PopupMessage::create(TR("Opponent refuse to regret"));
         }
     } else if (reply == "draw") {
         if (args == "deny") {
-            PopupMessage::create("Disagree with draw !");
+            PopupMessage::create(TR("Opponent refuse to draw"));
         }
     }
 }

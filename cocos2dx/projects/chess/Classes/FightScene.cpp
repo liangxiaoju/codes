@@ -44,12 +44,12 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
             int win = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
             int draw = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
             int lose = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
-            PopupMessage::create(TR("win: ") + Utils::toString(win) + "\n" +
-                                 TR("lose: ") + Utils::toString(lose) + "\n" +
-                                 TR("draw: ") + Utils::toString(draw));
+            PopupMessage::create(TR("The number of win:") + Utils::toString(win) + "\n" +
+                                 TR("The number of lost:") + Utils::toString(lose) + "\n" +
+                                 TR("The number of draw:") + Utils::toString(draw));
         });
     rheader->addClickEventListener([this](Ref *ref) {
-            PopupMessage::create(TR("level: ") + Utils::toString(_level));
+            PopupMessage::create(TR("level:") + Utils::toString(_level));
         });
 	auto lsize = lheader->getContentSize();
 	auto rsize = rheader->getContentSize();
@@ -81,19 +81,23 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	auto white_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
 		lheader->setActive(!rotation);
 		rheader->setActive(rotation);
+        /*
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
+        */
         fightControl->setEnabled(!rotation);
 	};
 	auto black_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
 		rheader->setActive(!rotation);
 		lheader->setActive(rotation);
+        /*
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
+        */
         fightControl->setEnabled(rotation);
 	};
 

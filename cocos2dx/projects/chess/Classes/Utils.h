@@ -2,6 +2,7 @@
 #define __UTILS_H__
 
 #include "cocos2d.h"
+#include "Localization.h"
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #include "platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
@@ -126,14 +127,26 @@ public:
             (dst.x < 0 || dst.x > 8 || dst.y < 0 || dst.y > 9))
                 return "";
 
-        std::map<char, std::string> symbolMap = {
-            {'r', "车"}, {'n', "马"}, {'b', "象"}, {'a', "士"}, {'k', "将"}, {'c', "炮"}, {'p', "卒"},
-            {'R', "车"}, {'N', "马"}, {'B', "相"}, {'A', "士"}, {'K', "帅"}, {'C', "炮"}, {'P', "兵"}
-        };
+        std::map<char, std::string> symbolMap;
+        symbolMap['r'] = TR("rook");
+        symbolMap['n'] = TR("knight");
+        symbolMap['b'] = TR("bishop");
+        symbolMap['a'] = TR("advisor");
+        symbolMap['k'] = TR("king");
+        symbolMap['c'] = TR("cannon");
+        symbolMap['p'] = TR("pawn");
+        symbolMap['R'] = TR("rook");
+        symbolMap['N'] = TR("KNIGHT");
+        symbolMap['B'] = TR("BISHOP");
+        symbolMap['A'] = TR("ADVISOR");
+        symbolMap['K'] = TR("KING");
+        symbolMap['C'] = TR("CANNON");
+        symbolMap['P'] = TR("PAWN");
 
         std::string name = symbolMap.at(symbol);
 
-        std::vector<std::string> numRedMap = {"一","二","三","四","五","六","七","八","九"};
+        std::vector<std::string> numRedMap = {
+            TR("I"),TR("II"),TR("III"),TR("IV"),TR("V"),TR("VI"),TR("VII"),TR("VIII"),TR("IX")};
         std::vector<std::string> numBlackMap = {"1","2","3","4","5","6","7","8","9"};
 
         std::vector<std::string> numMap;
@@ -149,11 +162,11 @@ public:
 
         std::string action = "";
         if (src.y == dst.y) {
-            action = "平";
+            action = TR("horizontal");
         } else if (src.y < dst.y) {
-            action = "进";
+            action = TR("forward");
         } else {
-            action = "退";
+            action = TR("backward");
         }
 
         std::string sname = numMap[src.x];

@@ -79,7 +79,7 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
             Sound::getInstance()->playEffect("move");
 
 		getEventDispatcher()->dispatchCustomEvent(EVENT_BLACK_START);
-		_playerBlack->start(_board->getFenWithMove());
+        _playerBlack->start(_board->getFenWithMove());
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
             std::string args = _board->getCurrentSide() == Board::Side::BLACK ?
@@ -115,7 +115,7 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
             Sound::getInstance()->playEffect("move");
 
 		getEventDispatcher()->dispatchCustomEvent(EVENT_WHITE_START);
-		_playerWhite->start(_board->getFenWithMove());
+        _playerWhite->start(_board->getFenWithMove());
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
             std::string args = (_board->getCurrentSide() == Board::Side::BLACK) ?
@@ -143,6 +143,10 @@ void GameLayer::onPlayerWhiteResignRequest()
 	if (_board->getCurrentSide() != Board::Side::WHITE)
 		return;
 
+    /* ignore the resign request if it has been mated */
+    if (Rule::getInstance()->isMate(_board->getFen()))
+        return;
+
     auto cb = [this](bool reply) {
         _playerWhite->stop();
         _playerBlack->stop();
@@ -157,6 +161,9 @@ void GameLayer::onPlayerBlackResignRequest()
 {
 	if (_board->getCurrentSide() != Board::Side::BLACK)
 		return;
+
+    if (Rule::getInstance()->isMate(_board->getFen()))
+        return;
 
     auto cb = [this](bool reply) {
         _playerWhite->stop();

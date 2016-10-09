@@ -107,6 +107,7 @@ public:
         XQNode *parent = _data.pCurNode;
         parent->pCurChild = parent->pFirstChild = node;
         node->pParent = parent;
+        _data.pCurNode = node;
     }
     virtual void addAltStep(XQNode *node)
     {

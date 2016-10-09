@@ -85,10 +85,12 @@ bool ReplayScene::init()
 
 			auto e = saveElements[index];
 
-			FightScene::Role roleWhite = (FightScene::Role)e.roleWhite;
-			FightScene::Role roleBlack = (FightScene::Role)e.roleBlack;
-			auto scene = FightScene::create(roleWhite, roleBlack, e.level, e.content);
-			Director::getInstance()->replaceScene(scene);
+            if (e.type == TYPE_FIGHT) {
+                FightScene::Role roleWhite = (FightScene::Role)e.roleWhite;
+                FightScene::Role roleBlack = (FightScene::Role)e.roleBlack;
+                auto scene = FightScene::create(roleWhite, roleBlack, e.level, e.content);
+                Director::getInstance()->replaceScene(scene);
+            }
 		}
 	default:
 		break;

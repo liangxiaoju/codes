@@ -12,7 +12,7 @@ public:
     bool init();
     static Localization *getInstance();
 
-    std::string getLocalizationString(std::string key);
+    std::string getLocalizationString(const std::string key);
 
 private:
     static Localization *s_localization;

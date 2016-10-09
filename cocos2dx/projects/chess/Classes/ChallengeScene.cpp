@@ -7,6 +7,7 @@
 #include "HeaderSprite.h"
 #include "Sound.h"
 #include "UserData.h"
+#include "Localization.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -91,7 +92,7 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
                 }
             }
             auto next = Button::create("ChallengeScene/button_next.png");
-            next->setTitleText("Next");
+            next->setTitleText(TR("Next"));
             next->setTitleFontSize(35);
             next->setZoomScale(0.1);
             next->addClickEventListener([&](Ref *ref){

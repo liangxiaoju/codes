@@ -28,5 +28,19 @@ package org.cocos2dx.cpp;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
+import android.content.Context;
+import android.util.Log;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 public class AppActivity extends Cocos2dxActivity {
+    private static final String TAG = "CHESS";
+
+    /* for jni */
+    public static boolean isWifiConnected() {
+        Log.d(TAG, "isWifiConnected");
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return ni.isConnected();
+    }
 }
