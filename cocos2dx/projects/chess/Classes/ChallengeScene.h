@@ -67,4 +67,12 @@ private:
 	ListView *_listview;
 	Layout *_default_model;
 };
+
+class ChallengeMapScene : public Scene
+{
+public:
+    virtual bool init();
+    CREATE_FUNC(ChallengeMapScene);
+};
+
 #endif

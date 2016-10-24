@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include "UserData.h"
 #include "Localization.h"
+#include "ChallengeMap.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -370,5 +371,74 @@ bool ChallengeMenuL1::init()
 	addChild(back);
 
 	return true;
+}
+
+bool ChallengeMapScene::init()
+{
+    if (!Scene::init())
+        return false;
+
+    auto vsize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto scrollview = ScrollView::create();
+    scrollview->setScrollBarEnabled(false);
+    scrollview->setBounceEnabled(false);
+    scrollview->setDirection(ScrollView::Direction::VERTICAL);
+    scrollview->setContentSize(vsize);
+    scrollview->setPosition(Vec2(0, 0));
+    addChild(scrollview);
+
+	auto back = Button::create("DifficultyScene/look_back.png");
+	back->addClickEventListener([](Ref *ref){
+			Director::getInstance()->popScene();
+			});
+	back->setZoomScale(0.1);
+	back->setPosition(Vec2(100, vsize.height-100));
+	addChild(back);
+
+    std::vector<EndGameData::EndGameClass> classes;
+    EndGameData::getInstance()->queryEndGameClass(classes);
+
+    int tid = classes[0].tid;
+    int total = classes[0].subCount;
+    int progress = classes[0].progress;
+
+    auto map = ChallengeMap::create(total, progress);
+    map->addClickEventListener([tid](int index) {
+            std::vector<EndGameData::EndGameItem> items;
+            EndGameData::getInstance()->queryEndGameItem(tid, items);
+            auto scene = ChallengeScene::create(items[index]);
+            Director::getInstance()->pushScene(scene);
+            });
+
+    auto msize = map->getContentSize();
+    map->setScale(vsize.width/msize.width);
+    scrollview->setInnerContainerSize(msize*map->getScale());
+    scrollview->addChild(map);
+    scrollview->jumpToBottom();
+
+    auto scrollToCurrent = [map, vsize, msize, scrollview]() {
+        auto focus = map->getChildByName("focus");
+        auto pos = focus->getPositionY() - vsize.height/2;
+        float percent = 100 - 100*pos/msize.height;
+        percent = std::max(percent, 0.0f);
+        percent = std::min(percent, 100.0f);
+        scrollview->jumpToPercentVertical(percent);
+    };
+
+    scrollToCurrent();
+
+    setOnEnterCallback([this, map, scrollToCurrent]() {
+            std::vector<EndGameData::EndGameClass> classes;
+            EndGameData::getInstance()->queryEndGameClass(classes);
+            int progress = classes[0].progress;
+            if (progress != map->getProgress()) {
+                map->setProgress(progress);
+                scrollToCurrent();
+            }
+            });
+
+    return true;
 }
 

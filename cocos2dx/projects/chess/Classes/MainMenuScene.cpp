@@ -104,7 +104,7 @@ bool MainMenuLayer::init()
 		Director::getInstance()->pushScene(DifficultyScene::create());
 	});
 	b2->addClickEventListener([](Ref *ref){
-		Director::getInstance()->pushScene(ChallengeMenuL1::create());
+		Director::getInstance()->pushScene(ChallengeMapScene::create());
 	});
 	b3->addClickEventListener([](Ref *ref){
             //Director::getInstance()->pushScene(ReplayScene::create());
