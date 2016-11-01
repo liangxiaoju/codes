@@ -30,6 +30,13 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 
 	_board = Board::createWithFen(fen);
 
+	/* rotation for UI black player */
+	bool rotation = false;
+	if ((black == Role::UI) && (white != Role::UI)) {
+		_board->setRotation(180);
+		rotation = true;
+	}
+
 	auto createPlayer = [this, level](Role role)->Player*{
 		if (role == Role::UI) {
 			auto player = UIPlayer::create();
@@ -46,12 +53,15 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	_playerWhite = createPlayer(white);
 	_playerBlack = createPlayer(black);
 
-    auto head1 = EnemyHeaderView::create(1, Board::Side::BLACK);
+    Board::Side side;
+    side = rotation ? Board::Side::WHITE : Board::Side::BLACK;
+    auto head1 = EnemyHeaderView::create(side);
     head1->setAnchorPoint(Vec2(0, 1));
     head1->setPosition(Vec2(origin.x, origin.y+vsize.height-20));
     addChild(head1);
 
-    auto head2 = SelfHeaderView::create();
+    side = !rotation ? Board::Side::WHITE : Board::Side::BLACK;
+    auto head2 = SelfHeaderView::create(side);
     head2->setAnchorPoint(Vec2(1, 0));
     head2->setPosition(Vec2(origin.x+vsize.width, origin.y+20));
     addChild(head2);
@@ -91,34 +101,11 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	_level = level;
 	_fen = fen;
 
-	/* rotation for UI black player */
-	bool rotation = false;
-	if ((black == Role::UI) && (white != Role::UI)) {
-		_board->setRotation(180);
-		rotation = true;
-	}
-
 	/* active/deactive header */
 	auto white_start_cb = [this, rotation, menu](EventCustom* ev){
-		//lheader->setActive(!rotation);
-		//rheader->setActive(rotation);
-        /*
-        int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
-        int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
-        lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
-        rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
-        */
         menu->setEnabled(!rotation);
 	};
 	auto black_start_cb = [this, rotation, menu](EventCustom* ev){
-		//rheader->setActive(!rotation);
-		//lheader->setActive(rotation);
-        /*
-        int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
-        int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
-        lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
-        rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
-        */
         menu->setEnabled(rotation);
 	};
 
@@ -225,13 +212,14 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
         UserData::getInstance()->insertRecordElement(e);
     };
 
-    auto level_cb = [this](EventCustom *ev) {
-        int level = (int)ev->getUserData();
+    auto level_cb = [this, head1](EventCustom *ev) {
+        int level = *((int*)(ev->getUserData()));
         _level = level;
         if (_roleWhite == Role::AI)
             dynamic_cast<AIPlayer*>(_playerWhite)->setLevel(level);
         else if (_roleBlack == Role::AI)
             dynamic_cast<AIPlayer*>(_playerBlack)->setLevel(level);
+
         log("set level to %d", level);
     };
 

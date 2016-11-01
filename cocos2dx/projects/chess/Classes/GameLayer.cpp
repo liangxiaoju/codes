@@ -84,13 +84,13 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
             b->setTitleColor(Color3B(240, 213, 172));
             b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
             addChild(b);
-            b->runAction(
-                Sequence::create(
+            auto action = Sequence::create(
                     DelayTime::create(0.5),
-                    FadeOut::create(1),
+                    FadeOut::create(0.5),
                     RemoveSelf::create(),
-                    nullptr)
-                );
+                    nullptr);
+            //action->setTag(123);
+            b->runAction(action);
 
         } else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("capture");
@@ -102,6 +102,7 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
 
+            //stopActionByTag(123);
             auto b = Button::create("common/button3.png");
             b->setZoomScale(0);
             b->setTitleText(TR("mated"));
@@ -158,13 +159,13 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
             b->setTitleColor(Color3B(240, 213, 172));
             b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
             addChild(b);
-            b->runAction(
-                Sequence::create(
+            auto action = Sequence::create(
                     DelayTime::create(0.5),
-                    FadeOut::create(1),
+                    FadeOut::create(0.5),
                     RemoveSelf::create(),
-                    nullptr)
-                );
+                    nullptr);
+            //action->setTag(123);
+            b->runAction(action);
 
         } else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("capture");
@@ -175,6 +176,8 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
         _playerWhite->start(_board->getFenWithMove());
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
+
+            //stopActionByTag(123);
             auto b = Button::create("common/button3.png");
             b->setZoomScale(0);
             b->setTitleText(TR("mated"));

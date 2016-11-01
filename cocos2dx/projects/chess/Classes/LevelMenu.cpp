@@ -58,7 +58,7 @@ bool LevelMenu::init()
 
                 getScheduler()->performFunctionInCocosThread([this, index]() {
                         Director::getInstance()->getEventDispatcher()
-                            ->dispatchCustomEvent(EVENT_LEVEL_CHANGE, (void*)index);
+                            ->dispatchCustomEvent(EVENT_LEVEL_CHANGE, (void*)&index);
                         this->removeFromParent();
                     });
             }

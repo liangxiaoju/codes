@@ -73,5 +73,39 @@
   "The number of draw:": "The number of draw: ",
   "level:": "level: ",
 
-  "Next": "Next"
+  "Next": "Next",
+
+  "Menu": "Menu",
+
+  "regret": "regret",
+  "tip": "tip",
+  "resign": "resign",
+  "again": "again",
+  "level": "level",
+  "setting": "setting",
+
+  "continue game": "Continue",
+  "back to home": "HomePage",
+
+  "LevelMenuString": "",
+  "level_0": "newer",
+  "level_1": "level1",
+  "level_2": "level2",
+  "level_3": "level3",
+  "level_4": "level4",
+  "level_5": "level5",
+  "level_6": "level6",
+  "level_7": "level7",
+
+  "FightContWinString": "win, upgrade to <%s>.",
+  "FightWinString": "win, go ahead.",
+  "FightContLoseString": "lose, downgrade to <%s>.",
+  "FightLoseString": "lose, fight again.",
+  "FightDrawString": "draw.",
+
+  "checked": "checked",
+  "mated": "mated",
+
+  "time:": "Time:",
+  "step:": "Step:"
 }

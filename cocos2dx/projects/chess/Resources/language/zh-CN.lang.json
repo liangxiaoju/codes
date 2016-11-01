@@ -104,5 +104,8 @@
   "FightDrawString": "平局。",
 
   "checked": "将 军",
-  "mated": "绝 杀"
+  "mated": "绝 杀",
+
+  "time:": "用时：",
+  "step:": "步数："
 }

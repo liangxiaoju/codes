@@ -178,7 +178,7 @@ public:
             if (src.y == dst.y)
                 dname = numMap[dst.x];
             else
-                dname = numMap[abs(dst.y-src.y) - 1];
+                dname = numMap[std::abs(dst.y-src.y) - 1];
         } else {
             dname = numMap[dst.x];
         }
