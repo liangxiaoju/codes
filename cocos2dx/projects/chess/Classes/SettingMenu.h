@@ -17,6 +17,7 @@ public:
     bool isEffectEnabled();
     bool isTipsEnabled();
     bool isVibrateEnabled();
+    bool isBlackEnabled();
     void load();
     void save();
     void show();
@@ -29,6 +30,7 @@ private:
     bool _effect_enabled;
     bool _tips_enabled;
     bool _vibrate_enabled;
+    bool _black_enabled;
 };
 
 #endif

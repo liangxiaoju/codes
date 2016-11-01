@@ -40,8 +40,9 @@ public:
 	static char toSymbol(Side side, Role role)
 	{
 		for (auto &kv : _symbolMap) {
-			if (kv.second == std::make_pair(side, role))
+			if (kv.second == std::make_pair(side, role)) {
 				return kv.first;
+            }
 		}
 		return 0;
 	}

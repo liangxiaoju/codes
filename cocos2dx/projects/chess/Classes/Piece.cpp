@@ -1,6 +1,6 @@
 #include "Piece.h"
 
-const std::string Piece::_bitMapBaseDir = "piece/WOOD/";
+const std::string Piece::_bitMapBaseDir = "common/";
 
 Piece* Piece::create(char c) {
     Piece *pRet = new Piece();

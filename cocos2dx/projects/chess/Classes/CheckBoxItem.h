@@ -26,6 +26,8 @@ public:
         auto wsize = Director::getInstance()->getWinSize();
 
         auto layout = RelativeBox::create();
+        layout->setBackGroundImage("common/B3btn@3x.png");
+        layout->setContentSize(layout->getBackGroundImageTextureSize());
         addChild(layout);
 
         RelativeLayoutParameter *param;
@@ -33,17 +35,17 @@ public:
         param = RelativeLayoutParameter::create();
         param->setAlign(
             RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_CENTER_VERTICAL);
-        auto text = Text::create(content, "", 35);
-        text->setTextColor(Color4B::BLACK);
+        auto text = Text::create(content, "", 60);
+        text->setTextColor(Color4B(88, 49, 14, 255));
         text->setLayoutParameter(param);
 
         param = RelativeLayoutParameter::create();
         param->setAlign(
             RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_CENTER_VERTICAL);
-        auto checkbox = CheckBox::create("check_box_normal.png",
-                                         "check_box_active.png");
+        param->setMargin(Margin(0, 0, 60, 0));
+        auto checkbox = CheckBox::create("common/B3radio_normal@3x.png",
+                                         "common/B3radio_selected@3x.png");
         checkbox->setSelected(defaultVal);
-        checkbox->setScale(1.5);
         checkbox->setLayoutParameter(param);
         checkbox->addEventListener([cb](Ref *pSender, CheckBox::EventType type) {
                 switch (type)
@@ -62,9 +64,6 @@ public:
         layout->addChild(text);
         layout->addChild(checkbox);
 
-        layout->setContentSize(Size(wsize.width/2,
-                            std::max(text->getContentSize().height,
-                                     checkbox->getContentSize().height)));
         setContentSize(layout->getContentSize());
 
         return true;

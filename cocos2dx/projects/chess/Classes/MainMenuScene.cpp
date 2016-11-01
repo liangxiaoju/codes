@@ -39,7 +39,7 @@ public:
 		b1->setLayoutParameter(lp1);
 
 		b1->addClickEventListener([](Ref *ref){
-			auto scene = FightScene::create(FightScene::UI, FightScene::AI, 0);
+			auto scene = FightScene::create(FightScene::UI, FightScene::AI, -1);
 			Director::getInstance()->pushScene(scene);
 		});
 		b2->addClickEventListener([](Ref *ref){
@@ -205,7 +205,7 @@ bool MainMenuLayer::init()
 	//layout3->addChild(quit);
 
 	auto vbox = VBox::create();
-	vbox->setBackGroundImage("MainMenuScene/common_bg_new2.png");
+	vbox->setBackGroundImage("common/background.png");
 	vbox->addChild(layout1);
 	vbox->addChild(layout2);
 	//vbox->addChild(layout3);

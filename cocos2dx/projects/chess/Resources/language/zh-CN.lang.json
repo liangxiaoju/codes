@@ -35,10 +35,11 @@
   "Are you sure to exit ?": "你确定要退出吗？",
   "Prev Step": "上一步",
   "Next Step": "下一步",
-  "Background Music:": "背景音乐：",
-  "Game Effect Sound:": "游戏音效：",
-  "Show Tips:": "显示走子提示：",
-  "Vibrate Effect:": "震动效果：",
+  "Background Music": "背景音乐",
+  "Game Effect Sound": "游戏音效",
+  "Show Tips": "显示走子提示",
+  "Vibrate Effect": "震动效果",
+  "Play as Black": "执黑后行",
 
   "Accept": "接受",
   "Deny": "取消",
@@ -72,5 +73,36 @@
   "The number of draw:": "平局：",
   "level:": "等级：",
 
-  "Next": "下一个"
+  "Next": "下一个",
+
+  "Menu": "菜 单",
+
+  "regret": "悔 棋",
+  "tip": "提 示",
+  "resign": "认 输",
+  "again": "重 来",
+  "level": "等 级",
+  "setting": "设 置",
+
+  "continue game": "继续游戏",
+  "back to home": "返回主页",
+
+  "LevelMenuString": "连胜3局，系统自动为你上升一个级别；\n连输3局，系统自动为你下调一个级别。",
+  "level_0": "新手",
+  "level_1": "业余棋手",
+  "level_2": "初级棋手",
+  "level_3": "中级棋手",
+  "level_4": "高级棋手",
+  "level_5": "业余大师",
+  "level_6": "地方大师",
+  "level_7": "国家大师",
+
+  "FightContWinString": "连胜，升级到《%s》。",
+  "FightWinString": "胜利，再接再厉。",
+  "FightContLoseString": "连败，降级到《%s》。",
+  "FightLoseString": "失败，卧薪尝胆",
+  "FightDrawString": "平局。",
+
+  "checked": "将 军",
+  "mated": "绝 杀"
 }

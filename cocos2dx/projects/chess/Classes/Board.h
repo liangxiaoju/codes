@@ -77,6 +77,8 @@ public:
 
 	void addPiece(Vec2 index, Piece *p);
 	void removePiece(Vec2 index);
+    void addShadow(Vec2 index);
+    void removeShadow(Vec2 index);
 
     virtual ~Board();
 
@@ -105,12 +107,14 @@ protected:
     std::vector<Move> _historyMv;
 
 	std::map<Vec2, Sprite*> _marked;
+	std::map<Vec2, Sprite*> _shadows;
 	std::map<Vec2, Sprite*> _selected;
 	std::vector<Sprite*> _tips;
 	std::map<Vec2, Piece*> _mapPieces;
 	Style _style;
 	Side _currSide;
 	Node *_pieceLayer;
+    bool _enableShadow;
 
 	void initFromFen(std::string fen);
 };

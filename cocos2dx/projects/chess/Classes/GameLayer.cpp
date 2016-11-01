@@ -70,10 +70,29 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
 {
 	log("WHITE: %s", mv.c_str());
 
-    auto move_cb = [this]() {
-        if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
+	auto vsize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto move_cb = [this, vsize, origin]() {
+        if (Rule::getInstance()->isChecked(_board->getFenWithMove())) {
             Sound::getInstance()->playEffect("check");
-        else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
+
+            auto b = Button::create("common/button3.png");
+            b->setZoomScale(0);
+            b->setTitleText(TR("checked"));
+            b->setTitleFontSize(60);
+            b->setTitleColor(Color3B(240, 213, 172));
+            b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
+            addChild(b);
+            b->runAction(
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    FadeOut::create(1),
+                    RemoveSelf::create(),
+                    nullptr)
+                );
+
+        } else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("capture");
         else
             Sound::getInstance()->playEffect("move");
@@ -82,10 +101,29 @@ void GameLayer::onPlayerWhiteMoveRequest(std::string mv)
         _playerBlack->start(_board->getFenWithMove());
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
-            std::string args = _board->getCurrentSide() == Board::Side::BLACK ?
-			"WIN:WHITE" : "WIN:BLACK";
-            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-                                                      (void *)args.c_str());
+
+            auto b = Button::create("common/button3.png");
+            b->setZoomScale(0);
+            b->setTitleText(TR("mated"));
+            b->setTitleFontSize(60);
+            b->setTitleColor(Color3B(240, 213, 172));
+            b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
+            addChild(b);
+            b->runAction(
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    FadeOut::create(1),
+                    CallFunc::create([this]() {
+                            std::string args = _board->getCurrentSide()
+                                == Board::Side::BLACK
+                                ? "WIN:WHITE" : "WIN:BLACK";
+                            getEventDispatcher()->dispatchCustomEvent(
+                                EVENT_GAMEOVER, (void *)args.c_str());
+                        }),
+                    RemoveSelf::create(),
+                    nullptr)
+                );
+
         }
     };
 
@@ -106,10 +144,29 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
 {
 	log("BLACK: %s", mv.c_str());
 
-    auto move_cb = [this]() {
-        if (Rule::getInstance()->isChecked(_board->getFenWithMove()))
+	auto vsize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    auto move_cb = [this, vsize, origin]() {
+        if (Rule::getInstance()->isChecked(_board->getFenWithMove())) {
             Sound::getInstance()->playEffect("check");
-        else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
+
+            auto b = Button::create("common/button3.png");
+            b->setZoomScale(0);
+            b->setTitleText(TR("checked"));
+            b->setTitleFontSize(60);
+            b->setTitleColor(Color3B(240, 213, 172));
+            b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
+            addChild(b);
+            b->runAction(
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    FadeOut::create(1),
+                    RemoveSelf::create(),
+                    nullptr)
+                );
+
+        } else if (Rule::getInstance()->isCaptured(_board->getFenWithMove()))
             Sound::getInstance()->playEffect("capture");
         else
             Sound::getInstance()->playEffect("move");
@@ -118,10 +175,28 @@ void GameLayer::onPlayerBlackMoveRequest(std::string mv)
         _playerWhite->start(_board->getFenWithMove());
 
         if (Rule::getInstance()->isMate(_board->getFen())) {
-            std::string args = (_board->getCurrentSide() == Board::Side::BLACK) ?
-			"WIN:WHITE" : "WIN:BLACK";
-            getEventDispatcher()->dispatchCustomEvent(EVENT_GAMEOVER,
-                                                      (void *)args.c_str());
+            auto b = Button::create("common/button3.png");
+            b->setZoomScale(0);
+            b->setTitleText(TR("mated"));
+            b->setTitleFontSize(60);
+            b->setTitleColor(Color3B(240, 213, 172));
+            b->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
+            addChild(b);
+            b->runAction(
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    FadeOut::create(1),
+                    CallFunc::create([this]() {
+                            std::string args = _board->getCurrentSide()
+                                == Board::Side::BLACK ?
+                                "WIN:WHITE" : "WIN:BLACK";
+                            getEventDispatcher()->dispatchCustomEvent(
+                                EVENT_GAMEOVER, (void *)args.c_str());
+                        }),
+                    RemoveSelf::create(),
+                    nullptr)
+                );
+
         }
     };
 

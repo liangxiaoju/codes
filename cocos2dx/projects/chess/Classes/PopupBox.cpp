@@ -3,15 +3,10 @@
 
 PopupBox::PopupBox()
 {
-   _default_parameter = LinearLayoutParameter::create();
-    _default_parameter->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
-    _default_parameter->setMargin(Margin(0.0f, 50.0f, 0.0f, 0.0f));
-    CC_SAFE_RETAIN(_default_parameter);
 }
 
 PopupBox::~PopupBox()
 {
-    CC_SAFE_RELEASE(_default_parameter);
 }
 
 PopupBox* PopupBox::create()
@@ -30,7 +25,8 @@ bool PopupBox::init()
     if (!LayerColor::initWithColor(Color4B(0, 0, 0, 0)))
         return false;
 
-    Size winSize = Director::getInstance()->getWinSize();
+    Size vsize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     auto listener = EventListenerTouchOneByOne::create();
     listener->onTouchBegan = CC_CALLBACK_2(PopupBox::onTouchBegan, this);
@@ -39,27 +35,36 @@ bool PopupBox::init()
 
     auto maskLayer = LayerColor::create(Color4B(0, 0, 0, 0));
     addChild(maskLayer);
-    maskLayer->runAction(FadeTo::create(0.15, 90));
+    maskLayer->runAction(FadeTo::create(0.25, 255*0.6));
 
     _layout = VBox::create();
-    _layout->setBackGroundImage("pop_bg.png");
+    _layout->setBackGroundImage("common/B2popupbox9_66x66_294x194_2@3x.png");
     _layout->setBackGroundImageScale9Enabled(true);
-    _layout->setBackGroundImageCapInsets(Rect(15, 15, 565-30, 199-30));
+    _layout->setBackGroundImageCapInsets(Rect(66, 66, 294-66, 194-66));
     _layout->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _layout->setPosition(Vec2(winSize.width/2, winSize.height/2));
-    _layout->setContentSize(Size(100, 50));
+    _layout->setPosition(Vec2(origin.x+vsize.width/2, origin.y+vsize.height/2));
+    _layout->setContentSize(Size(0, 0));
     addChild(_layout);
 
-    setOnEnterCallback([this]() {
-            _layout->setScale(0.8f);
-            auto s1 = ScaleTo::create(0.1f, 1.1f);
-            auto s2 = ScaleTo::create(0.07f, 0.9f);
-            auto s3 = ScaleTo::create(0.05f, 1.0f);
-            Sequence *seq = Sequence::create(s1, s2, s3, nullptr);
-            _layout->runAction(seq);
-        });
-
     return true;
+}
+
+void PopupBox::addElement(Widget *widget)
+{
+    LayoutParameter *param = widget->getLayoutParameter();
+    Margin margin = Margin(0, 0, 0, 0);
+    if (param)
+        margin = param->getMargin();
+
+    auto wsize = widget->getContentSize();
+    auto size = Size(wsize.width+margin.left+margin.right,
+            wsize.height+margin.top+margin.bottom);
+    auto lsize = _layout->getContentSize();
+    auto width = std::max(size.width, lsize.width);
+    auto height = size.height + lsize.height;
+
+    _layout->setContentSize(Size(width, height));
+    _layout->addChild(widget);
 }
 
 bool PopupBox::onTouchBegan(Touch *touch, Event *event)
@@ -72,18 +77,103 @@ Rect PopupBox::getInnerBoundingBox()
     return _layout->getBoundingBox();
 }
 
-void PopupBox::pushBackView(Widget* child)
+MenuBox *MenuBox::create(std::vector<std::string> menus,
+        std::function<void(int index)> cb)
 {
-    Widget* widget = dynamic_cast<Widget*>(child);
-    widget->setLayoutParameter(_default_parameter->clone());
-    _layout->addChild(child);
+    auto pRet = new (std::nothrow) MenuBox();
+    if (pRet && pRet->init(menus, cb)) {
+        pRet->autorelease();
+        return pRet;
+    }
+    CC_SAFE_DELETE(pRet);
+    return nullptr;
+}
 
-    Size vsize = Director::getInstance()->getVisibleSize();
-    Size wsize = widget->getContentSize();
-    Size lsize = _layout->getContentSize();
-    float width = std::max(lsize.width, wsize.width+100);
-    float height = std::min(lsize.height + 50 + wsize.height, vsize.height);
-    _layout->setContentSize(Size(width, height));
+bool MenuBox::init(std::vector<std::string> menus,
+        std::function<void(int index)> cb)
+{
+    if (!PopupBox::init())
+        return false;
+
+    LinearLayoutParameter *param;
+
+    auto callback = [this, cb](Ref *ref) {
+        auto button = dynamic_cast<Button*>(ref);
+        int index = button->getTag();
+
+        auto hide = Hide::create();
+        auto delay = DelayTime::create(0.1);
+        auto callfunc = CallFunc::create([cb, index]() {cb(index);});
+        auto remove = RemoveSelf::create();
+        auto seq = Sequence::create(hide, delay, callfunc, remove, nullptr);
+        runAction(seq);
+    };
+
+    for (int i = 0; i < menus.size(); i++) {
+        auto b = Button::create("common/button3.png");
+        b->setTitleText(menus[i]);
+        b->setTitleFontSize(60);
+        b->setTitleColor(Color3B(240, 213, 172));
+        b->setTag(i);
+        b->addClickEventListener(callback);
+
+        param = LinearLayoutParameter::create();
+        if (i == 0)
+            param->setMargin(Margin(40, 50, 40, 0));
+        else
+            param->setMargin(Margin(40, 0, 40, 0));
+        b->setLayoutParameter(param);
+        addElement(b);
+    }
+
+    auto b1 = Button::create("common/button1.png");
+    b1->setTitleText(TR("continue game"));
+    b1->setTitleFontSize(60);
+    b1->setTitleColor(Color3B(240, 213, 172));
+    b1->addClickEventListener([this](Ref *ref) { removeFromParent(); });
+
+    auto b2 = Button::create("common/button2.png");
+    b2->setTitleText(TR("back to home"));
+    b2->setTitleFontSize(60);
+    b2->setTitleColor(Color3B(240, 213, 172));
+    b2->addClickEventListener([](Ref *ref) {
+            Director::getInstance()->popScene();
+            });
+
+    auto bsize = b1->getContentSize();
+    auto hbox = HBox::create(Size(bsize.width*2+84, bsize.height));
+    param = LinearLayoutParameter::create();
+    param->setMargin(Margin(60, 0, 60, 0));
+    hbox->setLayoutParameter(param);
+
+    param = LinearLayoutParameter::create();
+    param->setGravity(LinearLayoutParameter::LinearGravity::LEFT);
+    param->setMargin(Margin(0.0f, 0.0f, 0.0f, 0.0f));
+    b2->setLayoutParameter(param->clone());
+
+    param->setGravity(LinearLayoutParameter::LinearGravity::RIGHT);
+    param->setMargin(Margin(84, 0.0f, 0.0f, 0.0f));
+    b1->setLayoutParameter(param->clone());
+
+    hbox->addChild(b2);
+    hbox->addChild(b1);
+    addElement(hbox);
+
+    Director::getInstance()->getRunningScene()->addChild(this);
+
+    return true;
+}
+
+bool MenuBox::onTouchBegan(Touch *touch, Event *event)
+{
+    Vec2 touchPos = touch->getLocation();
+    Rect boundRect = getInnerBoundingBox();
+
+    if (!boundRect.containsPoint(touchPos)) {
+        removeFromParent();
+    }
+
+    return true;
 }
 
 DialogBox* DialogBox::create(Text *text, Button *positive, Button *negative)
@@ -116,20 +206,33 @@ bool DialogBox::init(Text *text, Button *positive, Button *negative)
     if (!PopupBox::init())
         return false;
 
+    LinearLayoutParameter *param;
+
+    param = LinearLayoutParameter::create();
+    param->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
+    param->setMargin(Margin(0, 200, 0, 240-82));
+    text->setLayoutParameter(param);
+    addElement(text);
+
     auto bsize = positive->getContentSize();
-    auto hbox = HBox::create(Size(bsize.width*2.5f, bsize.height));
-    auto param = LinearLayoutParameter::create();
+    auto hbox = HBox::create(Size(bsize.width*2+84, bsize.height));
+    param = LinearLayoutParameter::create();
+    //param->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
+    param->setMargin(Margin(60, 0, 60, 0));
+    hbox->setLayoutParameter(param);
+
+    param = LinearLayoutParameter::create();
     param->setGravity(LinearLayoutParameter::LinearGravity::LEFT);
     param->setMargin(Margin(0.0f, 0.0f, 0.0f, 0.0f));
     positive->setLayoutParameter(param->clone());
+
     param->setGravity(LinearLayoutParameter::LinearGravity::RIGHT);
-    param->setMargin(Margin(bsize.width*0.5f, 0.0f, 0.0f, 0.0f));
+    param->setMargin(Margin(84, 0.0f, 0.0f, 0.0f));
     negative->setLayoutParameter(param->clone());
+
     hbox->addChild(positive);
     hbox->addChild(negative);
-
-    pushBackView(text);
-    pushBackView(hbox);
+    addElement(hbox);
 
     return true;
 }
@@ -139,18 +242,22 @@ bool DialogBox::init(std::string text,
                      std::string negative,
                      std::function<void(bool positive)> cb)
 {
-    auto t = Text::create(text, "", 40);
-    t->setTextColor(Color4B::BLUE);
-    auto p = Button::create("button.png");
+    auto t = Text::create(text, "", 60);
+    t->setTextColor(Color4B(240, 213, 172, 255));
+
+    auto p = Button::create("common/button2.png");
     p->setTitleText(positive);
-    p->setTitleFontSize(35);
+    p->setTitleFontSize(60);
+    p->setTitleColor(Color3B(240, 213, 172));
     p->addClickEventListener([this, cb](Ref *ref){
             cb(true);
             removeFromParent();
         });
-    auto n = Button::create("button.png");
+
+    auto n = Button::create("common/button2.png");
     n->setTitleText(negative);
-    n->setTitleFontSize(35);
+    n->setTitleFontSize(60);
+    n->setTitleColor(Color3B(240, 213, 172));
     n->addClickEventListener([this, cb](Ref *ref){
             cb(false);
             removeFromParent();
@@ -180,20 +287,33 @@ bool PopupMessage::init(std::string text, std::function<void(void)>cb)
     if (!PopupBox::init())
         return false;
 
-    auto t = Text::create(text, "", 40);
-    t->setTextColor(Color4B::BLUE);
+    LinearLayoutParameter *param;
 
-    auto button = Button::create("button.png");
+    auto t = Text::create(text, "", 60);
+    t->setTextColor(Color4B(240, 213, 172, 255));
+
+    param = LinearLayoutParameter::create();
+    param->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
+    param->setMargin(Margin(0, 200, 0, 240-82));
+    t->setLayoutParameter(param);
+
+    auto button = Button::create("common/button2.png");
     button->setTitleText(TR("OK"));
-    button->setTitleFontSize(35);
+    button->setTitleFontSize(60);
+    button->setTitleColor(Color3B(240, 213, 172));
     button->addClickEventListener([this, cb](Ref *ref) {
             if (cb != nullptr)
                 cb();
             removeFromParent();
         });
 
-    pushBackView(t);
-    pushBackView(button);
+    param = LinearLayoutParameter::create();
+    param->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
+    param->setMargin(Margin(60, 0, 60, 0));
+    button->setLayoutParameter(param);
+
+    addElement(t);
+    addElement(button);
 
     Director::getInstance()->getRunningScene()->addChild(this);
 
@@ -264,7 +384,11 @@ bool PopupMenu::init(std::vector<std::string> vec,
     height = std::min(height, winSize.height/2);
     listview->setContentSize(Size(width, height));
 
-    pushBackView(listview);
+    auto param = LinearLayoutParameter::create();
+    param->setMargin(Margin(50, 50, 50, 50));
+    listview->setLayoutParameter(param);
+
+    addElement(listview);
 
     Director::getInstance()->getRunningScene()->addChild(this);
 

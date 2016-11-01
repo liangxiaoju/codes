@@ -14,13 +14,22 @@ public:
     virtual ~PopupBox();
     static PopupBox* create();
     virtual bool init() override;
-    virtual void pushBackView(Widget* child);
+    virtual void addElement(Widget* widget);
     virtual bool onTouchBegan(Touch *touch, Event *event) override;
     virtual Rect getInnerBoundingBox();
 
-private:
+protected:
     Layout* _layout;
-    LinearLayoutParameter* _default_parameter;
+};
+
+class MenuBox : public PopupBox
+{
+public:
+    static MenuBox *create(std::vector<std::string> menus,
+            std::function<void(int index)> cb);
+    virtual bool init(std::vector<std::string> menus,
+            std::function<void(int index)> cb);
+    virtual bool onTouchBegan(Touch *touch, Event *event) override;
 };
 
 class DialogBox : public PopupBox

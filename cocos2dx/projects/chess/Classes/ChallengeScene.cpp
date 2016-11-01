@@ -9,6 +9,7 @@
 #include "UserData.h"
 #include "Localization.h"
 #include "ChallengeMap.h"
+#include "GameOverView.h"
 
 bool ChallengeScene::init(EndGameData::EndGameItem item)
 {
@@ -76,9 +77,8 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
 			Director::getInstance()->replaceScene(scene);
 		}
 	};
-    auto over_cb = [this, origin, vsize](EventCustom *ev) {
+    auto over_cb = [this, origin, vsize, board](EventCustom *ev) {
         std::string event = (const char *)ev->getUserData();
-        Sprite *sprite;
 
         auto white_win_callback = [&](){
             std::vector<EndGameData::EndGameClass> endGameClass;
@@ -92,32 +92,25 @@ bool ChallengeScene::init(EndGameData::EndGameItem item)
                     break;
                 }
             }
-            auto next = Button::create("ChallengeScene/button_next.png");
-            next->setTitleText(TR("Next"));
-            next->setTitleFontSize(35);
-            next->setZoomScale(0.1);
-            next->addClickEventListener([&](Ref *ref){
-                    getEventDispatcher()->dispatchCustomEvent(EVENT_NEXT);
-                });
-            auto vsize = Director::getInstance()->getVisibleSize();
-            next->setPosition(Vec2(vsize.width/2, vsize.height/3));
-            addChild(next);
+            UserData::getInstance()->setIntegerForKey("ChallengeScene:LEVEL", _item.id);
         };
 
-        if (event.find("DRAW:") != std::string::npos) {
-            Sound::getInstance()->playEffect("draw");
-            sprite = Sprite::create("ChallengeScene/text_hq.png");
-        } else if (event.find("WIN:WHITE") != std::string::npos) {
-            Sound::getInstance()->playEffect("win");
-            UserData::getInstance()->setIntegerForKey("ChallengeScene:LEVEL", _item.id);
-            sprite = Sprite::create("ChallengeScene/text_yq.png");
-            white_win_callback();
-        } else {
-            Sound::getInstance()->playEffect("lose");
-            sprite = Sprite::create("ChallengeScene/text_sq.png");
-        }
-        addChild(sprite);
-        sprite->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
+        auto showOverView = [this, event, white_win_callback]() {
+            if (event.find("DRAW:") != std::string::npos) {
+                FightDrawView::create();
+            } else if (event.find("WIN:WHITE") != std::string::npos) {
+                white_win_callback();
+                FightWinView::create();
+            } else {
+                FightLoseView::create();
+            }
+        };
+
+        auto filename = FileUtils::getInstance()->getWritablePath() + "/capture.png";
+        Director::getInstance()->getTextureCache()->removeTextureForKey(filename);
+        auto capture = utils::captureNode(board, 0.7);
+        capture->saveToFile(filename, false);
+        showOverView();
     };
 
 	setOnEnterCallback([this, reset_cb, next_cb, white_start_cb, black_start_cb, over_cb](){

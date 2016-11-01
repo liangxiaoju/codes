@@ -5,7 +5,7 @@
 USING_NS_CC;
 using namespace CocosDenshion;
 
-static cocos2d::Size designResolutionSize = cocos2d::Size(720, 1280);
+static cocos2d::Size designResolutionSize = cocos2d::Size(1080, 1920);
 static cocos2d::Size smallResolutionSize = cocos2d::Size(320, 480);
 static cocos2d::Size mediumResolutionSize = cocos2d::Size(768, 1024);
 static cocos2d::Size largeResolutionSize = cocos2d::Size(1536, 2048);

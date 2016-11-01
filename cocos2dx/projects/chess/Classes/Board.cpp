@@ -7,15 +7,17 @@ const std::string Board::START_FEN =
 
 bool Board::initWithFen(std::string fen)
 {
-	if (!Sprite::initWithFile("chessboard.png"))
+	if (!Sprite::initWithFile("common/chessboard.png"))
 		return false;
 
+    _enableShadow = true;
+
 	auto contentSize = getContentSize();
-	_stepX = (contentSize.width-50-50)/8;
+	_stepX = contentSize.width/9;
 	_stepY = _stepX;
 
-	_startX = _stepX/2+15;
-	_startY = _stepY/2+35;
+	_startX = _stepX/2;
+	_startY = _stepY/2+8;
 
 	_pieceLayer = Node::create();
 	_pieceLayer->setContentSize(Size(_stepX*8, _stepY*9));
@@ -42,7 +44,7 @@ std::string Board::getFen()
 
 		for (int c = 0; c <= 8; ++c) {
 			auto it = _mapPieces.find(Vec2(c, r));
-			if (it != _mapPieces.end()) {
+			if (it != _mapPieces.end() && (*it).second != nullptr) {
 				if (n != 0) {
 					fen += Utils::toString(n);
 					n = 0;
@@ -131,9 +133,11 @@ void Board::addPiece(Vec2 index, Piece *p)
 
 	p->setPosition(convertIndexToLocalCoord(index));
 	std::string name = Utils::toString(p->getSymbol());
-	_pieceLayer->addChild(p, 0, name);
+	_pieceLayer->addChild(p, 1, name);
 
 	_mapPieces[index] = p;
+
+    addShadow(index);
 }
 
 void Board::removePiece(Vec2 index)
@@ -143,6 +147,35 @@ void Board::removePiece(Vec2 index)
 		_pieceLayer->removeChild((Piece *)((*it).second), true);
 		_mapPieces.erase(index);
 	}
+
+    removeShadow(index);
+}
+
+void Board::addShadow(Vec2 index)
+{
+    if (!_enableShadow)
+        return;
+
+    removeShadow(index);
+
+    float rotation = -_pieceLayer->getRotation();
+    auto shadow = Sprite::create("common/shadow.png");
+    shadow->setRotation(rotation);
+	shadow->setPosition(convertIndexToLocalCoord(index));
+    _pieceLayer->addChild(shadow, 0);
+    _shadows[index] = shadow;
+}
+
+void Board::removeShadow(Vec2 index)
+{
+    if (!_enableShadow)
+        return;
+
+	auto it = _shadows.find(index);
+    if (it != _shadows.end()) {
+        _pieceLayer->removeChild((Sprite*)((*it).second), true);
+        _shadows.erase(index);
+    }
 }
 
 Vec2 Board::convertIndexToLocalCoord(Vec2 index)
@@ -263,8 +296,12 @@ void Board::moveWithCallback(std::string mv, std::function<void()> cb)
 
     unmarkMoveAll();
 
+    removeShadow(src);
+
     auto moveTo = MoveTo::create(0.3, convertIndexToLocalCoord(dst));
     auto callback = CallFunc::create([this, p, dp, cb, src, dst]() {
+            addShadow(dst);
+
             if (dp != nullptr)
                 _pieceLayer->removeChild(dp, true);
             p->release();
@@ -323,13 +360,19 @@ Piece* Board::pick(Vec2 index)
 
 void Board::markMove(Vec2 src, Vec2 dst)
 {
-	auto s = Sprite::create("board/OOS.png");
-	s->setColor(Color3B::RED);
+    float rotation = -_pieceLayer->getRotation();
+	auto dp = _mapPieces[dst];
+	if (dp != nullptr) {
+        rotation = dp->getRotation();
+    }
+
+	auto s = Sprite::create("common/mark.png");
+    s->setRotation(rotation);
 	s->setPosition(convertIndexToLocalCoord(src));
 	_pieceLayer->addChild(s);
 
-	auto d = Sprite::create("board/OOS.png");
-	d->setColor(Color3B::GREEN);
+	auto d = Sprite::create("common/mark.png");
+    d->setRotation(rotation);
 	d->setPosition(convertIndexToLocalCoord(dst));
 	_pieceLayer->addChild(d);
 
@@ -351,7 +394,15 @@ void Board::select(Vec2 index)
 	if (it != _selected.end())
 		return;
 
-	auto s = Sprite::create("board/OOS.png");
+    float rotation = -_pieceLayer->getRotation();
+	auto dp = _mapPieces[index];
+	if (dp != nullptr) {
+        rotation = dp->getRotation();
+        dp->setScale(1.2f);
+    }
+
+	auto s = Sprite::create("common/OOS.png");
+    s->setRotation(rotation);
 	s->setPosition(convertIndexToLocalCoord(index));
 	_pieceLayer->addChild(s);
 	_selected[index] = s;
@@ -362,7 +413,7 @@ void Board::select(Vec2 index)
 
         for (auto &mv : mvs) {
             auto dst = Utils::toVecMove(mv)[1];
-            auto s = Sprite::create("FightSceneMenu/red.png");
+            auto s = Sprite::create("common/tip.png");
             s->setPosition(convertIndexToLocalCoord(dst));
             _pieceLayer->addChild(s);
             _tips.push_back(s);
@@ -378,6 +429,11 @@ void Board::unselect(Vec2 index)
 		_selected.erase(index);
 	}
 
+	auto dp = _mapPieces[index];
+	if (dp != nullptr) {
+        dp->setScale(1.0f);
+    }
+
 	for (auto &p : _tips) {
 		_pieceLayer->removeChild(p, true);
 	}
@@ -388,6 +444,11 @@ void Board::unselectAll()
 {
 	for (auto &kv : _selected) {
 		_pieceLayer->removeChild(kv.second, true);
+
+        auto dp = _mapPieces[kv.first];
+        if (dp != nullptr) {
+            dp->setScale(1.0f);
+        }
 	}
 	_selected.clear();
 
@@ -400,12 +461,27 @@ void Board::unselectAll()
 void Board::setRotation(float rotation)
 {
     if (rotation == 180) {
+
         _pieceLayer->setRotation(rotation);
+
         for (auto &kv: _mapPieces) {
             Piece *p = kv.second;
             p->setRotation(-rotation);
         }
+
+        for (auto &kv : _shadows) {
+            Sprite *p = kv.second;
+            p->setRotation(-rotation);
+        }
+
     } else if (rotation == 90) {
+        /* do not enable shadow in this mode */
+        auto tmp = _shadows;
+        for (auto &kv : tmp)
+            removeShadow(kv.first);
+
+        _enableShadow = false;
+
         if (_pieceLayer->getRotation() == 180) {
             for (auto &kv : _mapPieces) {
                 Piece *p = kv.second;

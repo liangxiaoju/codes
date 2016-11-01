@@ -11,7 +11,7 @@ bool ChallengeMap::init(int total)
     auto vsize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    auto image = ImageView::create("challenge_map.png");
+    auto image = ImageView::create("common/challenge_map.png");
     auto size = image->getContentSize();
     image->setScale(vsize.width/size.width);
     size = size * image->getScale();

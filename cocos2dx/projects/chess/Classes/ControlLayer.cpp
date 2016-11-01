@@ -97,16 +97,18 @@ std::vector<Widget*> ControlLayer::generateControlPannelWidgets(
 void ControlLayer::initControlPannelButton()
 {
     _pannelButton = Button::create(
-        "FightSceneMenu/common_push.png",
-        "FightSceneMenu/common_pushP.png",
-        "FightSceneMenu/common_push_dis.png");
+        "common/menu.png");
     _pannelButton->addClickEventListener([this](Ref *ref) {
             setControlPannelVisible(true);
         });
+    _pannelButton->setTitleText(TR("Menu"));
+    _pannelButton->setTitleFontSize(48);
+    _pannelButton->setTitleColor(Color3B(231, 204, 143));
+
     auto param = RelativeLayoutParameter::create();
     param->setRelativeName("PannelButton");
     param->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_BOTTOM);
-    param->setMargin(Margin(35, 0, 0, 40));
+    param->setMargin(Margin(0, 0, 0, 28));
     _pannelButton->setLayoutParameter(param);
     _layout->addChild(_pannelButton);
 }

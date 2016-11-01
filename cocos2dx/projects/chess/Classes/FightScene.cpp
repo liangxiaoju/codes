@@ -8,11 +8,19 @@
 #include "ControlLayer.h"
 #include "PopupBox.h"
 #include "Localization.h"
+#include "SettingMenu.h"
+#include "LevelMenu.h"
+#include "GameOverView.h"
+#include "HeaderView.h"
 
 bool FightScene::init(Role white, Role black, int level, std::string fen)
 {
 	if (!Scene::init())
 		return false;
+
+    if (level < 0) {
+        level = LevelMenu::getUserLevel();
+    }
 
 	auto vsize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -38,32 +46,45 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	_playerWhite = createPlayer(white);
 	_playerBlack = createPlayer(black);
 
-	auto lheader = HeaderSprite::createWithType(HeaderSprite::Type::LEFT);
-	auto rheader = HeaderSprite::createWithType(HeaderSprite::Type::RIGHT);
-    lheader->addClickEventListener([](Ref *ref) {
-            int win = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
-            int draw = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
-            int lose = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
-            PopupMessage::create(TR("The number of win:") + Utils::toString(win) + "\n" +
-                                 TR("The number of lost:") + Utils::toString(lose) + "\n" +
-                                 TR("The number of draw:") + Utils::toString(draw));
-        });
-    rheader->addClickEventListener([this](Ref *ref) {
-            PopupMessage::create(TR("level:") + Utils::toString(_level));
-        });
-	auto lsize = lheader->getContentSize();
-	auto rsize = rheader->getContentSize();
-	lheader->setPosition(origin.x+vsize.width/2, origin.y+lsize.height/2+20);
-	rheader->setPosition(origin.x+vsize.width/2, origin.y+vsize.height-rsize.height/2-20);
+    auto head1 = EnemyHeaderView::create(1, Board::Side::BLACK);
+    head1->setAnchorPoint(Vec2(0, 1));
+    head1->setPosition(Vec2(origin.x, origin.y+vsize.height-20));
+    addChild(head1);
+
+    auto head2 = SelfHeaderView::create();
+    head2->setAnchorPoint(Vec2(1, 0));
+    head2->setPosition(Vec2(origin.x+vsize.width, origin.y+20));
+    addChild(head2);
 
 	/* GameLayer will add player & board as childs */
 	_gameLayer = GameLayer::create(_playerWhite, _playerBlack, _board);
-	_gameLayer->addChild(lheader);
-	_gameLayer->addChild(rheader);
 	addChild(_gameLayer);
 
-	auto fightControl = FightControlLayer::create();
-	addChild(fightControl);
+    std::vector<std::string> menus = {
+        TR("regret"), TR("tip"), TR("resign"), TR("again"), TR("level"), TR("setting")};
+    std::vector<std::string> events = {
+        EVENT_REGRET, EVENT_TIP, EVENT_RESIGN, EVENT_RESET, EVENT_LEVEL, EVENT_SETTING};
+
+    auto menu = Button::create("common/menu.png");
+    menu->addClickEventListener([this, menus, events](Ref *ref) {
+            MenuBox::create(menus, [this, events](int index) {
+                    getScheduler()->performFunctionInCocosThread([this, events, index]() {
+                            if (events[index] == EVENT_SETTING) {
+                                SettingMenu::getInstance()->show();
+                            } else if (events[index] == EVENT_LEVEL) {
+                                LevelMenu::create();
+                            } else {
+                                getEventDispatcher()->dispatchCustomEvent(events[index]);
+                            }
+                            });
+                    });
+        });
+    menu->setTitleText(TR("Menu"));
+    menu->setTitleFontSize(48);
+    menu->setTitleColor(Color3B(231, 204, 143));
+    menu->setAnchorPoint(Vec2::ZERO);
+    menu->setPosition(Vec2(0, 20));
+    addChild(menu);
 
 	_roleWhite = white;
 	_roleBlack = black;
@@ -78,39 +99,39 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	}
 
 	/* active/deactive header */
-	auto white_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
-		lheader->setActive(!rotation);
-		rheader->setActive(rotation);
+	auto white_start_cb = [this, rotation, menu](EventCustom* ev){
+		//lheader->setActive(!rotation);
+		//rheader->setActive(rotation);
         /*
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
         */
-        fightControl->setEnabled(!rotation);
+        menu->setEnabled(!rotation);
 	};
-	auto black_start_cb = [this, lheader, rheader, rotation, fightControl](EventCustom* ev){
-		rheader->setActive(!rotation);
-		lheader->setActive(rotation);
+	auto black_start_cb = [this, rotation, menu](EventCustom* ev){
+		//rheader->setActive(!rotation);
+		//lheader->setActive(rotation);
         /*
         int val1 = Rule::getInstance()->getWhiteLife(_board->getFenWithMove());
         int val2 = Rule::getInstance()->getBlackLife(_board->getFenWithMove());
         lheader->setInfoLine(Utils::toString(rotation ? val2 : val1));
         rheader->setInfoLine(Utils::toString(rotation ? val1 : val2));
         */
-        fightControl->setEnabled(rotation);
+        menu->setEnabled(rotation);
 	};
 
 	/* response for reset */
 	auto reset_cb = [this](EventCustom* ev) {
 		removeAllChildren();
-		auto scene = FightScene::create(_roleWhite, _roleBlack, _level, _fen);
+		auto scene = FightScene::create(_roleWhite, _roleBlack, -1, _fen);
 		Director::getInstance()->replaceScene(scene);
 	};
 	/* response for switch */
 	auto switch_cb = [this](EventCustom* ev) {
 		removeAllChildren();
-		auto scene = FightScene::create(_roleBlack, _roleWhite, _level, _fen);
+		auto scene = FightScene::create(_roleBlack, _roleWhite, -1, _fen);
 		Director::getInstance()->replaceScene(scene);
 	};
 	/* response for save */
@@ -160,27 +181,25 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
     auto over_cb = [this, origin, vsize](EventCustom *ev) {
 
         std::string event = (const char *)ev->getUserData();
-        Sprite *sprite;
 
-        if (event.find("DRAW:") != std::string::npos) {
-            Sound::getInstance()->playEffect("draw");
-            int count = UserData::getInstance()->getIntegerForKey("FightScene:DRAW", 0);
-            UserData::getInstance()->setIntegerForKey("FightScene:DRAW", count+1);
-            sprite = Sprite::create("ChallengeScene/text_hq.png");
-        } else if (((event.find("WIN:WHITE") != std::string::npos) && (_roleWhite == Role::UI))
-                   || ((event.find("WIN:BLACK") != std::string::npos) && (_roleBlack == Role::UI))) {
-            Sound::getInstance()->playEffect("win");
-            int count = UserData::getInstance()->getIntegerForKey("FightScene:WIN", 0);
-            UserData::getInstance()->setIntegerForKey("FightScene:WIN", count+1);
-            sprite = Sprite::create("ChallengeScene/text_yq.png");
-        } else {
-            Sound::getInstance()->playEffect("lose");
-            int count = UserData::getInstance()->getIntegerForKey("FightScene:LOSE", 0);
-            UserData::getInstance()->setIntegerForKey("FightScene:LOSE", count+1);
-            sprite = Sprite::create("ChallengeScene/text_sq.png");
-        }
-        addChild(sprite);
-        sprite->setPosition(origin.x + vsize.width/2, origin.y + vsize.height/2);
+        auto showOverView = [this, event]() {
+            if (event.find("DRAW:") != std::string::npos) {
+                FightDrawView::create();
+            } else if (((event.find("WIN:WHITE") != std::string::npos)
+                        && (_roleWhite == Role::UI))
+                       || ((event.find("WIN:BLACK") != std::string::npos)
+                           && (_roleBlack == Role::UI))) {
+                FightWinView::create();
+            } else {
+                FightLoseView::create();
+            }
+        };
+
+        auto filename = FileUtils::getInstance()->getWritablePath() + "/capture.png";
+        Director::getInstance()->getTextureCache()->removeTextureForKey(filename);
+        auto capture = utils::captureNode(_board, 0.7);
+        capture->saveToFile(filename, false);
+        showOverView();
 
         auto xqFile = new XQJsonFile();
         auto header = xqFile->getHeader();
@@ -206,7 +225,20 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
         UserData::getInstance()->insertRecordElement(e);
     };
 
-	setOnEnterCallback([this, reset_cb, switch_cb, save_cb, tip_cb, white_start_cb, black_start_cb, over_cb](){
+    auto level_cb = [this](EventCustom *ev) {
+        int level = (int)ev->getUserData();
+        _level = level;
+        if (_roleWhite == Role::AI)
+            dynamic_cast<AIPlayer*>(_playerWhite)->setLevel(level);
+        else if (_roleBlack == Role::AI)
+            dynamic_cast<AIPlayer*>(_playerBlack)->setLevel(level);
+        log("set level to %d", level);
+    };
+
+	setOnEnterCallback(
+        [this, level_cb, reset_cb, switch_cb, save_cb, tip_cb,
+         white_start_cb, black_start_cb, over_cb](){
+		getEventDispatcher()->addCustomEventListener(EVENT_LEVEL_CHANGE, level_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_RESET, reset_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SWITCH, switch_cb);
 		getEventDispatcher()->addCustomEventListener(EVENT_SAVE, save_cb);
@@ -217,6 +249,7 @@ bool FightScene::init(Role white, Role black, int level, std::string fen)
 	});
 
 	setOnExitCallback([this](){
+		getEventDispatcher()->removeCustomEventListeners(EVENT_LEVEL_CHANGE);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_RESET);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SWITCH);
 		getEventDispatcher()->removeCustomEventListeners(EVENT_SAVE);
