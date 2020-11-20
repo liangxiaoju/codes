@@ -1,0 +1,12 @@
+#!/system/bin/sh
+
+cd /data/
+
+/data/action.sh
+
+nohup /data/event android_usb /data/action.sh &
+
+sleep 2
+
+echo "OK"
+

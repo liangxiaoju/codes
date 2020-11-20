@@ -1,0 +1,688 @@
+diff --git a/camera/device/3.4/default/Android.bp b/camera/device/3.4/default/Android.bp
+index c22b13c2c..8b754d87f 100644
+--- a/camera/device/3.4/default/Android.bp
++++ b/camera/device/3.4/default/Android.bp
+@@ -32,6 +32,7 @@ cc_library_shared {
+     proprietary: true,
+     vendor: true,
+     srcs: [
++        "VirtualCamera.cpp",
+         "CameraDevice.cpp",
+         "CameraDeviceSession.cpp",
+         "convert.cpp"
+@@ -53,6 +54,8 @@ cc_library_shared {
+         "libhardware",
+         "libcamera_metadata",
+         "libfmq",
++        "libsync",
++        "libyuv",
+     ],
+     static_libs: [
+         "android.hardware.camera.common@1.0-helper",
+diff --git a/camera/device/3.4/default/CameraDeviceSession.cpp b/camera/device/3.4/default/CameraDeviceSession.cpp
+index b4ebe2270..28654bf4c 100644
+--- a/camera/device/3.4/default/CameraDeviceSession.cpp
++++ b/camera/device/3.4/default/CameraDeviceSession.cpp
+@@ -60,6 +60,8 @@ CameraDeviceSession::CameraDeviceSession(
+     // Parse and store current logical camera's physical ids.
+     (void)CameraModule::isLogicalMultiCamera(mDeviceInfo, &mPhysicalCameraIds);
+ 
++    VirtualCamera::getInstance()->setCameraCallbackOps(static_cast<camera3_callback_ops_t*>(this));
++    VirtualCamera::getInstance()->setHandleImporter(&sHandleImporter);
+ }
+ 
+ CameraDeviceSession::~CameraDeviceSession() {
+@@ -485,7 +487,11 @@ Status CameraDeviceSession::processOneCaptureRequest_3_4(const V3_4::CaptureRequ
+ 
+     ATRACE_ASYNC_BEGIN("frame capture", request.v3_2.frameNumber);
+     ATRACE_BEGIN("camera3->process_capture_request");
+-    status_t ret = mDevice->ops->process_capture_request(mDevice, &halRequest);
++    status_t ret = VirtualCamera::getInstance()->processCaptureRequest(&halRequest);
++    if (ret != OK) {
++    //status_t ret = mDevice->ops->process_capture_request(mDevice, &halRequest);
++        ret = mDevice->ops->process_capture_request(mDevice, &halRequest);
++    }
+     ATRACE_END();
+     if (aeCancelTriggerNeeded) {
+         settingsOverride.unlock(halRequest.settings);
+@@ -528,6 +534,8 @@ void CameraDeviceSession::sProcessCaptureResult_3_4(
+     CameraDeviceSession *d =
+             const_cast<CameraDeviceSession*>(static_cast<const CameraDeviceSession*>(cb));
+ 
++    VirtualCamera::getInstance()->processCaptureResult(hal_result);
++
+     CaptureResult result = {};
+     camera3_capture_result shadowResult;
+     bool handlePhysCam = (d->mDeviceVersion >= CAMERA_DEVICE_API_VERSION_3_5);
+diff --git a/camera/device/3.4/default/VirtualCamera.cpp b/camera/device/3.4/default/VirtualCamera.cpp
+new file mode 100644
+index 000000000..88cd10b2f
+--- /dev/null
++++ b/camera/device/3.4/default/VirtualCamera.cpp
+@@ -0,0 +1,478 @@
++#define LOG_TAG "VirtualCamera"
++#include <android/log.h>
++
++#include "VirtualCamera.h"
++#include <libyuv.h>
++
++namespace android {
++namespace hardware {
++namespace camera {
++namespace device {
++namespace V3_4 {
++namespace implementation {
++
++extern "C" int sync_wait(int fd, int timeout);
++
++VFrame::VFrame(uint32_t w, uint32_t h, uint32_t fourcc) :
++    mWidth(w), mHeight(h), mFourcc(fourcc) {}
++
++VFrame::~VFrame() {}
++
++int VFrame::allocate(YCbCrLayout* out) {
++    std::lock_guard<std::mutex> lk(mLock);
++    if ((mWidth % 2) || (mHeight % 2)) {
++        ALOGE("%s: bad dimension %dx%d (not multiple of 2)", __FUNCTION__, mWidth, mHeight);
++        return -EINVAL;
++    }
++
++    uint32_t dataSize = mWidth * mHeight * 3 / 2; // YUV420
++    if (mData.size() != dataSize) {
++        mData.resize(dataSize);
++    }
++
++    if (out != nullptr) {
++        out->y = mData.data();
++        out->yStride = mWidth;
++        uint8_t* cbStart = mData.data() + mWidth * mHeight;
++        uint8_t* crStart = cbStart + mWidth * mHeight / 4;
++        out->cb = cbStart;
++        out->cr = crStart;
++        out->cStride = mWidth / 2;
++        out->chromaStep = 1;
++    }
++    return 0;
++}
++
++int VFrame::getData(uint8_t** outData, size_t* dataSize) {
++    YCbCrLayout layout;
++    int ret = allocate(&layout);
++    if (ret != 0) {
++        return ret;
++    }
++    *outData = mData.data();
++    *dataSize = mData.size();
++    return 0;
++}
++
++int VFrame::getLayout(YCbCrLayout* out) {
++    IMapper::Rect noCrop = {0, 0,
++        static_cast<int32_t>(mWidth),
++        static_cast<int32_t>(mHeight)};
++    return getCroppedLayout(noCrop, out);
++}
++
++int VFrame::getCroppedLayout(const IMapper::Rect& rect, YCbCrLayout* out) {
++    if (out == nullptr) {
++        ALOGE("%s: null out", __FUNCTION__);
++        return -1;
++    }
++
++    std::lock_guard<std::mutex> lk(mLock);
++    if ((rect.left + rect.width) > static_cast<int>(mWidth) ||
++            (rect.top + rect.height) > static_cast<int>(mHeight) ||
++            (rect.left % 2) || (rect.top % 2) || (rect.width % 2) || (rect.height % 2)) {
++        ALOGE("%s: bad rect left %d top %d w %d h %d", __FUNCTION__,
++                rect.left, rect.top, rect.width, rect.height);
++        return -1;
++    }
++
++    out->y = mData.data() + mWidth * rect.top + rect.left;
++    out->yStride = mWidth;
++    uint8_t* cbStart = mData.data() + mWidth * mHeight;
++    uint8_t* crStart = cbStart + mWidth * mHeight / 4;
++    out->cb = cbStart + mWidth * rect.top / 4 + rect.left / 2;
++    out->cr = crStart + mWidth * rect.top / 4 + rect.left / 2;
++    out->cStride = mWidth / 2;
++    out->chromaStep = 1;
++    return 0;
++}
++
++VirtualCamera* VirtualCamera::sInstance = NULL;
++
++VirtualCamera::VirtualCamera() {
++    mInputThread = new InputThread();
++    mInputThread->run("VirtualCameraInput", PRIORITY_DISPLAY);
++}
++
++VirtualCamera::~VirtualCamera() {
++    sInstance = NULL;
++    if (mInputThread) {
++        mInputThread->requestExit();
++        mInputThread->join();
++        mInputThread.clear();
++    }
++}
++
++void VirtualCamera::setHandleImporter(HandleImporter *importer) {
++    mImporter = importer;
++}
++
++void VirtualCamera::setCameraCallbackOps(camera3_callback_ops_t *callback) {
++    mCallback = callback;
++}
++
++static void copyYCbCrLayout(const YCbCrLayout& out, const YCbCrLayout& in, const Size& sz) {
++    size_t width = sz.width;
++    size_t height = sz.height;
++
++    char *dst = static_cast<char*>(out.y);
++    char *src = static_cast<char*>(in.y);
++    for (int y = 0; y < height; y++) {
++        std::memcpy(dst, src, width);
++        dst += out.yStride;
++        src += in.yStride;
++    }
++
++    dst = static_cast<char*>(out.cb);
++    src = static_cast<char*>(in.cb);
++    for (int y = 0; y < height/2; y++) {
++        for (int x = 0; x < width/2; x++) {
++            dst[out.chromaStep * x] = src[in.chromaStep * x];
++        }
++        dst += out.cStride;
++        src += in.cStride;
++    }
++
++    dst = static_cast<char*>(out.cr);
++    src = static_cast<char*>(in.cr);
++    for (int y = 0; y < height/2; y++) {
++        for (int x = 0; x < width/2; x++) {
++            dst[out.chromaStep * x] = src[in.chromaStep * x];
++        }
++        dst += out.cStride;
++        src += in.cStride;
++    }
++}
++
++bool VirtualCamera::readFrame(YCbCrLayout& outLayout, const Size& sz) {
++    uint8_t *frameData;
++    size_t frameSize;
++    sp<VFrame> frame = mInputThread->getFrame();
++    if (frame == nullptr)
++        return false;
++
++    frame->getData(&frameData, &frameSize);
++
++    size_t width = frame->mWidth;
++    size_t height = frame->mHeight;
++    size_t size = width*height*3/2;
++    size_t outsize = sz.width*sz.height*3/2;
++    size_t maxsize = size > outsize ? size : outsize;
++
++    char *buf1 = new char[maxsize];
++    char *buf2 = new char[maxsize];
++
++    YCbCrLayout nv12;
++    nv12.yStride = width;
++    nv12.cStride = width;
++    nv12.chromaStep = 2;
++    nv12.y = frameData;
++    nv12.cb = (char*)nv12.y + width * height;
++    nv12.cr = (char*)nv12.cb + 1;
++
++    if (sz.width == width && sz.height == height) {
++        copyYCbCrLayout(outLayout, nv12, sz);
++        goto out;
++    }
++
++    YCbCrLayout i420;
++    i420.yStride = width;
++    i420.cStride = width / 2;
++    i420.chromaStep = 1;
++    i420.y = buf2;
++    i420.cb = (char*)i420.y + width * height;
++    i420.cr = (char*)i420.cb + width * height / 4;
++
++    ALOGE("%s: NV12ToI420", __FUNCTION__);
++    libyuv::NV12ToI420(
++        static_cast<uint8_t*>(nv12.y),
++        nv12.yStride,
++        static_cast<uint8_t*>(nv12.cb),
++        nv12.cStride,
++        static_cast<uint8_t*>(i420.y),
++        i420.yStride,
++        static_cast<uint8_t*>(i420.cb),
++        i420.cStride,
++        static_cast<uint8_t*>(i420.cr),
++        i420.cStride,
++        width,
++        height
++        );
++
++    YCbCrLayout i420Scaled;
++    i420Scaled.yStride = sz.width;
++    i420Scaled.cStride = sz.width / 2;
++    i420Scaled.chromaStep = 1;
++    i420Scaled.y = buf1;
++    i420Scaled.cb = (char*)i420Scaled.y + sz.width * sz.height;
++    i420Scaled.cr = (char*)i420Scaled.cb + sz.width * sz.height / 4;
++
++    ALOGE("%s: I420Scale", __FUNCTION__);
++    libyuv::I420Scale(
++        static_cast<uint8_t*>(i420.y),
++        i420.yStride,
++        static_cast<uint8_t*>(i420.cb),
++        i420.cStride,
++        static_cast<uint8_t*>(i420.cr),
++        i420.cStride,
++        width,
++        height,
++        static_cast<uint8_t*>(i420Scaled.y),
++        i420Scaled.yStride,
++        static_cast<uint8_t*>(i420Scaled.cb),
++        i420Scaled.cStride,
++        static_cast<uint8_t*>(i420Scaled.cr),
++        i420Scaled.cStride,
++        sz.width,
++        sz.height,
++        libyuv::FilterMode::kFilterNone
++        );
++
++    ALOGE("%s: I420ToNV12", __FUNCTION__);
++    libyuv::I420ToNV12(
++        static_cast<uint8_t*>(i420Scaled.y),
++        i420Scaled.yStride,
++        static_cast<uint8_t*>(i420Scaled.cb),
++        i420Scaled.cStride,
++        static_cast<uint8_t*>(i420Scaled.cr),
++        i420Scaled.cStride,
++        static_cast<uint8_t*>(outLayout.y),
++        outLayout.yStride,
++        static_cast<uint8_t*>(outLayout.cb),
++        outLayout.cStride,
++        sz.width,
++        sz.height
++        );
++
++out:
++    delete[] buf1;
++    delete[] buf2;
++
++    return true;
++}
++
++static const uint32_t FLEX_YUV_GENERIC = static_cast<uint32_t>('F') |
++                                        static_cast<uint32_t>('L') << 8 | static_cast<uint32_t>('E') << 16 |
++                                        static_cast<uint32_t>('X') << 24;
++
++static uint32_t getFourCcFromLayout(const YCbCrLayout& layout) {
++    intptr_t cb = reinterpret_cast<intptr_t>(layout.cb);
++    intptr_t cr = reinterpret_cast<intptr_t>(layout.cr);
++    if (std::abs(cb - cr) == 1 && layout.chromaStep == 2) {
++        // Interleaved format
++        if (layout.cb > layout.cr) {
++            return V4L2_PIX_FMT_NV21;
++        } else {
++            return V4L2_PIX_FMT_NV12;
++        }
++    } else if (layout.chromaStep == 1) {
++        // Planar format
++        if (layout.cb > layout.cr) {
++            return V4L2_PIX_FMT_YVU420; // YV12
++        } else {
++            return V4L2_PIX_FMT_YUV420; // YU12
++        }
++    } else {
++        return FLEX_YUV_GENERIC;
++    }
++}
++
++static const char *getFourCcStringFromLayout(const YCbCrLayout& layout) {
++    uint32_t cc = getFourCcFromLayout(layout);
++    switch (cc) {
++    case V4L2_PIX_FMT_NV21:
++        return "NV21";
++    case V4L2_PIX_FMT_NV12:
++        return "NV12";
++    case V4L2_PIX_FMT_YVU420:
++        return "YV12";
++    case V4L2_PIX_FMT_YUV420:
++        return "YU12";
++    default:
++        return "FLEX";
++    }
++}
++
++void VirtualCamera::fillVirtualData(int num, const camera3_stream_buffer_t *buffers) {
++    std::unique_lock<std::mutex> lk(mBufferLock);
++
++    for (size_t i = 0; i < num; i++) {
++        ALOGI("%s: %zu >>>>>", __FUNCTION__, i);
++        auto outBuf = &buffers[i];
++
++        if (outBuf->acquire_fence > 0) {
++            sync_wait(outBuf->acquire_fence, 500);
++            ::close(outBuf->acquire_fence);
++        }
++
++        IMapper::Rect rect {0, 0,
++            static_cast<int32_t>(outBuf->stream->width),
++            static_cast<int32_t>(outBuf->stream->height)};
++        uint32_t usage = outBuf->stream->usage |
++            graphics::common::V1_0::BufferUsage::CPU_WRITE_OFTEN |
++            graphics::common::V1_0::BufferUsage::CAMERA_OUTPUT;
++        int format = outBuf->stream->format;
++        int rotation = outBuf->stream->rotation;
++        int type = outBuf->stream->stream_type;
++
++        uint32_t width = outBuf->stream->width;
++        uint32_t height = outBuf->stream->height;
++
++        ALOGI("%s: buffer %p", __FUNCTION__, outBuf->buffer);
++
++        if (format == (int)PixelFormat::BLOB) {
++            ALOGI("%s: unsupport format", __FUNCTION__);
++            continue;
++        }
++
++        YCbCrLayout outLayout = mImporter->lockYCbCr(*(outBuf->buffer), usage, rect);
++        ALOGI("%s: outLayout y %p cb %p cr %p y_str %d c_str %d c_step %d %s",
++                __FUNCTION__, outLayout.y, outLayout.cb, outLayout.cr,
++                outLayout.yStride, outLayout.cStride, outLayout.chromaStep,
++                getFourCcStringFromLayout(outLayout));
++
++        if (!readFrame(outLayout, Size{width, height}))
++            ALOGE("%s: failed to readFrame", __FUNCTION__);
++
++        ALOGI("%s: width %d height %d rotation %d format 0x%x usage 0x%x type %d",
++                __FUNCTION__, width, height, rotation, format, usage, type);
++
++        mImporter->unlock(*(outBuf->buffer));
++        ALOGI("%s: <<<<<", __FUNCTION__);
++    }
++
++    lk.unlock();
++}
++
++void VirtualCamera::processCaptureResult(const camera3_capture_result_t *result) {
++    ((void)(result));
++    //fillVirtualData(result->num_output_buffers, result->output_buffers);
++}
++/*
++void VirtualCamera::processPartialMetaResult() {
++}
++void VirtualCamera::processMetaResult() {
++}
++void VirtualCamera::processImageResult() {
++}
++*/
++status_t VirtualCamera::processCaptureRequest(const camera3_capture_request_t *request) {
++    //return -EINVAL;
++    fillVirtualData(request->num_output_buffers, request->output_buffers);
++
++    V3_2::CameraMetadata metadata;
++    ::android::hardware::camera::common::V1_0::helper::CameraMetadata md;
++    md = request->settings;
++
++    nsecs_t timestamp = systemTime(SYSTEM_TIME_MONOTONIC);
++    int64_t syncFrameNumber = request->frame_number;
++
++    md.update(ANDROID_SENSOR_TIMESTAMP, &timestamp, 1);
++    md.update(ANDROID_SYNC_FRAME_NUMBER, &syncFrameNumber, 1);
++    const camera_metadata_t *settings = md.getAndLock();
++
++    if (1) {
++        std::shared_ptr<camera3_capture_result> hal_result = std::make_shared<camera3_capture_result>();
++        hal_result->frame_number = request->frame_number;
++        hal_result->result = settings; 
++        hal_result->num_output_buffers = 0;
++        hal_result->partial_result = 1;
++        hal_result->num_physcam_metadata = 0;
++        mCallback->process_capture_result(mCallback, hal_result.get());
++    }
++    if (1) {
++        std::shared_ptr<camera3_capture_result> hal_result = std::make_shared<camera3_capture_result>();
++        hal_result->frame_number = request->frame_number;
++        hal_result->result = settings; 
++        hal_result->num_output_buffers = 0;
++        hal_result->partial_result = 2;
++        hal_result->num_physcam_metadata = 0;
++        mCallback->process_capture_result(mCallback, hal_result.get());
++    }
++    if (1) {
++        camera3_notify_msg msg;
++        msg.message.shutter.frame_number = request->frame_number;
++        msg.message.shutter.timestamp = timestamp;
++        msg.type = CAMERA3_MSG_SHUTTER;
++        mCallback->notify(mCallback, &msg);
++    }
++    if (1) {
++        std::shared_ptr<camera3_capture_result> hal_result = std::make_shared<camera3_capture_result>();
++        hal_result->frame_number = request->frame_number;
++        hal_result->output_buffers = request->output_buffers;
++        hal_result->num_output_buffers = request->num_output_buffers;
++        hal_result->partial_result = 0;
++        hal_result->num_physcam_metadata = 0;
++        mCallback->process_capture_result(mCallback, hal_result.get());
++    }
++
++    md.unlock(settings);
++
++    return OK;
++}
++
++VirtualCamera::InputThread::InputThread() {
++    mPipe = NULL;
++}
++
++VirtualCamera::InputThread::~InputThread() {
++    if (mPipe != NULL)
++        fclose(mPipe);
++}
++
++bool VirtualCamera::InputThread::threadLoop() {
++    uint8_t *data;
++    size_t size;
++
++    if (exitPending()) {
++        return false;
++    }
++
++    if (mPipe == NULL) {
++        mPipe = fopen("/data/vendor/camera/fifo", "r");
++        if (mPipe == NULL) {
++            ALOGE("%s: failed to open FIFO: %s", __FUNCTION__, strerror(errno));
++            return true;
++        }
++    }
++
++    sp<VFrame> frame = new VFrame(1440, 1080);
++    frame->getData(&data, &size);
++
++    if (fread(data, size, 1, mPipe) != 1) {
++        ALOGE("%s: skip one frame", __FUNCTION__);
++        return true;
++    }
++
++    ALOGI("%s: read one frame", __FUNCTION__);
++
++    std::unique_lock<std::mutex> lk(mFrameListLock);
++    if (mFrameList.size() >= 8)
++        mFrameList.pop_front();
++    mFrameList.push_back(frame);
++
++    mFrameListCond.notify_one();
++
++    return true;
++}
++
++sp<VFrame> VirtualCamera::InputThread::getFrame() {
++    std::unique_lock<std::mutex> lk(mFrameListLock);
++    while (mFrameList.empty()) {
++        if (exitPending()) {
++            return nullptr;
++        }
++
++        mFrameListCond.wait(lk);
++    }
++    sp<VFrame> frame = mFrameList.front();
++    mFrameList.pop_front();
++    return frame;
++}
++
++} // namespace implementation
++}  // namespace V3_4
++}  // namespace device
++}  // namespace camera
++}  // namespace hardware
++}  // namespace android
+diff --git a/camera/device/3.4/default/include/device_v3_4_impl/CameraDeviceSession.h b/camera/device/3.4/default/include/device_v3_4_impl/CameraDeviceSession.h
+index 280c4bec4..685d8b67d 100644
+--- a/camera/device/3.4/default/include/device_v3_4_impl/CameraDeviceSession.h
++++ b/camera/device/3.4/default/include/device_v3_4_impl/CameraDeviceSession.h
+@@ -34,6 +34,7 @@
+ #include "hardware/camera3.h"
+ #include "hardware/camera_common.h"
+ #include "utils/Mutex.h"
++#include "VirtualCamera.h"
+ 
+ namespace android {
+ namespace hardware {
+@@ -71,6 +72,7 @@ struct CameraDeviceSession : public V3_3::implementation::CameraDeviceSession {
+     virtual sp<V3_2::ICameraDeviceSession> getInterface() override {
+         return new TrampolineSessionInterface_3_4(this);
+     }
++    VirtualCamera *VirtualCamera;
+ 
+ protected:
+     // Methods from v3.3 and earlier will trampoline to inherited implementation
+diff --git a/camera/device/3.4/default/include/device_v3_4_impl/VirtualCamera.h b/camera/device/3.4/default/include/device_v3_4_impl/VirtualCamera.h
+new file mode 100644
+index 000000000..3c5160a9a
+--- /dev/null
++++ b/camera/device/3.4/default/include/device_v3_4_impl/VirtualCamera.h
+@@ -0,0 +1,122 @@
++#ifndef ANDROID_HARDWARE_CAMERA_DEVICE_VIRTUAL_CAMERA_H
++#define ANDROID_HARDWARE_CAMERA_DEVICE_VIRTUAL_CAMERA_H
++
++#include <android/hardware/camera/device/3.2/ICameraDevice.h>
++#include <android/hardware/camera/device/3.4/ICameraDeviceSession.h>
++#include <android/hardware/camera/device/3.4/ICameraDeviceCallback.h>
++#include <../../3.3/default/CameraDeviceSession.h>
++#include <../../3.3/default/include/convert.h>
++#include <hidl/Status.h>
++#include <map>
++#include <list>
++#include <unordered_set>
++#include <unordered_map>
++#include "utils/Thread.h"
++#include <linux/videodev2.h>
++
++namespace android {
++namespace hardware {
++namespace camera {
++namespace device {
++namespace V3_4 {
++namespace implementation {
++
++using namespace ::android::hardware::camera::device;
++using ::android::hardware::graphics::common::V1_0::PixelFormat;
++using ::android::hardware::camera::device::V3_2::CaptureRequest;
++using ::android::hardware::camera::device::V3_2::StreamType;
++using ::android::hardware::camera::device::V3_4::StreamConfiguration;
++using ::android::hardware::camera::device::V3_4::HalStreamConfiguration;
++using ::android::hardware::camera::device::V3_4::ICameraDeviceSession;
++using ::android::hardware::camera::device::V3_4::ICameraDeviceCallback;
++using ::android::hardware::camera::common::V1_0::Status;
++using ::android::hardware::camera::common::V1_0::helper::HandleImporter;
++using ::android::hardware::kSynchronizedReadWrite;
++using ::android::hardware::MessageQueue;
++using ::android::hardware::MQDescriptorSync;
++using ::android::hardware::Return;
++using ::android::hardware::Void;
++using ::android::hardware::hidl_vec;
++using ::android::hardware::hidl_string;
++using ::android::sp;
++using ::android::Mutex;
++
++struct Size {
++    uint32_t width;
++    uint32_t height;
++};
++
++class VFrame : public VirtualLightRefBase {
++    public:
++        const uint32_t mWidth;
++        const uint32_t mHeight;
++        const uint32_t mFourcc;
++
++        VFrame(uint32_t w, uint32_t h, uint32_t fourcc = V4L2_PIX_FMT_YUV420);
++        ~VFrame() override;
++
++        virtual int getData(uint8_t** outData, size_t* dataSize);
++
++        int allocate(YCbCrLayout* out = nullptr);
++        int getLayout(YCbCrLayout* out);
++        int getCroppedLayout(const IMapper::Rect&, YCbCrLayout* out);
++    private:
++        std::mutex mLock;
++        std::vector<uint8_t> mData;
++};
++
++struct VirtualCamera : public virtual RefBase {
++
++    static VirtualCamera *getInstance() {
++        if (sInstance == NULL)
++            sInstance = new VirtualCamera();
++        return sInstance;
++    }
++
++    VirtualCamera();
++    virtual ~VirtualCamera();
++
++    void setCameraCallbackOps(camera3_callback_ops_t *callback);
++    void setHandleImporter(HandleImporter *importer);
++    status_t processCaptureRequest(const camera3_capture_request_t *request);
++    void processCaptureResult(const camera3_capture_result_t *result);
++
++    struct OutputThread : public android::Thread {
++        virtual bool threadLoop() override;
++    };
++
++    struct InputThread : public android::Thread {
++        InputThread();
++        virtual ~InputThread();
++        virtual bool threadLoop() override;
++        sp<VFrame> getFrame();
++
++    protected:
++        std::list<sp<VFrame>> mFrameList;
++        mutable std::mutex mFrameListLock;
++        std::condition_variable mFrameListCond;
++
++        FILE *mPipe;
++    };
++
++protected:
++    void fillVirtualData(int num, const camera3_stream_buffer_t *buffers);
++    bool readFrame(YCbCrLayout& outLayout, const Size& sz);
++
++    mutable std::mutex mBufferLock;
++
++    HandleImporter *mImporter;
++    camera3_callback_ops_t *mCallback;
++
++    static VirtualCamera *sInstance;
++    sp<InputThread> mInputThread;
++};
++
++}  // namespace implementation
++}  // namespace V3_4
++}  // namespace device
++}  // namespace camera
++}  // namespace hardware
++}  // namespace android
++
++#endif

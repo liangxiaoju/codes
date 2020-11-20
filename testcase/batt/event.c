@@ -74,6 +74,15 @@ ssize_t uevent_kernel_multicast_recv(int socket, void *buffer, size_t length)
     int n;
 
     n = recv(socket, buffer, length, 0);
+    if (n < 0)
+        return 0;
+
+    for (int i = 0; i < n; i++) {
+        if (((char*)buffer)[i] == '\0')
+            ((char*)buffer)[i] = ' ';
+    }
+    ((char*)buffer)[n] = '\0';
+
     INFO("socket (%d): %s\n", n, (char *)buffer);
 
     return n;
@@ -85,7 +94,7 @@ int parse_uevent(const char *msg, struct uevent *uevent)
     return 0;
 }
 
-void child(int argc, char *argv[])
+void child(int argc, const char *argv[])
 {
     char *argv_child[argc + 1];
 
@@ -99,7 +108,7 @@ void child(int argc, char *argv[])
     }
 }
 
-int run(char *fn)
+int run(char *fn, const char *args)
 {
     pid_t pid;
 
@@ -107,8 +116,8 @@ int run(char *fn)
     if (pid < 0) {
         return -1;
     } else if (pid == 0) {
-        int argc = 1;
-        char *argv[] = { fn, NULL };
+        int argc = 2;
+        const char *argv[] = { strdup(fn), strdup(args), NULL };
         child(argc, argv);
     } else {
         int status;
@@ -127,7 +136,7 @@ int process_uevent(event_t *event, struct uevent *uevent)
     int ret = 0;
 
     if (strstr(uevent->res, event->filter)) {
-        ret = run(event->filename);
+        ret = run(event->filename, uevent->res);
     }
 
     return ret;

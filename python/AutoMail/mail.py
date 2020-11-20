@@ -44,7 +44,7 @@ class Email:
         if not self._debug:
             smtp = smtplib.SMTP(self._host)
             if self._passwd:
-                smtp.login(self._sender.split("@")[0], self._passwd)
+                smtp.login(self._user.split("@")[0], self._passwd)
             smtp.sendmail(self._user, list(set(to_addrs)) + list(set(cc_addrs)), self._msg.as_string())
             smtp.quit()
 
@@ -76,7 +76,7 @@ def main():
             help="who the mail CC to", default="")
     parser.add_option("--attach", dest="attachment",
             help="attachments for the mail", default="")
-   
+
     (options, args) = parser.parse_args()
 
     from_addr = options.from_addr

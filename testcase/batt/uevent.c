@@ -13,12 +13,15 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#define ERROR(fmt, arg...) do { fprintf(stderr, fmt, ##arg); fflush(stderr); } while(0)
+#define INFO(fmt, arg...) do { fprintf(stdout, fmt, ##arg); fflush(stdout); } while(0)
+#define NOTICE(fmt, arg...) do { fprintf(stdout, fmt, ##arg); fflush(stdout); } while(0)
 
 static int uevent_init()
 {
 	struct sockaddr_nl addr;
 	int sz = 64 * 1024;
-        int on = 1;
+    int on = 1;
 	int fd;
 
 	memset(&addr, 0, sizeof(addr));
@@ -28,35 +31,94 @@ static int uevent_init()
 
 	fd = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
 	if (fd < 0) {
-		printf("Failed to create socket !\n");
+		ERROR("Failed to create socket !\n");
 		return -1;
 	}
 	setsockopt(fd, SOL_SOCKET, SO_RCVBUFFORCE, &sz, sizeof(sz));
 	setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on));
 
-
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		printf("Failed to bind socket !\n");
+		ERROR("Failed to bind socket !\n");
 		close(fd);
 		return -1;
 	}
 	return fd;
 }
 
+bool isMatch(const char *buf, int length, const char *match)
+{
+    const char *field = buf;
+    const char *end = buf + length + 1;
 
-int main()
+    do {
+        if (strstr(field, match))
+            return true;
+        field += strlen(field) + 1;
+    } while (field < end);
+
+    return false;
+}
+
+const char *getKey(const char *buf, int length, const char *key)
+{
+    const char *field = buf;
+    const char *end = buf + length + 1;
+
+    do {
+        if (strstr(field, key)) {
+            const char *equal = strchr(field, '=');
+            if (equal)
+                return equal + 1;
+        }
+
+        field += strlen(field) + 1;
+    } while (field < end);
+
+    return NULL;
+}
+
+void dump(const char *buf, int length)
+{
+    const char *field = buf;
+    const char *end = buf + length + 1;
+
+    INFO("\n+++\n");
+    do {
+        INFO("* %s\n", field);
+        field += strlen(field) + 1;
+    } while (field < end);
+    INFO("---\n");
+}
+
+int main(int argc, char *argv[])
 {
 	int fd, n;
 	char buf[1024] = { 0 };
+    bool debug = false;
+    char *match, *key;
+
+    if (argc == 1) {
+        debug = true;
+    } else if (argc == 3) {
+        match = strdup(argv[1]);
+        key = strdup(argv[2]);
+    } else {
+        ERROR("Illegal param!\n");
+        return -1;
+    }
 
 	fd = uevent_init();
 	if(fd < 0) {
-		printf("Failed to exec uevent_init !\n");
+		ERROR("Failed to exec uevent_init !\n");
 		return -1;
 	}
 
-	while ((n = recv(fd, buf, sizeof(buf), 0)) > 0) {
-		printf("socket (%d): %s\n", n, buf);
+	while ((n = recv(fd, buf, sizeof(buf)-1, 0)) > 0) {
+        if (debug) {
+            dump(buf, n);
+        } else if (isMatch(buf, n, match)) {
+            INFO("* %s = %s\n", key, getKey(buf, n, key));
+        }
 		memset(buf, 0, sizeof(buf));
 	}
 

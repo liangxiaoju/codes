@@ -18,8 +18,12 @@ struct usb_handle *usb_init(void)
 	libusb_init(&(handle->ctx));
 	libusb_set_debug(handle->ctx, 4);
 
+    /*
 	handle->dev = libusb_open_device_with_vid_pid(
 			handle->ctx, 0x1bbb, 0x9018);
+    */
+	handle->dev = libusb_open_device_with_vid_pid(
+			handle->ctx, 0x05c6, 0x9091);
 	if (!handle->dev) {
 		fprintf(stderr, "Failed to open usb device.\n");
 		free(handle);

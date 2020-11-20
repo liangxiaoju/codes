@@ -123,7 +123,7 @@ public:
 			}
 		}
 
-		//printf("add: %s\n", inet_ntoa(from.sin_addr));
+		printf("add: %s\n", inet_ntoa(from.sin_addr));
 		packet = RoomPacket(msg);
 		packet["ADDR"] = inet_ntoa(from.sin_addr);
 
